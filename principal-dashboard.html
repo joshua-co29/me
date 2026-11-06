@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Principal Dashboard – Sentinel Edu</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Product+Sans:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style/style.css">
+    <style>
+        :root { --accent-lilac: #9f96ee; }
+        body { background: #f5f6fa; font-family: 'Google Sans', sans-serif; }
+        .dash-wrap { max-width: 1280px; margin: 0 auto; padding: 2rem 1.5rem; }
+        .page-header { margin-bottom: 2rem; }
+        .page-header h1 { font-size: 1.6rem; font-weight: 700; color: #111; letter-spacing: -0.02em; margin: 0 0 0.3rem; }
+        .page-header p  { font-size: 0.9rem; color: #6b7280; margin: 0; }
+
+        /* Section label */
+        .section-label { font-size: 0.72rem; font-weight: 700; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.75rem; }
+
+        .metrics-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+        .metric-card { background: #fff; border: 1px solid rgba(0,0,0,0.08); border-radius: 4px; padding: 1.4rem 1.5rem; }
+        .metric-label { font-size: 0.78rem; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; }
+        .metric-value { font-size: 2rem; font-weight: 800; color: #111; letter-spacing: -0.03em; line-height: 1; }
+        .metric-sub   { font-size: 0.78rem; color: #9ca3af; margin-top: 0.3rem; }
+
+        .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
+        @media (max-width: 900px) { .two-col { grid-template-columns: 1fr; } }
+
+        .section-card { background: #fff; border: 1px solid rgba(0,0,0,0.08); border-radius: 4px; margin-bottom: 1.5rem; overflow: hidden; }
+        .section-head { padding: 1.1rem 1.5rem; border-bottom: 1px solid rgba(0,0,0,0.07); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; }
+        .section-head h2 { font-size: 0.97rem; font-weight: 700; color: #111; margin: 0; }
+        .section-head span { font-size: 0.8rem; color: #9ca3af; }
+
+        .data-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+        .data-table th { padding: 0.7rem 1.5rem; text-align: left; font-size: 0.72rem; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: 0.06em; border-bottom: 1px solid rgba(0,0,0,0.07); background: #fafafa; white-space: nowrap; }
+        .data-table td { padding: 0.9rem 1.5rem; border-bottom: 1px solid rgba(0,0,0,0.05); color: #222; vertical-align: middle; }
+        .data-table tr:last-child td { border-bottom: none; }
+        .data-table tr:hover td { background: #fafafe; }
+
+        .badge-l1 { font-weight: 700; color: #b45309; }
+        .badge-l2 { font-weight: 700; color: #ea580c; }
+        .badge-l3 { font-weight: 700; color: #991b1b; }
+        .badge-l0 { font-weight: 600; color: #6b7280; }
+
+        .status-pill { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; }
+        .status-open      { background: #fef3c7; color: #92400e; }
+        .status-resolved  { background: #d1fae5; color: #065f46; }
+        .status-escalated { background: #fee2e2; color: #991b1b; }
+
+        /* Role tags */
+        .role-tag { display: inline-block; padding: 2px 7px; border-radius: 2px; font-size: 0.72rem; font-weight: 700; }
+        .role-teacher    { background: #e0f2fe; color: #075985; }
+        .role-dean       { background: #fee2e2; color: #991b1b; }
+        .role-counselor  { background: #d1fae5; color: #065f46; }
+
+        /* Class chips in teacher-class table */
+        .class-chips { display: flex; flex-wrap: wrap; gap: 0.3rem; }
+        .class-chip-sm { display: inline-block; padding: 2px 7px; background: #eeecfb; color: #5243aa; border-radius: 2px; font-size: 0.72rem; font-weight: 700; }
+
+        /* Mini level bars */
+        .mini-chart { padding: 1.2rem 1.5rem; }
+        .bar-row { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.6rem; }
+        .bar-label { width: 70px; font-size: 0.78rem; color: #555; font-weight: 600; text-align: right; flex-shrink: 0; }
+        .bar-track { flex: 1; background: #f3f4f6; border-radius: 2px; height: 16px; overflow: hidden; }
+        .bar-fill  { height: 100%; border-radius: 2px; transition: width 0.6s ease; }
+        .bar-count { width: 28px; font-size: 0.8rem; font-weight: 700; color: #111; }
+
+        /* Search */
+        .search-wrap { padding: 0.75rem 1.5rem; border-bottom: 1px solid rgba(0,0,0,0.06); }
+        .search-input { width: 100%; max-width: 360px; padding: 0.55rem 0.9rem; border: 1px solid rgba(0,0,0,0.13); border-radius: 3px; font-family: inherit; font-size: 0.88rem; outline: none; }
+        .search-input:focus { border-color: var(--accent-lilac); }
+
+        /* Tab strip */
+        .tab-strip { display: flex; gap: 0; border-bottom: 1px solid rgba(0,0,0,0.08); padding: 0 1.5rem; background: #fafafa; }
+        .tab-btn { padding: 0.7rem 1.1rem; font-size: 0.85rem; font-weight: 600; color: #6b7280; border: none; border-bottom: 2px solid transparent; background: none; cursor: pointer; font-family: inherit; margin-bottom: -1px; transition: color 0.15s; }
+        .tab-btn.active { color: #111; border-bottom-color: #111; }
+
+        .empty-state { padding: 2.5rem; text-align: center; color: #9ca3af; font-size: 0.9rem; }
+        .loading-text { padding: 1.5rem; text-align: center; color: #9ca3af; }
+    </style>
+</head>
+<body>
+
+<header class="site-header">
+    <a href="index.html" class="brand-logo">Sentinel Edu<span class="brand-dot"></span></a>
+    <nav><ul class="nav-links"></ul></nav>
+    <div class="header-actions"></div>
+</header>
+
+<main class="dash-wrap">
+    <div class="page-header">
+        <h1 id="pageTitle">Principal Dashboard</h1>
+        <p id="pageSubtitle">Loading school overview…</p>
+    </div>
+
+    <!-- School-wide metrics -->
+    <div class="section-label">School Overview</div>
+    <div class="metrics-row" id="metricsRow">
+        <div class="metric-card"><div class="metric-label">Total Students</div><div class="metric-value" id="metStudents">–</div><div class="metric-sub">enrolled this term</div></div>
+        <div class="metric-card"><div class="metric-label">Teaching Staff</div><div class="metric-value" id="metStaff">–</div><div class="metric-sub">assigned to classes</div></div>
+        <div class="metric-card"><div class="metric-label">Total Incidents</div><div class="metric-value" id="metIncidents">–</div><div class="metric-sub">logged this term</div></div>
+        <div class="metric-card"><div class="metric-label">Open Cases</div><div class="metric-value" id="metOpen">–</div><div class="metric-sub">awaiting action</div></div>
+        <div class="metric-card"><div class="metric-label">Level 3 (Critical)</div><div class="metric-value" id="metL3" style="color:#991b1b;">–</div><div class="metric-sub">high severity</div></div>
+        <div class="metric-card"><div class="metric-label">Total Classes</div><div class="metric-value" id="metClasses">–</div><div class="metric-sub">across all forms</div></div>
+    </div>
+
+    <!-- Two-column: Level breakdown + Top students -->
+    <div class="two-col">
+        <div class="section-card" style="margin-bottom:0;">
+            <div class="section-head"><h2>Incident Level Breakdown</h2></div>
+            <div class="mini-chart" id="levelChart"><div class="loading-text">Loading…</div></div>
+        </div>
+        <div class="section-card" id="students" style="margin-bottom:0; scroll-margin-top: 90px;">
+            <div class="section-head">
+                <h2>Students with Most Incidents</h2>
+                <span>Top 5 Focus List</span>
+            </div>
+            <div id="topStudents"><div class="loading-text">Loading…</div></div>
+        </div>
+    </div>
+
+    <!-- Teacher → Class Assignments -->
+    <div style="margin-top:1.5rem;" class="section-label">Staff & Class Assignments</div>
+    <div class="section-card" id="staff" style="scroll-margin-top: 90px;">
+        <div class="section-head">
+            <h2>Teacher–Class Assignments</h2>
+            <span id="teacherCount">–</span>
+        </div>
+        <div id="teacherClassBody"><div class="loading-text">Loading…</div></div>
+    </div>
+
+    <!-- Staff Roster -->
+    <div class="section-card">
+        <div class="section-head">
+            <h2>Staff Roster</h2>
+            <span id="staffCount">–</span>
+        </div>
+        <div id="staffBody"><div class="loading-text">Loading…</div></div>
+    </div>
+
+    <!-- All Incidents with tabs -->
+    <div class="section-label">Incident Records</div>
+    <div class="section-card" id="incidents" style="scroll-margin-top: 90px;">
+        <div class="section-head">
+            <h2>All School Incidents</h2>
+            <span id="incidentCount">–</span>
+        </div>
+        <div class="tab-strip">
+            <button class="tab-btn active" onclick="switchTab('all', this)">All</button>
+            <button class="tab-btn" onclick="switchTab('open', this)">Open</button>
+            <button class="tab-btn" onclick="switchTab('escalated', this)">Escalated</button>
+            <button class="tab-btn" onclick="switchTab('resolved', this)">Resolved</button>
+        </div>
+        <div class="search-wrap">
+            <input type="text" class="search-input" id="searchInput" placeholder="Search by student, form, or incident type…" oninput="applyFilters()">
+        </div>
+        <div id="incidentsBody"><div class="loading-text">Loading incidents…</div></div>
+    </div>
+</main>
+
+<script src="auth.js"></script>
+<script>
+const API_BASE = 'http://localhost:5000';
+
+let currentUser  = null;
+let allIncidents = [];
+let allStaff     = [];
+let allClasses   = [];
+let allStudents  = [];
+let activeTab    = 'all';
+
+document.addEventListener('DOMContentLoaded', async () => {
+    currentUser = getLoggedInUserData();
+    if (!currentUser) { window.location.href = 'login.html'; return; }
+    if (!(currentUser.role || '').toLowerCase().includes('principal')) {
+        redirectByRole(currentUser); return;
+    }
+
+    document.getElementById('pageTitle').textContent = `${currentUser.schoolName || 'School'} – Principal`;
+    document.getElementById('pageSubtitle').textContent =
+        `${currentUser.schoolName || 'Your School'} · Full School Overview`;
+
+    await Promise.all([loadIncidents(), loadStaff(), loadClasses(), loadStudents()]);
+    buildTeacherClassTable();
+    renderStaffRoster();
+    updateMetrics();
+    renderLevelChart();
+    renderTopStudents();
+    renderIncidents();
+
+    if (window.location.hash) {
+        const target = document.querySelector(window.location.hash);
+        if (target) {
+            setTimeout(() => target.scrollIntoView({ behavior: 'smooth', block: 'start' }), 200);
+        }
+    }
+});
+
+async function loadIncidents() {
+    try {
+        const res = await fetch(`${API_BASE}/api/incidents/by-school/${currentUser.schoolId}`);
+        allIncidents = await res.json();
+        if (!Array.isArray(allIncidents)) allIncidents = [];
+    } catch { allIncidents = []; }
+}
+async function loadStaff() {
+    try {
+        const res = await fetch(`${API_BASE}/api/staff/by-school/${currentUser.schoolId}`);
+        allStaff = await res.json();
+        if (!Array.isArray(allStaff)) allStaff = [];
+    } catch { allStaff = []; }
+}
+async function loadClasses() {
+    try {
+        const res = await fetch(`${API_BASE}/api/classes/by-school/${currentUser.schoolId}`);
+        allClasses = await res.json();
+        if (!Array.isArray(allClasses)) allClasses = [];
+    } catch { allClasses = []; }
+}
+async function loadStudents() {
+    try {
+        const res = await fetch(`${API_BASE}/api/students/by-school/${currentUser.schoolId}`);
+        allStudents = await res.json();
+        if (!Array.isArray(allStudents)) allStudents = [];
+    } catch { allStudents = []; }
+}
+
+function updateMetrics() {
+    const teachers = allStaff.filter(s => (s.role||'').toLowerCase().includes('teacher'));
+    document.getElementById('metStudents').textContent  = allStudents.length;
+    document.getElementById('metStaff').textContent     = teachers.length;
+    document.getElementById('metIncidents').textContent = allIncidents.length;
+    document.getElementById('metOpen').textContent      = allIncidents.filter(i => (i.status||'').toLowerCase() === 'open').length;
+    document.getElementById('metL3').textContent        = allIncidents.filter(i => parseInt(i.level || i.triageLevel) === 3).length;
+    document.getElementById('metClasses').textContent   = allClasses.length;
+}
+
+function renderLevelChart() {
+    const el = document.getElementById('levelChart');
+    const levels = [1,2,3];
+    const counts = levels.map(l => allIncidents.filter(i => parseInt(i.level || i.triageLevel) === l).length);
+    const max = Math.max(...counts, 1);
+    const colors = { 1:'#f59e0b', 2:'#ea580c', 3:'#991b1b' };
+    const labels = { 1:'Level 1', 2:'Level 2', 3:'Level 3' };
+    el.innerHTML = levels.map((l,i) => {
+        const pct = Math.round((counts[i]/max)*100);
+        return `<div class="bar-row">
+            <div class="bar-label">${labels[l]}</div>
+            <div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${colors[l]};"></div></div>
+            <div class="bar-count">${counts[i]}</div>
+        </div>`;
+    }).join('');
+}
+
+function renderTopStudents() {
+    const el = document.getElementById('topStudents');
+    const counts = {};
+    allIncidents.forEach(i => {
+        const n = i.studentName || 'Unknown';
+        counts[n] = (counts[n] || { count:0, form:i.form });
+        counts[n].count++;
+    });
+    const top5 = Object.entries(counts).sort((a,b) => b[1].count - a[1].count).slice(0,5);
+    if (!top5.length) { el.innerHTML = '<div class="empty-state">No data.</div>'; return; }
+    const maxC = top5[0][1].count;
+    el.innerHTML = `<table class="data-table">
+        <thead><tr><th>Student</th><th>Form</th><th>Incidents</th></tr></thead>
+        <tbody>${top5.map(([name, d]) => `<tr>
+            <td><strong>${name}</strong></td>
+            <td style="color:#5243aa;font-weight:600;">${d.form||'–'}</td>
+            <td>${d.count}</td>
+        </tr>`).join('')}</tbody>
+    </table>`;
+}
+
+function buildTeacherClassTable() {
+    const el = document.getElementById('teacherClassBody');
+    const teachers = allStaff.filter(s => (s.role||'').toLowerCase().includes('teacher'));
+    document.getElementById('teacherCount').textContent = `${teachers.length} teacher${teachers.length!==1?'s':''}`;
+
+    if (!teachers.length) { el.innerHTML = '<div class="empty-state">No teacher data available.</div>'; return; }
+
+    el.innerHTML = `<table class="data-table">
+        <thead><tr><th>Teacher</th><th>Subjects</th><th>Assigned Classes</th><th>Incidents Logged</th></tr></thead>
+        <tbody>${teachers.map(t => {
+            const tClasses = allClasses.filter(c => c.teacherId === t.id);
+            const incCount = allIncidents.filter(i => i.loggedById === t.id).length;
+            const subjects = Array.isArray(t.subjects) ? t.subjects.join(', ') : (t.subjects || '–');
+            const chips    = tClasses.map(c =>
+                `<span class="class-chip-sm">${c.label||c.id}</span>`
+            ).join('');
+            return `<tr>
+                <td><strong>${t.name}</strong></td>
+                <td style="color:#6b7280;font-size:0.82rem;">${subjects}</td>
+                <td><div class="class-chips">${chips || '<span style="color:#9ca3af;">None assigned</span>'}</div></td>
+                <td>${incCount}</td>
+            </tr>`;
+        }).join('')}</tbody>
+    </table>`;
+}
+
+function renderStaffRoster() {
+    const el = document.getElementById('staffBody');
+    document.getElementById('staffCount').textContent = `${allStaff.length} member${allStaff.length!==1?'s':''}`;
+
+    if (!allStaff.length) { el.innerHTML = '<div class="empty-state">No staff data.</div>'; return; }
+
+    const roleClass = r => {
+        const rl = (r||'').toLowerCase();
+        if (rl.includes('teacher')) return 'role-teacher';
+        if (rl.includes('dean'))    return 'role-dean';
+        if (rl.includes('counsel')) return 'role-counselor';
+        return '';
+    };
+    el.innerHTML = `<table class="data-table">
+        <thead><tr><th>Name</th><th>Role</th><th>Email</th></tr></thead>
+        <tbody>${allStaff.map(s => `<tr>
+            <td><strong>${s.name}</strong></td>
+            <td><span class="role-tag ${roleClass(s.role)}">${s.role||'Staff'}</span></td>
+            <td style="color:#6b7280;font-size:0.82rem;">${s.email||'–'}</td>
+        </tr>`).join('')}</tbody>
+    </table>`;
+}
+
+function renderIncidents() {
+    const el = document.getElementById('incidentsBody');
+    const q  = (document.getElementById('searchInput').value||'').toLowerCase();
+
+    let filtered = allIncidents;
+    if (activeTab !== 'all') filtered = filtered.filter(i => (i.status||'').toLowerCase() === activeTab);
+    if (q) filtered = filtered.filter(i =>
+        (i.studentName||'').toLowerCase().includes(q) ||
+        (i.form||'').toLowerCase().includes(q) ||
+        (i.matrix||'').toLowerCase().includes(q)
+    );
+
+    document.getElementById('incidentCount').textContent = `${filtered.length} record${filtered.length!==1?'s':''}`;
+
+    if (!filtered.length) { el.innerHTML = '<div class="empty-state">No incidents match this filter.</div>'; return; }
+
+    el.innerHTML = `<table class="data-table">
+        <thead><tr>
+            <th>Date</th><th>Student</th><th>Form</th><th>Incident</th>
+            <th>Level</th><th>Status</th><th>Logged By</th>
+        </tr></thead>
+        <tbody>${filtered.map(inc => `<tr>
+            <td style="white-space:nowrap;">${fmtDate(inc.date)}</td>
+            <td><strong>${inc.studentName||'–'}</strong></td>
+            <td style="color:#5243aa;font-weight:600;">${inc.form||'–'}</td>
+            <td>${inc.matrix||'–'}</td>
+            <td>${lvlBadge(inc.level||inc.triageLevel)}</td>
+            <td>${statusPill(inc.status)}</td>
+            <td style="color:#6b7280;font-size:0.82rem;">${inc.loggedBy||'–'}</td>
+        </tr>`).join('')}</tbody>
+    </table>`;
+}
+
+function switchTab(tab, btn) {
+    activeTab = tab;
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderIncidents();
+}
+
+function applyFilters() { renderIncidents(); }
+
+function lvlBadge(lvl) {
+    const n = parseInt(lvl)||0;
+    if (n===1) return `<span class="badge-l1">Level 1</span>`;
+    if (n===2) return `<span class="badge-l2">Level 2</span>`;
+    if (n===3) return `<span class="badge-l3">Level 3</span>`;
+    return `<span class="badge-l0">–</span>`;
+}
+function statusPill(s) {
+    const v=(s||'').toLowerCase();
+    if (v==='open')      return `<span class="status-pill status-open">Open</span>`;
+    if (v==='resolved')  return `<span class="status-pill status-resolved">Resolved</span>`;
+    if (v==='escalated') return `<span class="status-pill status-escalated">Escalated</span>`;
+    return `<span class="status-pill status-open">Open</span>`;
+}
+function fmtDate(d) {
+    if (!d) return '–';
+    try { return new Date(d).toLocaleDateString('en-TT', { day:'numeric', month:'short', year:'numeric' }); }
+    catch { return d; }
+}
+</script>
+</body>
+</html>
+

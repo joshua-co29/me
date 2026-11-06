@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff Profile - Sentinel Edu</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Product+Sans:wght@400;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="style/style.css">
+    <style>
+        .profile-page-main {
+            padding: 3rem 4rem 5rem 4rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .profile-header-banner {
+            background: #ffffff;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .profile-user-left {
+            display: flex;
+            align-items: center;
+            gap: 1.8rem;
+        }
+
+        .profile-avatar-large {
+            width: 76px;
+            height: 76px;
+            border-radius: 50%;
+            background: var(--accent-lilac);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(159, 150, 238, 0.35);
+        }
+
+        .profile-avatar-large svg {
+            width: 40px;
+            height: 40px;
+            fill: #ffffff;
+        }
+
+        .profile-name {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #111111;
+            margin-bottom: 0.25rem;
+            letter-spacing: -0.02em;
+        }
+
+        .profile-role-tag {
+            display: inline-block;
+            padding: 0.25rem 0.8rem;
+            background: #eeecfb;
+            color: #5243aa;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            border-radius: 2px;
+        }
+
+        .profile-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .profile-stat-card {
+            background: #ffffff;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            padding: 1.8rem;
+        }
+
+        .profile-stat-label {
+            font-size: 0.85rem;
+            color: #6c717e;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            margin-bottom: 0.5rem;
+        }
+
+        .profile-stat-value {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #111111;
+        }
+
+        .profile-stat-sub {
+            font-size: 0.82rem;
+            color: #15803d;
+            margin-top: 0.3rem;
+        }
+
+        .profile-details-card {
+            background: #ffffff;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            padding: 2.2rem;
+            margin-bottom: 2rem;
+        }
+
+        .profile-section-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #111111;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.8rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .profile-field-row {
+            display: grid;
+            grid-template-columns: 220px 1fr;
+            padding: 0.9rem 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+            font-size: 0.92rem;
+        }
+
+        .profile-field-label {
+            font-weight: 600;
+            color: #555555;
+        }
+
+        .profile-field-value {
+            color: #111111;
+            font-weight: 500;
+        }
+
+        .btn-action-outline {
+            padding: 0.65rem 1.4rem;
+            border: 1px solid #111111;
+            background: transparent;
+            color: #111111;
+            font-size: 0.9rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s ease;
+        }
+
+        .btn-action-outline:hover {
+            background: #111111;
+            color: #ffffff;
+        }
+
+        .btn-action-danger {
+            padding: 0.65rem 1.4rem;
+            border: 1px solid #dc2626;
+            background: transparent;
+            color: #dc2626;
+            font-size: 0.9rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s ease;
+        }
+
+        .btn-action-danger:hover {
+            background: #dc2626;
+            color: #ffffff;
+        }
+
+        @media (max-width: 850px) {
+            .profile-page-main {
+                padding: 1.5rem;
+            }
+            .profile-stats-grid {
+                grid-template-columns: 1fr;
+            }
+            .profile-field-row {
+                grid-template-columns: 1fr;
+                gap: 0.25rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Site Header -->
+    <header class="site-header">
+        <a href="index.html" class="brand-logo">
+            Sentinel Edu<span class="brand-dot"></span>
+        </a>
+
+        <nav>
+            <ul class="nav-links">
+                <li><a href="dashboard.html">Dashboard</a></li>
+                <li><a href="students.html">Students</a></li>
+                <li><a href="incidents.html">Incidents</a></li>
+                <li><a href="engine.html">Engine</a></li>
+            </ul>
+        </nav>
+
+        <div class="header-actions">
+            <!-- Populated dynamically by auth.js -->
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="profile-page-main">
+
+        <!-- Top Profile Banner -->
+        <div class="profile-header-banner">
+            <div class="profile-user-left">
+                <div class="profile-avatar-large">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="profile-name" id="profNameDisplay">Dean R. Mohammed</h1>
+                    <div>
+                        <span class="profile-role-tag" id="profRoleDisplay">Dean of Discipline</span>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 0.8rem; align-items: center; flex-wrap: wrap;">
+                <a href="dashboard.html" id="btnBackToDashboard" class="btn-action-outline">&larr; Back to My Dashboard</a>
+                <button onclick="logoutUser()" class="btn-action-danger">Log Out</button>
+            </div>
+        </div>
+
+        <!-- Stat Cards -->
+        <div class="profile-stats-grid">
+            <div class="profile-stat-card">
+                <div class="profile-stat-label">Institutional Status</div>
+                <div class="profile-stat-value">Authorized Staff</div>
+                <div class="profile-stat-sub">&bull; Active Ministry Credentials</div>
+            </div>
+            <div class="profile-stat-card">
+                <div class="profile-stat-label">Database Connection</div>
+                <div class="profile-stat-value" style="font-size: 1.15rem;">moe-app-d6ce9-database</div>
+                <div class="profile-stat-sub">&bull; Synchronized Live</div>
+            </div>
+            <div class="profile-stat-card">
+                <div class="profile-stat-label">Assigned School</div>
+                <div class="profile-stat-value" id="profSchoolDisplay" style="font-size: 1.15rem;">Port of Spain North Secondary</div>
+                <div class="profile-stat-sub" id="profDistrictDisplay" style="color: #6c717e;">St. George East District</div>
+            </div>
+        </div>
+
+        <!-- Account & Security Details -->
+        <div class="profile-details-card">
+            <div class="profile-section-title">
+                <span>Account Information</span>
+                <span style="font-size: 0.82rem; font-weight: 500; color: #15803d;">System Verified</span>
+            </div>
+
+            <div class="profile-field-row">
+                <div class="profile-field-label">Full Name</div>
+                <div class="profile-field-value" id="fieldFullName">Dean R. Mohammed</div>
+            </div>
+
+            <div class="profile-field-row">
+                <div class="profile-field-label">Official Email</div>
+                <div class="profile-field-value" id="fieldEmail">dean.mohammed@moe.edu.tt</div>
+            </div>
+
+            <div class="profile-field-row">
+                <div class="profile-field-label">System Role</div>
+                <div class="profile-field-value" id="fieldRole">Dean of Discipline</div>
+            </div>
+
+            <div class="profile-field-row">
+                <div class="profile-field-label">Access Level</div>
+                <div class="profile-field-value" id="fieldAccessLevel">Level 1, Level 2, & Level 3 Matrix Resolution Clearance</div>
+            </div>
+
+            <div class="profile-field-row" id="rowAssignments">
+                <div class="profile-field-label">Jurisdiction / Scope</div>
+                <div class="profile-field-value" id="fieldScope">All Forms</div>
+            </div>
+
+            <div class="profile-field-row">
+                <div class="profile-field-label">Authentication Mode</div>
+                <div class="profile-field-value">Direct Database Verification (No Google Authenticator required)</div>
+            </div>
+
+            <div class="profile-field-row" style="border-bottom: none;">
+                <div class="profile-field-label">Cloud Project</div>
+                <div class="profile-field-value">moe-app-d6ce9 (Northern Virginia / us-east4)</div>
+            </div>
+        </div>
+
+        <!-- Quick Access Incidents -->
+        <div class="profile-details-card">
+            <div class="profile-section-title">
+                <span>Quick Actions</span>
+            </div>
+            <div id="quickActionsContainer" style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                <!-- Populated dynamically based on role -->
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Shared Header & Auth Script -->
+    <script src="auth.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const data = getLoggedInUserData();
+            if (data && data.name) {
+                let name = data.name;
+                let role = data.role || 'Staff Member';
+                let email = data.email || `${name.toLowerCase().replace(/[^a-z0-9]/g, '.')}@moe.edu.tt`;
+
+                if (name.includes('(') && name.includes(')')) {
+                    const match = name.match(/^(.*?)\s*\((.*?)\)$/);
+                    if (match) {
+                        name = match[1].trim();
+                        if (!data.role) role = match[2].trim();
+                    }
+                }
+
+                document.getElementById('profNameDisplay').textContent = name;
+                document.getElementById('profRoleDisplay').textContent = role;
+                document.getElementById('fieldFullName').textContent = name;
+                document.getElementById('fieldRole').textContent = role;
+                document.getElementById('fieldEmail').textContent = email;
+
+                // Set back button to user's role-specific dashboard
+                const dashUrl = getDashboardUrl(data);
+                const backBtn = document.getElementById('btnBackToDashboard');
+                if (backBtn) {
+                    backBtn.href = dashUrl;
+                }
+
+                // School display
+                if (data.schoolName) {
+                    document.getElementById('profSchoolDisplay').textContent = data.schoolName;
+                } else if (role.toLowerCase().includes('ministry')) {
+                    document.getElementById('profSchoolDisplay').textContent = 'Ministry of Education Headquarters';
+                    document.getElementById('profDistrictDisplay').textContent = 'National Central Office';
+                }
+
+                // Scope & Access Level
+                const r = role.toLowerCase();
+                const scopeEl = document.getElementById('fieldScope');
+                const accessEl = document.getElementById('fieldAccessLevel');
+                const actionsCont = document.getElementById('quickActionsContainer');
+
+                if (r.includes('teacher')) {
+                    accessEl.textContent = 'Class Incident Reporting & Class Roll Access';
+                    const classes = data.assignedClassIds ? data.assignedClassIds.join(', ') : 'Assigned Classes';
+                    scopeEl.textContent = `Assigned Classes: ${classes}`;
+                    actionsCont.innerHTML = `
+                        <a href="teacher-dashboard.html" class="btn-action-outline">Open Teacher Dashboard</a>
+                        <a href="teacher-dashboard.html#classes" class="btn-action-outline">View My Classes</a>
+                        <a href="teacher-dashboard.html#class-roll" class="btn-action-outline">View Class Students</a>
+                        <a href="teacher-dashboard.html#incidents" class="btn-action-outline">+ Log New Incident</a>
+                    `;
+                } else if (r.includes('dean')) {
+                    accessEl.textContent = 'Dean of Discipline — Form Level Resolution Clearance';
+                    const forms = data.coversForms ? data.coversForms.join(', ') : 'Assigned Forms';
+                    scopeEl.textContent = `Form Jurisdiction: ${forms}`;
+                    actionsCont.innerHTML = `
+                        <a href="dean-dashboard.html" class="btn-action-outline">Open Dean Dashboard</a>
+                        <a href="dean-dashboard.html#students" class="btn-action-outline">View Form Students</a>
+                        <a href="dean-dashboard.html#incidents" class="btn-action-outline">View Incident Reports</a>
+                    `;
+                } else if (r.includes('counsel') || r.includes('guidance')) {
+                    accessEl.textContent = 'Guidance & Student Support — School-Wide Triage Clearance';
+                    scopeEl.textContent = 'School-Wide Student Welfare & Intervention Oversight';
+                    actionsCont.innerHTML = `
+                        <a href="counselor-dashboard.html" class="btn-action-outline">Open Counselor Dashboard</a>
+                        <a href="counselor-dashboard.html#welfare" class="btn-action-outline">Students at Risk</a>
+                        <a href="counselor-dashboard.html#incidents" class="btn-action-outline">All School Incidents</a>
+                    `;
+                } else if (r.includes('principal')) {
+                    accessEl.textContent = 'Institutional Head — Full School Administrative Authority';
+                    scopeEl.textContent = 'Complete School Oversight & Staff-Class Allocation';
+                    actionsCont.innerHTML = `
+                        <a href="principal-dashboard.html" class="btn-action-outline">Open Principal Dashboard</a>
+                        <a href="principal-dashboard.html#staff" class="btn-action-outline">Staff & Class Assignments</a>
+                        <a href="principal-dashboard.html#students" class="btn-action-outline">School Student Roll</a>
+                        <a href="principal-dashboard.html#incidents" class="btn-action-outline">School Incidents</a>
+                    `;
+                } else {
+                    accessEl.textContent = 'National Ministry Level — Full Cross-School Access';
+                    scopeEl.textContent = 'All Educational Districts & Registered Schools';
+                    actionsCont.innerHTML = `
+                        <a href="dashboard.html" class="btn-action-outline">National Dashboard</a>
+                        <a href="students.html" class="btn-action-outline">National Student Registry</a>
+                        <a href="incidents.html" class="btn-action-outline">National Incident Matrix</a>
+                    `;
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>
+

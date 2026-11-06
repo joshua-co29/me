@@ -1,0 +1,1744 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Sentinel Edu</title>
+
+    <!-- Google Fonts: Google Sans & Product Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Product+Sans:wght@400;700&display=swap"
+        rel="stylesheet">
+
+    <!-- External Stylesheet -->
+    <link rel="stylesheet" href="style/style.css">
+    <!-- Chart.js for Incident Analytics Graphs -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            background-color: #ffffff;
+            color: #121316;
+            font-family: var(--font-family);
+        }
+
+        /* Ensure brand logo never wraps */
+        .site-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1.5rem;
+            flex-wrap: nowrap;
+        }
+
+        .brand-logo {
+            white-space: nowrap !important;
+            flex-shrink: 0 !important;
+            display: inline-flex !important;
+            align-items: baseline !important;
+        }
+
+        .header-actions {
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+        }
+
+        .dash-page-wrapper {
+            max-width: 1400px;
+            margin: 2.5rem auto 4rem;
+            padding: 0 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2.5rem;
+        }
+
+        /* =========================================================
+           TOP HERO BANNER (Square Boxes / Cream Editorial Palette)
+           ========================================================= */
+        .hero-banner-card {
+            background: transparent;
+            color: #121316;
+            border-radius: 0px;
+            border: none;
+            padding: 3rem 0;
+            display: grid;
+            grid-template-columns: 1.15fr 1fr;
+            gap: 2.5rem;
+            align-items: center;
+        }
+
+        .hero-banner-left {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .hero-greeting {
+            font-size: 1.15rem;
+            font-weight: 500;
+            color: #1a1a1a;
+            margin-bottom: 0.8rem;
+        }
+
+        .hero-big-title {
+            font-size: clamp(2.3rem, 3.8vw, 3.3rem);
+            font-weight: 700;
+            line-height: 1.12;
+            letter-spacing: -0.03em;
+            color: #111111;
+            margin-bottom: 2.2rem;
+        }
+
+        .btn-view-progress {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            background: #111111;
+            color: #ffffff;
+            padding: 0.9rem 1.6rem;
+            border-radius: 0px; /* Square */
+            font-size: 0.95rem;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            width: fit-content;
+            transition: all 0.25s ease;
+            text-decoration: none;
+        }
+
+        .btn-view-progress:hover {
+            background: #272a33;
+            transform: translateY(-2px);
+        }
+
+        /* 3 Top Cards on the right */
+        .hero-banner-cards-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.2rem;
+            height: 100%;
+        }
+
+        .top-mini-card {
+            border-radius: 0px; /* Square corners */
+            padding: 1.5rem 1.4rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 250px;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            transition: transform 0.25s ease;
+        }
+
+        .top-mini-card:hover {
+            transform: translateY(-4px);
+        }
+
+        .card-num {
+            font-size: 0.88rem;
+            font-weight: 700;
+            opacity: 0.85;
+            letter-spacing: 0.05em;
+        }
+
+        .card-title-text {
+            font-size: 1.35rem;
+            font-weight: 700;
+            line-height: 1.25;
+            margin-top: 0.4rem;
+            letter-spacing: -0.02em;
+        }
+
+        /* 3 Top Card Colors from the design picture */
+        .card-cream {
+            background: #ffffff;
+            color: #141518;
+        }
+
+        .card-yellow {
+            background: #e59e19;
+            color: #111111;
+        }
+
+        .card-purple {
+            background: #6f58ad;
+            color: #ffffff;
+        }
+
+        .card-illustration-wrap {
+            margin-top: auto;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            height: 120px;
+            width: 100%;
+        }
+
+        .card-illustration-wrap svg {
+            max-height: 110px;
+            width: auto;
+        }
+
+        /* =========================================================
+           METRICS SUMMARY GRID (Square Cards, Crisp Borders)
+           ========================================================= */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+
+        .metric-card {
+            background: transparent;
+            border: none;
+            border-radius: 0px;
+            padding: 1.8rem 0.5rem;
+        }
+
+        .metric-card:hover {
+            opacity: 0.85;
+        }
+
+        .metric-card-label {
+            font-size: 0.85rem;
+            color: #5e6472;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.6rem;
+        }
+
+        .metric-card-value {
+            font-size: 2.3rem;
+            font-weight: 800;
+            color: #111111;
+            line-height: 1.1;
+        }
+
+        .metric-card-sub {
+            font-size: 0.82rem;
+            margin-top: 0.5rem;
+            color: #10b981;
+        }
+
+        /* =========================================================
+           MAIN DASHBOARD SPLIT: INCIDENTS TABLE (LEFT) & SCHEDULED/TOOLS (RIGHT)
+           ========================================================= */
+        .dash-split-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1.65fr) minmax(310px, 1fr);
+            gap: 2.2rem;
+            background: transparent;
+            color: #121316;
+            border-radius: 0px;
+            border: none;
+            padding: 1rem 0;
+            align-items: start;
+        }
+
+        .table-left-column {
+            min-width: 0;
+            width: 100%;
+            align-self: start;
+        }
+
+        .analytics-column {
+            min-width: 0;
+            width: 100%;
+            position: sticky;
+            top: 90px;
+            align-self: start;
+        }
+
+        .section-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            padding-bottom: 1.5rem;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+        }
+
+        .section-subtitle {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #717682;
+            margin-bottom: 0.3rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .section-main-title {
+            font-size: 1.95rem;
+            font-weight: 700;
+            color: #111111;
+            letter-spacing: -0.02em;
+        }
+
+        .table-progress-box {
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+        }
+
+        .progress-bar-track {
+            width: 140px;
+            height: 8px;
+            background: #ded7c8;
+            border-radius: 0px; /* Square track */
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            width: 82%;
+            background: #6f58ad;
+            border-radius: 0px;
+        }
+
+        .progress-percentage {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #111111;
+        }
+
+        /* Table Design */
+        .incident-table-wrap {
+            width: 100%;
+            overflow-x: auto;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            background: #ffffff;
+            border-radius: 0px; /* Square */
+        }
+
+        .incident-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        .incident-table th {
+            font-size: 0.82rem;
+            color: #4b5162;
+            background: #f5f5f5;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            padding: 1rem 1.1rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+            font-weight: 700;
+        }
+
+        .incident-table td {
+            padding: 1.1rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+            font-size: 0.92rem;
+            color: #1a1a1a;
+            vertical-align: middle;
+        }
+
+        .incident-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .incident-table tr:hover td {
+            background-color: #f9f9f9;
+        }
+
+        .school-name-text {
+            font-weight: 600;
+            color: #111111;
+            display: block;
+        }
+
+        .school-district-sub {
+            font-size: 0.8rem;
+            color: #6c717e;
+        }
+
+        /* Severity Labels (clean text without enclosing box) */
+        .status-badge {
+            display: inline-block;
+            padding: 0;
+            background: transparent;
+            border: none;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .status-level-1 { background: transparent; color: #b45309; border: none; } /* Level 1: Soft Amber / Muted Yellow */
+        .status-level-2 { background: transparent; color: #ea580c; border: none; } /* Level 2: Warm Orange */
+        .status-level-3 { background: transparent; color: #991b1b; border: none; } /* Level 3: Deep Red / Crimson */
+
+        /* CRUD Action Buttons */
+        .table-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .btn-action-edit,
+        .btn-action-delete {
+            padding: 0.35rem 0.65rem;
+            font-size: 0.78rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            border: 1px solid rgba(0, 0, 0, 0.15);
+            background: #ffffff;
+            color: #111111;
+            transition: all 0.15s ease;
+            text-decoration: none;
+            border-radius: 0px;
+        }
+
+        .btn-action-edit:hover {
+            background: #111111;
+            color: #ffffff;
+            border-color: #111111;
+        }
+
+        .btn-action-delete {
+            color: #991b1b;
+            border-color: rgba(153, 27, 27, 0.25);
+        }
+
+        .btn-action-delete:hover {
+            background: #991b1b;
+            color: #ffffff;
+            border-color: #991b1b;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            padding: 1rem;
+        }
+
+        .modal-overlay.is-active {
+            display: flex;
+        }
+
+        .modal-card {
+            background: #ffffff;
+            width: 100%;
+            max-width: 520px;
+            padding: 2rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-card h3 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 0.3rem;
+            color: #111111;
+            letter-spacing: -0.01em;
+        }
+
+        .modal-card p.modal-sub {
+            font-size: 0.88rem;
+            color: #6a6f7c;
+            margin-bottom: 1.4rem;
+        }
+
+        .modal-form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+            margin-bottom: 1.1rem;
+        }
+
+        .modal-form-group label {
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: #4b5162;
+        }
+
+        .modal-form-group input,
+        .modal-form-group select,
+        .modal-form-group textarea {
+            padding: 0.65rem 0.85rem;
+            font-size: 0.92rem;
+            font-family: inherit;
+            border: 1px solid rgba(0, 0, 0, 0.2);
+            border-radius: 0;
+            outline: none;
+            color: #111111;
+        }
+
+        .modal-form-group input:focus,
+        .modal-form-group select:focus,
+        .modal-form-group textarea:focus {
+            border-color: #6f58ad;
+            box-shadow: 0 0 0 2px rgba(111, 88, 173, 0.15);
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.6rem;
+            margin-top: 1.6rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(0, 0, 0, 0.08);
+        }
+
+        .btn-modal-cancel {
+            padding: 0.65rem 1.2rem;
+            background: #ffffff;
+            color: #111111;
+            border: 1px solid rgba(0, 0, 0, 0.15);
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .btn-modal-cancel:hover {
+            background: #f5f5f5;
+        }
+
+        .btn-modal-save {
+            padding: 0.65rem 1.4rem;
+            background: #111111;
+            color: #ffffff;
+            border: 1px solid #111111;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .btn-modal-save:hover {
+            background: #2e3040;
+        }
+
+        /* =========================================================
+           INCIDENT ANALYTICS COLUMN (RIGHT) - 2 GRAPHS
+           ========================================================= */
+        .analytics-column,
+        .scheduled-column {
+            border-left: 1px solid rgba(0, 0, 0, 0.08);
+            padding-left: 2.2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.8rem;
+        }
+
+        .analytics-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.2rem;
+        }
+
+        .analytics-header h2 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #111111;
+            letter-spacing: -0.02em;
+        }
+
+        .analytics-see-all {
+            font-size: 0.92rem;
+            font-weight: 600;
+            color: #6a6f7c;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .analytics-see-all:hover {
+            color: #111111;
+        }
+
+        .analytics-chart-card {
+            background: #ffffff;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            border-radius: 0px; /* Square */
+            padding: 1.4rem 1.4rem 1.2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .chart-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .chart-subtitle {
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: #717682;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.2rem;
+        }
+
+        .chart-title {
+            font-size: 1.12rem;
+            font-weight: 700;
+            color: #111111;
+            letter-spacing: -0.01em;
+        }
+
+        .chart-pill-badge {
+            font-size: 0.82rem;
+            font-weight: 600;
+            padding: 0;
+            background: transparent;
+            color: #5e6472;
+            border: none;
+            letter-spacing: 0.02em;
+        }
+
+        .chart-pill-badge.badge-danger {
+            background: transparent;
+            color: #991b1b;
+            border: none;
+            font-weight: 700;
+        }
+
+        .chart-canvas-container {
+            position: relative;
+            width: 100%;
+            height: 180px;
+        }
+
+        .chart-legend-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 0.8rem;
+            border-top: 1px solid rgba(0, 0, 0, 0.06);
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            font-size: 0.82rem;
+            color: #4b5162;
+        }
+
+        .legend-item strong {
+            color: #111111;
+            font-weight: 700;
+        }
+
+        .legend-box {
+            width: 9px;
+            height: 9px;
+            border-radius: 0px; /* Square */
+            display: inline-block;
+        }
+
+        .legend-box.box-level-1 { background: #f59e0b; }
+        .legend-box.box-level-2 { background: #ea580c; }
+        .legend-box.box-level-3 { background: #991b1b; }
+
+        /* Responsive Breakpoints */
+        @media (max-width: 1200px) {
+            .site-header {
+                padding: 0 2rem;
+            }
+            .brand-logo {
+                font-size: 1.8rem;
+                white-space: nowrap;
+            }
+            .nav-links {
+                gap: 1.5rem;
+            }
+        }
+
+        @media (max-width: 1100px) {
+            .hero-banner-card {
+                grid-template-columns: 1fr;
+            }
+            .dash-split-grid {
+                grid-template-columns: minmax(0, 1.4fr) minmax(290px, 1fr);
+                gap: 1.5rem;
+            }
+        }
+
+        @media (max-width: 860px) {
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+            .dash-split-grid {
+                grid-template-columns: 1fr;
+            }
+            .analytics-column,
+            .scheduled-column {
+                border-left: none;
+                border-top: 1px solid rgba(0, 0, 0, 0.08);
+                padding-left: 0;
+                padding-top: 2rem;
+                position: static;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .dash-page-wrapper {
+                padding: 0 1rem;
+            }
+            .hero-banner-cards-row {
+                grid-template-columns: 1fr;
+            }
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Top Navigation Header -->
+    <header class="site-header">
+        <a href="index.html" class="brand-logo">
+            Sentinel Edu<span class="brand-dot"></span>
+        </a>
+
+        <nav>
+            <ul class="nav-links">
+                <li><a href="dashboard.html" style="font-weight: 700; color: #000;">Dashboard</a></li>
+                <li><a href="students.html">Students</a></li>
+                <li><a href="incidents.html">Incidents</a></li>
+                <li><a href="engine.html">Engine</a></li>
+            </ul>
+        </nav>
+
+        <div class="header-actions">
+            <!-- Dynamic header populates here via auth.js -->
+            <a href="login.html" class="login-btn">
+                <span class="login-avatar">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                    </svg>
+                </span>
+                Staff Login
+            </a>
+            <a href="signup.html" class="btn-enroll-header">Request Access</a>
+        </div>
+    </header>
+
+    <!-- MAIN DASHBOARD CONTENT -->
+    <main class="dash-page-wrapper">
+
+        <!-- =========================================================
+             TOP BAR: HERO BANNER (Square Boxes with 3 Colored Cards)
+             ========================================================= -->
+        <section class="hero-banner-card">
+            <!-- Left Headline Area -->
+            <div class="hero-banner-left">
+                <div class="hero-greeting" id="heroGreeting">Welcome back, Officer!</div>
+                <h1 class="hero-big-title">
+                    National Decision<br>Support &amp; Triage<br>Monitoring
+                </h1>
+                <a href="#incident-records" class="btn-view-progress">
+                    <span>View Incidents Table</span>
+                    <span>&#8599;</span>
+                </a>
+            </div>
+
+            <!-- Right 3 Mini Cards (Square) -->
+            <div class="hero-banner-cards-row">
+                <!-- Card 01: Active Cases (White/Cream card) -->
+                <div class="top-mini-card card-cream">
+                    <div>
+                        <div class="card-num">01</div>
+                        <div class="card-title-text">Active<br>Monitoring</div>
+                    </div>
+                    <div class="card-illustration-wrap">
+                        <svg viewBox="0 0 100 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="68" cy="20" r="8" fill="#e59e19"/>
+                            <path d="M64 16c2-4 9-2 9 2 0 1-2 3-5 3" stroke="#d94834" stroke-width="3" stroke-linecap="round"/>
+                            <path d="M54 36c2-8 12-10 18-5l6 14-8 6-4-8-3 10-12-3z" fill="#e59e19"/>
+                            <path d="M56 34L45 46l-8-2" stroke="#111" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M74 44l8 12" stroke="#111" stroke-width="3.5" stroke-linecap="round"/>
+                            <path d="M52 50l-14 42-12 12" stroke="#6f58ad" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M58 50l14 35 12 18" stroke="#6f58ad" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+                            <rect x="18" y="103" width="14" height="6" fill="#111"/>
+                            <rect x="80" y="102" width="14" height="6" fill="#111"/>
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Card 02: Educational Districts (Warm Amber/Yellow Card with wireframe globe) -->
+                <div class="top-mini-card card-yellow">
+                    <div>
+                        <div class="card-num">02</div>
+                        <div class="card-title-text">All School<br>Districts</div>
+                    </div>
+                    <div class="card-illustration-wrap">
+                        <svg viewBox="0 0 110 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="55" cy="65" r="42" stroke="#111111" stroke-width="2.5" fill="none"/>
+                            <ellipse cx="55" cy="65" rx="42" ry="16" stroke="#111111" stroke-width="2.5" fill="none"/>
+                            <ellipse cx="55" cy="65" rx="42" ry="30" stroke="#111111" stroke-width="2.5" fill="none"/>
+                            <path d="M55 23v84" stroke="#111111" stroke-width="2.5"/>
+                            <ellipse cx="55" cy="65" rx="20" ry="42" stroke="#111111" stroke-width="2.5" fill="none"/>
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Card 03: Ministry Priority (Royal Purple Card with Tower Graphic) -->
+                <div class="top-mini-card card-purple">
+                    <div>
+                        <div class="card-num">03</div>
+                        <div class="card-title-text">Ministry<br>Priority</div>
+                    </div>
+                    <div class="card-illustration-wrap">
+                        <svg viewBox="0 0 80 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M40 8l-8 26h16L40 8z" fill="#111111"/>
+                            <path d="M40 2v6" stroke="#111111" stroke-width="3"/>
+                            <rect x="28" y="34" width="24" height="28" rx="0" fill="#e59e19" stroke="#111111" stroke-width="2.5"/>
+                            <circle cx="34" cy="48" r="4.5" fill="#ffffff" stroke="#111111" stroke-width="1.8"/>
+                            <path d="M34 46v2h1.5" stroke="#111111" stroke-width="1.2"/>
+                            <circle cx="46" cy="48" r="4.5" fill="#ffffff" stroke="#111111" stroke-width="1.8"/>
+                            <path d="M46 46v2h1.5" stroke="#111111" stroke-width="1.2"/>
+                            <rect x="30" y="62" width="20" height="58" fill="#e59e19" stroke="#111111" stroke-width="2.5"/>
+                            <path d="M36 72v44M44 72v44" stroke="#111111" stroke-width="2.2"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- =========================================================
+             METRICS SECTION (Square Cards)
+             ========================================================= -->
+        <section class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-card-label">Active Students Monitored</div>
+                <div class="metric-card-value" id="dashActiveStudents">--</div>
+                <div class="metric-card-sub" id="dashActiveStudentsSub">&uarr; Loading live stats...</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-card-label">Open Incidents</div>
+                <div class="metric-card-value" id="dashOpenIncidents">--</div>
+                <div class="metric-card-sub" id="dashOpenIncidentsSub" style="color: #f59e0b;">Loading live count...</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-card-label">Triage Priority Level 3</div>
+                <div class="metric-card-value" id="dashPriorityL3">--</div>
+                <div class="metric-card-sub" id="dashPriorityL3Sub" style="color: #ef4444;">Loading live count...</div>
+            </div>
+        </section>
+
+        <!-- =========================================================
+             BOTTOM SECTION: SCHOOL INCIDENTS TABLE (LEFT) & SCHEDULED (RIGHT)
+             ========================================================= -->
+        <div id="incidents" style="scroll-margin-top: 90px;"></div>
+        <section class="dash-split-grid" id="incident-records" style="scroll-margin-top: 90px;">
+
+            <!-- LEFT: REAL-TIME INCIDENT LOGS TABLE -->
+            <div class="table-left-column">
+                <div class="section-header-row" style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <div class="section-subtitle">National Education Matrix</div>
+                        <h2 class="section-main-title">Recent School Incident Logs</h2>
+                    </div>
+                    <div>
+                        <button type="button" onclick="openCreateIncidentModal()" style="background: #111111; color: #ffffff; border: none; padding: 0.65rem 1.3rem; font-weight: 600; cursor: pointer; font-family: inherit; font-size: 0.88rem; display: inline-flex; align-items: center; gap: 0.4rem;">
+                            + Log Incident
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Incident Logs Table with Real School Examples -->
+                <div class="incident-table-wrap">
+                    <table class="incident-table">
+                        <thead>
+                            <tr>
+                                <th>Incident ID</th>
+                                <th>Student / Class</th>
+                                <th>Institution / School</th>
+                                <th>Discipline Matrix</th>
+                                <th>Status / Action</th>
+                                <th style="text-align: right;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dashboardIncidentsBody">
+                            <!-- Populated dynamically with live Supabase data & CRUD capabilities -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- RIGHT: INCIDENT ANALYTICS (2 GRAPHS) -->
+            <div class="analytics-column">
+                <div class="analytics-header">
+                    <h2>Analytics</h2>
+                    <a href="incidents.html" class="analytics-see-all">View all &nearr;</a>
+                </div>
+
+                <!-- GRAPH 1: TOTAL INCIDENTS -->
+                <div class="analytics-chart-card">
+                    <div class="chart-card-header">
+                        <div>
+                            <div class="chart-subtitle">7-Day Trend</div>
+                            <h3 class="chart-title">Total Incidents</h3>
+                        </div>
+                        <span class="chart-pill-badge">38 Active</span>
+                    </div>
+                    <div class="chart-canvas-container">
+                        <canvas id="totalIncidentsChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- GRAPH 2: INCIDENTS BY LEVEL (LEVEL 1, 2, 3) -->
+                <div class="analytics-chart-card">
+                    <div class="chart-card-header">
+                        <div>
+                            <div class="chart-subtitle">National Matrix Triage</div>
+                            <h3 class="chart-title">Incidents by Level</h3>
+                        </div>
+                        <span class="chart-pill-badge badge-danger">7 Level 3</span>
+                    </div>
+                    <div class="chart-canvas-container">
+                        <canvas id="incidentLevelsChart"></canvas>
+                    </div>
+                    <div class="chart-legend-row">
+                        <div class="legend-item"><span class="legend-box box-level-1"></span> Level 1: <strong>19</strong></div>
+                        <div class="legend-item"><span class="legend-box box-level-2"></span> Level 2: <strong>12</strong></div>
+                        <div class="legend-item"><span class="legend-box box-level-3"></span> Level 3: <strong>7</strong></div>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+    </main>
+
+    <!-- Modal for Editing Incident -->
+    <div class="modal-overlay" id="editIncidentModal">
+        <div class="modal-card">
+            <h3 id="modalIncidentTitle">Update Incident Record</h3>
+            <p class="modal-sub">Ministry Education Officer Administrative Update</p>
+            <form id="editIncidentForm" onsubmit="saveIncidentUpdate(event)">
+                <input type="hidden" id="editIncidentId">
+                <div class="modal-form-group">
+                    <label for="editStudentName">Student / Class</label>
+                    <input type="text" id="editStudentName" required>
+                </div>
+                <div class="modal-form-group">
+                    <label for="editSchool">Institution / School</label>
+                    <input type="text" id="editSchool" required>
+                </div>
+                <div class="modal-form-group">
+                    <label for="editDistrict">District</label>
+                    <input type="text" id="editDistrict" required>
+                </div>
+                <div class="modal-form-group">
+                    <label for="editMatrix">Discipline Matrix</label>
+                    <select id="editMatrix">
+                        <option value="Level 1 Matrix">Level 1 Matrix (Minor Infraction)</option>
+                        <option value="Level 2 Matrix">Level 2 Matrix (Moderate Violation)</option>
+                        <option value="Level 3 Matrix">Level 3 Matrix (Severe / Criminal)</option>
+                    </select>
+                </div>
+                <div class="modal-form-group">
+                    <label for="editAction">Status / Action Taken</label>
+                    <input type="text" id="editAction" required placeholder="e.g. Dean Formal Review">
+                </div>
+                <div class="modal-form-group">
+                    <label for="editStatus">Case Status</label>
+                    <select id="editStatus">
+                        <option value="Open">Open</option>
+                        <option value="Resolved">Resolved</option>
+                        <option value="Escalated">Escalated</option>
+                    </select>
+                </div>
+                <div class="modal-form-group">
+                    <label for="editDescription">Incident Description</label>
+                    <textarea id="editDescription" rows="3" placeholder="Brief circumstances..."></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-modal-cancel" onclick="closeEditModal()">Cancel</button>
+                    <button type="submit" class="btn-modal-save">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal for Logging Incident Directly from Dashboard -->
+    <div class="modal-overlay" id="createIncidentModal">
+        <div class="modal-card">
+            <h3>Log New Incident Record</h3>
+            <p class="modal-sub">National School Discipline Matrix Live Submission</p>
+            <form id="createIncidentForm" onsubmit="saveNewIncident(event)">
+                <div class="modal-form-group">
+                    <label for="createStudentName">Student Name / ID</label>
+                    <input type="text" id="createStudentName" placeholder="e.g. Marcus J. Williams" required>
+                </div>
+                <div class="modal-form-group">
+                    <label for="createForm">Student Form / Class</label>
+                    <input type="text" id="createForm" placeholder="e.g. Form 4-B" required>
+                </div>
+                <div class="modal-form-group">
+                    <label for="createSchool">School / Institution</label>
+                    <input type="text" id="createSchool" placeholder="e.g. Port of Spain North Secondary" required>
+                </div>
+                <div class="modal-form-group">
+                    <label for="createDistrict">Educational District</label>
+                    <select id="createDistrict" required>
+                        <option value="St. George East District">St. George East District</option>
+                        <option value="Victoria Educational District">Victoria Educational District</option>
+                        <option value="Caroni Educational District">Caroni Educational District</option>
+                        <option value="Tobago Educational District">Tobago Educational District</option>
+                        <option value="St. Patrick Educational District">St. Patrick Educational District</option>
+                        <option value="Nariva/Mayaro District">Nariva/Mayaro District</option>
+                    </select>
+                </div>
+                <div class="modal-form-group">
+                    <label for="createMatrix">Discipline Matrix Level</label>
+                    <select id="createMatrix">
+                        <option value="Level 1 Matrix">Level 1 Matrix (Minor Infraction)</option>
+                        <option value="Level 2 Matrix">Level 2 Matrix (Moderate Violation)</option>
+                        <option value="Level 3 Matrix">Level 3 Matrix (Severe / Criminal)</option>
+                    </select>
+                </div>
+                <div class="modal-form-group">
+                    <label for="createAction">Action Taken</label>
+                    <input type="text" id="createAction" placeholder="e.g. Dean Formal Review" required>
+                </div>
+                <div class="modal-form-group">
+                    <label for="createStatus">Case Status</label>
+                    <select id="createStatus">
+                        <option value="Open" selected>Open</option>
+                        <option value="Resolved">Resolved</option>
+                        <option value="Escalated">Escalated</option>
+                    </select>
+                </div>
+                <div class="modal-form-group">
+                    <label for="createDescription">Incident Description</label>
+                    <textarea id="createDescription" rows="3" placeholder="Brief circumstances..." required></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-modal-cancel" onclick="closeCreateIncidentModal()">Cancel</button>
+                    <button type="submit" class="btn-modal-save">Submit Incident</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Seed Database & Shared Header/Auth Script -->
+    <script src="data/seed.js"></script>
+    <script src="auth.js"></script>
+    <script>
+        let allIncidents = (window.SENTINEL_SEED_DATA && Array.isArray(window.SENTINEL_SEED_DATA.incidents))
+            ? [...window.SENTINEL_SEED_DATA.incidents]
+            : [];
+        let allStudents = (window.SENTINEL_SEED_DATA && Array.isArray(window.SENTINEL_SEED_DATA.students))
+            ? [...window.SENTINEL_SEED_DATA.students]
+            : [];
+        let chartTotal = null;
+        let chartLevels = null;
+
+        function getApiUrl(path) {
+            const base = (typeof API_BASE !== 'undefined' && API_BASE) ? API_BASE : 'http://localhost:5000';
+            if (window.location.protocol === 'http:' || window.location.protocol === 'https:') {
+                if (!window.location.port || window.location.port === '5000') {
+                    return path;
+                }
+            }
+            return `${base}${path.startsWith('/') ? '' : '/'}${path}`;
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const user = getLoggedInUser();
+            const greetingEl = document.getElementById('heroGreeting');
+            if (user && greetingEl) {
+                greetingEl.textContent = `Welcome back, ${user}!`;
+            }
+
+            // Instantly render initial data so metrics and table are NEVER 0 or blank
+            renderIncidentsTable(allIncidents);
+            renderAnalyticsCharts(allIncidents);
+            updateDashboardMetrics();
+
+            // Pull live updates from server and online Supabase database in background
+            loadDashboardData();
+
+            // Auto-refresh when tab gains focus
+            window.addEventListener('focus', () => {
+                loadDashboardData();
+            });
+        });
+
+        const SUPABASE_REST_URL = "https://wrumedevccqkopguaxdi.supabase.co/rest/v1";
+        const SUPABASE_ANON_KEY = "sb_publishable_zpd_lzgRqghcN-0X7qw7SA_I2hAZHXH";
+
+        async function fetchIncidentsLive() {
+            let list = [];
+
+            // 1. Try local server
+            const endpoints = [
+                'http://localhost:5000/api/incidents',
+                '/api/incidents'
+            ];
+            for (const ep of endpoints) {
+                try {
+                    const res = await fetch(ep);
+                    if (res.ok) {
+                        const data = await res.json();
+                        if (Array.isArray(data) && data.length > 0) {
+                            list = data;
+                            break;
+                        }
+                    }
+                } catch (_) {}
+            }
+
+            // 2. Direct online Supabase REST fetch
+            if (list.length === 0) {
+                try {
+                    const res = await fetch(`${SUPABASE_REST_URL}/incidents?select=*&order=created_at.desc`, {
+                        headers: {
+                            'apikey': SUPABASE_ANON_KEY,
+                            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+                        }
+                    });
+                    if (res.ok) {
+                        const raw = await res.json();
+                        if (Array.isArray(raw) && raw.length > 0) {
+                            list = raw.map(inc => ({
+                                id: inc.id,
+                                incidentId: inc.incident_id || inc.id,
+                                studentId: inc.student_id,
+                                studentName: inc.student_name,
+                                classId: inc.class_id,
+                                form: inc.form,
+                                schoolId: inc.school_id,
+                                school: inc.school || 'Port of Spain North Secondary',
+                                district: inc.district || 'St. George East District',
+                                matrix: inc.matrix || 'Level 1 Matrix',
+                                level: parseInt(inc.level || 1),
+                                action: inc.action || 'Under Review',
+                                description: inc.description || '',
+                                status: (inc.status && inc.status.toLowerCase() === 'resolved') ? 'Resolved' :
+                                        (inc.status && inc.status.toLowerCase() === 'escalated') ? 'Escalated' : 'Open',
+                                loggedById: inc.logged_by_id,
+                                loggedBy: inc.logged_by || 'Staff Member',
+                                date: inc.date || 'Oct 2026',
+                                createdAt: inc.created_at
+                            }));
+                        }
+                    }
+                } catch (err) {
+                    console.warn('[Supabase Direct REST Fetch]:', err.message);
+                }
+            }
+
+            // 3. Fallback to seed data or disk
+            if (list.length === 0) {
+                if (window.SENTINEL_SEED_DATA && Array.isArray(window.SENTINEL_SEED_DATA.incidents) && window.SENTINEL_SEED_DATA.incidents.length > 0) {
+                    list = [...window.SENTINEL_SEED_DATA.incidents];
+                } else {
+                    try {
+                        const res = await fetch('data/database.json');
+                        if (res.ok) {
+                            const db = await res.json();
+                            if (db && Array.isArray(db.incidents) && db.incidents.length > 0) {
+                                list = db.incidents;
+                            }
+                        }
+                    } catch (_) {}
+                }
+            }
+
+            return list;
+        }
+
+        async function fetchStudentsLive() {
+            // 1. Try local server
+            const endpoints = [
+                'http://localhost:5000/api/students',
+                '/api/students'
+            ];
+            for (const ep of endpoints) {
+                try {
+                    const res = await fetch(ep);
+                    if (res.ok) {
+                        const data = await res.json();
+                        if (Array.isArray(data) && data.length > 0) return data;
+                    }
+                } catch (_) {}
+            }
+
+            // 2. Direct online Supabase REST fetch
+            try {
+                const res = await fetch(`${SUPABASE_REST_URL}/students?select=*&order=name.asc`, {
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+                    }
+                });
+                if (res.ok) {
+                    const raw = await res.json();
+                    if (Array.isArray(raw) && raw.length > 0) {
+                        return raw.map(st => ({
+                            id: st.id,
+                            studentNumber: st.student_number,
+                            name: st.name,
+                            firstName: st.first_name,
+                            lastName: st.last_name,
+                            classId: st.class_id,
+                            schoolId: st.school_id,
+                            school: st.school || 'Port of Spain North Secondary',
+                            district: st.district || 'St. George East District',
+                            form: st.form,
+                            incidentCount: st.incident_count || 0,
+                            triageLevel: st.triage_level || 0,
+                            attendance: st.attendance || 95,
+                            status: st.status || 'Active'
+                        }));
+                    }
+                }
+            } catch (err) {
+                console.warn('[Supabase Direct Students Fetch]:', err.message);
+            }
+
+            // 3. Fallback to seed data
+            if (window.SENTINEL_SEED_DATA && Array.isArray(window.SENTINEL_SEED_DATA.students) && window.SENTINEL_SEED_DATA.students.length > 0) {
+                return window.SENTINEL_SEED_DATA.students;
+            }
+            try {
+                const res = await fetch('data/database.json');
+                if (res.ok) {
+                    const db = await res.json();
+                    if (db && Array.isArray(db.students) && db.students.length > 0) {
+                        return db.students;
+                    }
+                }
+            } catch (_) {}
+
+            return [];
+        }
+
+        async function loadDashboardData() {
+            try {
+                const [incs, stus] = await Promise.all([
+                    fetchIncidentsLive(),
+                    fetchStudentsLive()
+                ]);
+
+                if (Array.isArray(incs) && incs.length > 0) {
+                    allIncidents = incs;
+                }
+                if (Array.isArray(stus) && stus.length > 0) {
+                    allStudents = stus;
+                }
+
+                renderIncidentsTable(allIncidents);
+                renderAnalyticsCharts(allIncidents);
+                updateDashboardMetrics();
+            } catch (err) {
+                console.error('Failed to load dashboard data:', err);
+            }
+        }
+
+        function updateDashboardMetrics() {
+            const totalStudents = allStudents.length;
+            const activeStudents = allStudents.filter(s => (s.status || 'Active').toLowerCase() === 'active').length || totalStudents;
+            const openIncidents = allIncidents.filter(i => (i.status || '').toLowerCase() === 'open').length;
+            const resolvedIncidents = allIncidents.filter(i => (i.status || '').toLowerCase() === 'resolved').length;
+            const escalatedIncidents = allIncidents.filter(i => (i.status || '').toLowerCase() === 'escalated').length;
+            const level3Incidents = allIncidents.filter(i => parseInt(i.level) === 3 || (i.matrix || '').toLowerCase().includes('level 3')).length;
+
+            const elActive = document.getElementById('dashActiveStudents');
+            const elActiveSub = document.getElementById('dashActiveStudentsSub');
+            const elOpen = document.getElementById('dashOpenIncidents');
+            const elOpenSub = document.getElementById('dashOpenIncidentsSub');
+            const elL3 = document.getElementById('dashPriorityL3');
+            const elL3Sub = document.getElementById('dashPriorityL3Sub');
+
+            if (elActive) elActive.textContent = activeStudents.toLocaleString();
+            if (elActiveSub) elActiveSub.innerHTML = `&uarr; ${totalStudents} registered students across schools`;
+
+            if (elOpen) elOpen.textContent = openIncidents.toLocaleString();
+            if (elOpenSub) {
+                elOpenSub.innerHTML = `<span style="color: #f59e0b; font-weight:600;">${openIncidents} pending action</span> &bull; <span style="color: #15803d; font-weight:600;">${resolvedIncidents} resolved</span>`;
+            }
+
+            if (elL3) elL3.textContent = level3Incidents.toLocaleString();
+            if (elL3Sub) {
+                elL3Sub.innerHTML = `<span style="color: #ef4444; font-weight:600;">${level3Incidents} high severity cases logged</span>`;
+            }
+        }
+
+        function openCreateIncidentModal() {
+            const userData = typeof getLoggedInUserData === 'function' ? getLoggedInUserData() : null;
+            if (userData) {
+                const schoolInput = document.getElementById('createSchool');
+                if (schoolInput && !schoolInput.value && userData.schoolName) {
+                    schoolInput.value = userData.schoolName;
+                }
+                const districtSelect = document.getElementById('createDistrict');
+                if (districtSelect && userData.district) {
+                    districtSelect.value = userData.district;
+                }
+            }
+            document.getElementById('createIncidentModal').classList.add('is-active');
+        }
+
+        function closeCreateIncidentModal() {
+            document.getElementById('createIncidentModal').classList.remove('is-active');
+            document.getElementById('createIncidentForm').reset();
+        }
+
+        async function saveNewIncident(e) {
+            e.preventDefault();
+            const currentUser = typeof getLoggedInUserData === 'function' ? getLoggedInUserData() : null;
+            const matrix = document.getElementById('createMatrix').value;
+            const level = matrix.includes('3') ? 3 : matrix.includes('2') ? 2 : 1;
+            const status = document.getElementById('createStatus').value;
+
+            const newId = `#INC-2026-${Math.floor(100 + Math.random() * 900)}`;
+            const todayStr = new Date().toLocaleDateString('en-TT', { month: 'short', day: 'numeric', year: 'numeric' });
+
+            const payload = {
+                id: 'inc_' + Date.now(),
+                incidentId: newId,
+                studentName: document.getElementById('createStudentName').value.trim(),
+                form: document.getElementById('createForm').value.trim(),
+                school: document.getElementById('createSchool').value.trim(),
+                district: document.getElementById('createDistrict').value,
+                matrix: matrix,
+                level: level,
+                action: document.getElementById('createAction').value.trim(),
+                status: status,
+                description: document.getElementById('createDescription').value.trim(),
+                schoolId: currentUser ? (currentUser.schoolId || 'sch_001') : 'sch_001',
+                loggedById: currentUser ? currentUser.id : 'usr_ministry_01',
+                loggedBy: currentUser ? currentUser.name : 'Ministry Officer',
+                date: todayStr
+            };
+
+            let saved = false;
+
+            // 1. Try local API
+            const endpoints = ['http://localhost:5000/api/incidents', '/api/incidents'];
+            for (const ep of endpoints) {
+                try {
+                    const res = await fetch(ep, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    if (res.ok) {
+                        const data = await res.json();
+                        if (data && data.incident) {
+                            allIncidents.unshift(data.incident);
+                            saved = true;
+                            break;
+                        }
+                    }
+                } catch (_) {}
+            }
+
+            // 2. Direct online Supabase REST if API didn't respond
+            if (!saved) {
+                try {
+                    const sbRes = await fetch(`${SUPABASE_REST_URL}/incidents`, {
+                        method: 'POST',
+                        headers: {
+                            'apikey': SUPABASE_ANON_KEY,
+                            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                            'Content-Type': 'application/json',
+                            'Prefer': 'return=representation'
+                        },
+                        body: JSON.stringify({
+                            id: payload.id,
+                            incident_id: payload.incidentId,
+                            student_name: payload.studentName,
+                            form: payload.form,
+                            school: payload.school,
+                            district: payload.district,
+                            matrix: payload.matrix,
+                            level: payload.level,
+                            action: payload.action,
+                            status: payload.status,
+                            description: payload.description,
+                            logged_by: payload.loggedBy,
+                            date: payload.date
+                        })
+                    });
+                    if (sbRes.ok) {
+                        allIncidents.unshift(payload);
+                        saved = true;
+                    }
+                } catch (sbErr) {
+                    console.warn('[Supabase Direct Save]:', sbErr);
+                }
+            }
+
+            if (!saved) {
+                allIncidents.unshift(payload);
+            }
+
+            renderIncidentsTable(allIncidents);
+            renderAnalyticsCharts(allIncidents);
+            updateDashboardMetrics();
+            closeCreateIncidentModal();
+        }
+
+        function renderIncidentsTable(incidents) {
+            const tbody = document.getElementById('dashboardIncidentsBody');
+            if (!tbody) return;
+
+            if (!incidents || incidents.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #717682; padding: 2rem;">No incident records found.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = incidents.map(inc => {
+                const matrixText = inc.matrix || 'Level 1 Matrix';
+                const levelNum = inc.level || (matrixText.includes('3') ? 3 : matrixText.includes('2') ? 2 : 1);
+                const badgeClass = `status-level-${levelNum}`;
+                const studentDisplay = inc.studentName || inc.student || 'Unknown Student';
+                const formDisplay = inc.form ? `Form ${inc.form}` : (inc.classId || '');
+                const schoolDisplay = inc.school || 'Unassigned Institution';
+                const districtDisplay = inc.district || '';
+                const actionDisplay = inc.action || 'Under Review';
+                const statusDisplay = inc.status || 'Open';
+                const safeId   = inc.id;
+                const safeCode = (inc.incidentId || inc.id).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+
+                return `
+                    <tr id="row-${inc.id}">
+                        <td><strong style="color: #111;">${inc.incidentId || inc.id}</strong></td>
+                        <td>
+                            <span class="school-name-text">${studentDisplay}</span>
+                            <span class="school-district-sub">${formDisplay}</span>
+                        </td>
+                        <td>
+                            <span class="school-name-text">${schoolDisplay}</span>
+                            <span class="school-district-sub">${districtDisplay}</span>
+                        </td>
+                        <td><span class="status-badge ${badgeClass}">${matrixText}</span></td>
+                        <td>
+                            <div>${actionDisplay}</div>
+                            <small style="color: ${statusDisplay.toLowerCase() === 'resolved' ? '#15803d' : statusDisplay.toLowerCase() === 'escalated' ? '#b91c1c' : '#b45309'}; font-weight: 600;">${statusDisplay}</small>
+                        </td>
+                        <td style="text-align: right;">
+                            <div class="table-actions" style="justify-content: flex-end;">
+                                <button class="btn-action-edit" onclick="openEditModal('${safeId}')">Edit</button>
+                                <button class="btn-action-delete" onclick="deleteIncident('${safeId}', '${safeCode}')">Delete</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function openEditModal(incId) {
+            const inc = allIncidents.find(i => i.id === incId || i.incidentId === incId);
+            if (!inc) return;
+
+            document.getElementById('editIncidentId').value = inc.id;
+            document.getElementById('modalIncidentTitle').textContent = `Update Incident ${inc.incidentId || inc.id}`;
+            document.getElementById('editStudentName').value = inc.studentName || inc.student || '';
+            document.getElementById('editSchool').value = inc.school || '';
+            document.getElementById('editDistrict').value = inc.district || '';
+            document.getElementById('editAction').value = inc.action || '';
+            document.getElementById('editStatus').value = inc.status || 'Open';
+            document.getElementById('editDescription').value = inc.description || '';
+
+            const matrixVal = inc.matrix || 'Level 1 Matrix';
+            if (matrixVal.includes('3')) document.getElementById('editMatrix').value = 'Level 3 Matrix';
+            else if (matrixVal.includes('2')) document.getElementById('editMatrix').value = 'Level 2 Matrix';
+            else document.getElementById('editMatrix').value = 'Level 1 Matrix';
+
+            document.getElementById('editIncidentModal').classList.add('is-active');
+        }
+
+        function closeEditModal() {
+            document.getElementById('editIncidentModal').classList.remove('is-active');
+        }
+
+        async function saveIncidentUpdate(e) {
+            e.preventDefault();
+            const id = document.getElementById('editIncidentId').value;
+            const matrix = document.getElementById('editMatrix').value;
+            const level = matrix.includes('3') ? 3 : matrix.includes('2') ? 2 : 1;
+
+            const payload = {
+                studentName: document.getElementById('editStudentName').value.trim(),
+                school: document.getElementById('editSchool').value.trim(),
+                district: document.getElementById('editDistrict').value.trim(),
+                matrix: matrix,
+                level: level,
+                action: document.getElementById('editAction').value.trim(),
+                status: document.getElementById('editStatus').value,
+                description: document.getElementById('editDescription').value.trim()
+            };
+
+            let updated = false;
+            try {
+                const endpoints = [`/api/incidents/${id}`, getApiUrl(`/api/incidents/${id}`)];
+                for (const ep of endpoints) {
+                    try {
+                        const res = await fetch(ep, {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(payload)
+                        });
+                        if (res.ok) {
+                            const data = await res.json();
+                            const idx = allIncidents.findIndex(i => i.id === id);
+                            if (idx !== -1) {
+                                allIncidents[idx] = data.incident;
+                            }
+                            updated = true;
+                            break;
+                        }
+                    } catch (_) {}
+                }
+            } catch (_) {}
+
+            if (!updated) {
+                try {
+                    await fetch(`${SUPABASE_REST_URL}/incidents?id=eq.${id}`, {
+                        method: 'PATCH',
+                        headers: {
+                            'apikey': SUPABASE_ANON_KEY,
+                            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            student_name: payload.studentName,
+                            school: payload.school,
+                            district: payload.district,
+                            matrix: payload.matrix,
+                            level: payload.level,
+                            action: payload.action,
+                            status: payload.status,
+                            description: payload.description
+                        })
+                    });
+                } catch (_) {}
+                const idx = allIncidents.findIndex(i => i.id === id);
+                if (idx !== -1) {
+                    allIncidents[idx] = { ...allIncidents[idx], ...payload };
+                }
+            }
+
+            renderIncidentsTable(allIncidents);
+            renderAnalyticsCharts(allIncidents);
+            updateDashboardMetrics();
+            closeEditModal();
+        }
+
+        // ── Custom Delete Confirmation (replaces browser confirm() which can be suppressed) ──
+        let _pendingDeleteId   = null;
+        let _pendingDeleteCode = null;
+
+        function confirmDeleteCancel() {
+            _pendingDeleteId   = null;
+            _pendingDeleteCode = null;
+            document.getElementById('deleteConfirmOverlay').style.display = 'none';
+        }
+
+        async function confirmDeleteOk() {
+            document.getElementById('deleteConfirmOverlay').style.display = 'none';
+            const id   = _pendingDeleteId;
+            const code = _pendingDeleteCode;
+            _pendingDeleteId   = null;
+            _pendingDeleteCode = null;
+            if (!id) return;
+
+            const btn = document.getElementById('confirmDeleteOkBtn');
+            if (btn) btn.disabled = true;
+
+            // 1. Try local Express API (absolute URL first so it works from any port)
+            const apiEndpoints = [
+                `http://localhost:5000/api/incidents/${id}`,
+                getApiUrl(`/api/incidents/${id}`)
+            ];
+            for (const ep of apiEndpoints) {
+                try {
+                    const res = await fetch(ep, { method: 'DELETE' });
+                    if (res.ok) break;
+                } catch (_) {}
+            }
+
+            // 2. Direct online Supabase REST DELETE (always runs to keep Supabase in sync)
+            try {
+                await fetch(`${SUPABASE_REST_URL}/incidents?id=eq.${encodeURIComponent(id)}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+                    }
+                });
+            } catch (_) {}
+
+            // 3. Remove from memory & re-render immediately
+            allIncidents = allIncidents.filter(i => i.id !== id && i.incidentId !== id && i.incidentId !== code);
+            renderIncidentsTable(allIncidents);
+            renderAnalyticsCharts(allIncidents);
+            updateDashboardMetrics();
+
+            if (btn) btn.disabled = false;
+        }
+
+        async function deleteIncident(id, code) {
+            _pendingDeleteId   = id;
+            _pendingDeleteCode = code;
+            document.getElementById('deleteConfirmMsg').textContent =
+                `Permanently delete incident ${code}? This action cannot be undone.`;
+            document.getElementById('deleteConfirmOverlay').style.display = 'flex';
+        }
+
+        function renderAnalyticsCharts(incidents) {
+            let l1 = 0, l2 = 0, l3 = 0;
+            incidents.forEach(inc => {
+                const m = (inc.matrix || '').toLowerCase();
+                const lvl = inc.level;
+                if (lvl === 3 || m.includes('level 3')) l3++;
+                else if (lvl === 2 || m.includes('level 2')) l2++;
+                else l1++;
+            });
+
+            // Update DOM metrics
+            const total = incidents.length;
+            const badgeL3 = document.querySelector('.chart-pill-badge.badge-danger');
+            if (badgeL3) badgeL3.textContent = `${l3} Level 3`;
+
+            const pillTotal = document.querySelector('.analytics-chart-card .chart-pill-badge');
+            if (pillTotal) pillTotal.textContent = `${total} Active`;
+
+            // Chart 1: Total Incidents (Last 7 Days)
+            const ctxTotal = document.getElementById('totalIncidentsChart');
+            if (ctxTotal && typeof Chart !== 'undefined') {
+                if (chartTotal) chartTotal.destroy();
+                chartTotal = new Chart(ctxTotal, {
+                    type: 'line',
+                    data: {
+                        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                        datasets: [{
+                            label: 'Total Incidents',
+                            data: [4, 7, 5, 8, 6, 3, total],
+                            borderColor: '#111111',
+                            backgroundColor: 'rgba(17, 17, 17, 0.05)',
+                            borderWidth: 2.2,
+                            fill: true,
+                            tension: 0.35,
+                            pointBackgroundColor: '#111111',
+                            pointBorderColor: '#ffffff',
+                            pointBorderWidth: 1.5,
+                            pointRadius: 4,
+                            pointHoverRadius: 6
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                backgroundColor: '#111111',
+                                titleFont: { family: "'Google Sans', sans-serif", weight: '600' },
+                                bodyFont: { family: "'Google Sans', sans-serif" },
+                                cornerRadius: 0,
+                                padding: 8
+                            }
+                        },
+                        scales: {
+                            x: {
+                                grid: { display: false },
+                                ticks: { font: { family: "'Google Sans', sans-serif", size: 11 }, color: '#717682' }
+                            },
+                            y: {
+                                beginAtZero: true,
+                                ticks: { stepSize: 2, font: { family: "'Google Sans', sans-serif", size: 11 }, color: '#717682' },
+                                grid: { color: 'rgba(0, 0, 0, 0.05)' }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Chart 2: Incidents by Level (Level 1, 2, 3)
+            const ctxLevels = document.getElementById('incidentLevelsChart');
+            if (ctxLevels && typeof Chart !== 'undefined') {
+                if (chartLevels) chartLevels.destroy();
+                chartLevels = new Chart(ctxLevels, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Level 1', 'Level 2', 'Level 3'],
+                        datasets: [{
+                            label: 'Incidents Logged',
+                            data: [l1, l2, l3],
+                            backgroundColor: ['#f59e0b', '#ea580c', '#991b1b'],
+                            borderRadius: 0,
+                            barThickness: 28
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                backgroundColor: '#111111',
+                                titleFont: { family: "'Google Sans', sans-serif", weight: '600' },
+                                bodyFont: { family: "'Google Sans', sans-serif" },
+                                cornerRadius: 0,
+                                padding: 8
+                            }
+                        },
+                        scales: {
+                            x: {
+                                grid: { display: false },
+                                ticks: { font: { family: "'Google Sans', sans-serif", size: 11, weight: '600' }, color: '#111111' }
+                            },
+                            y: {
+                                beginAtZero: true,
+                                ticks: { stepSize: 5, font: { family: "'Google Sans', sans-serif", size: 11 }, color: '#717682' },
+                                grid: { color: 'rgba(0, 0, 0, 0.05)' }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+    </script>
+
+    <!-- Custom Delete Confirm Dialog (browser confirm() can be suppressed) -->
+    <div id="deleteConfirmOverlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.55); z-index:9999; align-items:center; justify-content:center;">
+        <div style="background:#fff; border-radius:12px; padding:2rem 2.5rem; max-width:420px; width:90%; box-shadow:0 8px 32px rgba(0,0,0,0.22); text-align:center;">
+            <div style="font-size:2.2rem; margin-bottom:0.5rem;">🗑️</div>
+            <h3 style="margin:0 0 0.5rem; color:#111; font-size:1.1rem;">Delete Incident?</h3>
+            <p id="deleteConfirmMsg" style="color:#555; font-size:0.92rem; margin:0 0 1.5rem;"></p>
+            <div style="display:flex; gap:0.75rem; justify-content:center;">
+                <button onclick="confirmDeleteCancel()" style="padding:0.6rem 1.5rem; border:1px solid #d1d5db; border-radius:8px; background:#f9fafb; color:#374151; font-size:0.9rem; cursor:pointer;">Cancel</button>
+                <button id="confirmDeleteOkBtn" onclick="confirmDeleteOk()" style="padding:0.6rem 1.5rem; border:none; border-radius:8px; background:#dc2626; color:#fff; font-size:0.9rem; font-weight:600; cursor:pointer;">Yes, Delete</button>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

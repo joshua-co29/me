@@ -1,0 +1,1287 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Registry - Sentinel Edu</title>
+    <meta name="description" content="Student Behavioral & Triage Registry — search, monitor, and assess student records according to the National School Discipline Matrix.">
+
+    <!-- Google Fonts: Google Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Product+Sans:wght@400;700&display=swap" rel="stylesheet">
+
+    <!-- Shared Stylesheet -->
+    <link rel="stylesheet" href="style/style.css">
+
+    <style>
+        body {
+            background-color: #ffffff;
+            color: #121316;
+            font-family: var(--font-family);
+        }
+
+        /* ===== PAGE WRAPPER ===== */
+        .page-wrapper {
+            max-width: 1400px;
+            margin: 2.5rem auto 4rem;
+            padding: 0 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        /* ===== PAGE TITLE BANNER ===== */
+        .page-title-banner {
+            background: transparent;
+            border: none;
+            padding: 2.5rem 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .page-banner-left .page-subtitle {
+            font-size: 0.88rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #5e6472;
+            margin-bottom: 0.5rem;
+        }
+
+        .page-banner-left h1 {
+            font-size: clamp(1.8rem, 2.8vw, 2.6rem);
+            font-weight: 800;
+            color: #111111;
+            letter-spacing: -0.025em;
+            line-height: 1.1;
+        }
+
+        .page-banner-left p {
+            font-size: 1rem;
+            color: #5e6472;
+            margin-top: 0.7rem;
+            max-width: 520px;
+        }
+
+        .page-banner-stats {
+            display: flex;
+            gap: 2.5rem;
+        }
+
+        .banner-stat {
+            text-align: center;
+        }
+
+        .banner-stat-value {
+            font-size: 2.4rem;
+            font-weight: 800;
+            color: #111111;
+            line-height: 1;
+        }
+
+        .banner-stat-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #717682;
+            margin-top: 0.35rem;
+        }
+
+        /* ===== FILTER / SEARCH BAR ===== */
+        .filter-bar {
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid rgba(0,0,0,0.08);
+            padding: 1.2rem 0;
+            display: flex;
+            gap: 1.2rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .filter-bar label {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #4b5162;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            white-space: nowrap;
+        }
+
+        .filter-input,
+        .filter-select {
+            padding: 0.65rem 1rem;
+            border: 1px solid rgba(0, 0, 0, 0.15);
+            background: #ffffff;
+            font-size: 0.92rem;
+            font-family: inherit;
+            outline: none;
+            color: #111111;
+            transition: border-color 0.2s ease;
+            border-radius: 0;
+        }
+
+        .filter-input {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .filter-input:focus,
+        .filter-select:focus {
+            border-color: #6f58ad;
+            box-shadow: 0 0 0 3px rgba(111, 88, 173, 0.15);
+        }
+
+        .filter-select {
+            min-width: 180px;
+        }
+
+        .btn-filter {
+            padding: 0.65rem 1.6rem;
+            background: #111111;
+            color: #ffffff;
+            border: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            transition: background 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .btn-filter:hover {
+            background: #2e3040;
+        }
+
+        /* ===== STUDENTS TABLE ===== */
+        .table-section {
+            background: transparent;
+            border: none;
+            padding: 2.5rem 0;
+        }
+
+        .table-section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 1.8rem;
+            padding-bottom: 1.2rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+        }
+
+        .table-section-title {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #111111;
+            letter-spacing: -0.02em;
+        }
+
+        .table-section-count {
+            font-size: 0.88rem;
+            color: #717682;
+        }
+
+        .students-table-wrap {
+            width: 100%;
+            overflow-x: auto;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+        }
+
+        .students-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            background: #ffffff;
+        }
+
+        .students-table th {
+            font-size: 0.8rem;
+            color: #4b5162;
+            background: #f5f5f5;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            padding: 1rem 1.2rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .students-table td {
+            padding: 1rem 1.2rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            font-size: 0.92rem;
+            color: #1a1a1a;
+            vertical-align: middle;
+        }
+
+        .students-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .students-table tr:hover td {
+            background-color: #f9f9f9;
+        }
+
+        .student-id-badge {
+            font-weight: 700;
+            font-size: 0.82rem;
+            color: #6f58ad;
+            letter-spacing: 0.02em;
+        }
+
+        .student-name {
+            font-weight: 600;
+            color: #111111;
+        }
+
+        .student-form {
+            font-size: 0.85rem;
+            color: #717682;
+            margin-top: 1px;
+        }
+
+        .school-name {
+            font-weight: 600;
+            color: #111111;
+            display: block;
+        }
+
+        .school-district {
+            font-size: 0.8rem;
+            color: #717682;
+        }
+
+        /* Triage Labels (clean text without enclosing box) */
+        .triage-badge {
+            display: inline-block;
+            padding: 0;
+            background: transparent;
+            border: none;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .triage-1 { background: transparent; color: #b45309; border: none; } /* Level 1: Soft Amber / Muted Yellow */
+        .triage-2 { background: transparent; color: #ea580c; border: none; } /* Level 2: Warm Orange */
+        .triage-3 { background: transparent; color: #991b1b; border: none; } /* Level 3: Deep Red / Crimson */
+        .triage-0 { background: transparent; color: #15803d; border: none; }
+
+        .btn-view-student {
+            display: inline-block;
+            padding: 0.35rem 0.9rem;
+            background: transparent;
+            border: 1px solid #111111;
+            color: #111111;
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            border-radius: 0;
+        }
+
+        .btn-view-student:hover {
+            background: #111111;
+            color: #ffffff;
+        }
+
+        /* CRUD Action Buttons for Student Record */
+        .student-actions-cell {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-stu-edit,
+        .btn-stu-delete {
+            padding: 0.35rem 0.65rem;
+            font-size: 0.78rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            border: 1px solid rgba(0, 0, 0, 0.15);
+            background: #ffffff;
+            color: #111111;
+            transition: all 0.15s ease;
+            text-decoration: none;
+            border-radius: 0px;
+        }
+
+        .btn-stu-edit:hover {
+            background: #111111;
+            color: #ffffff;
+            border-color: #111111;
+        }
+
+        .btn-stu-delete {
+            color: #991b1b;
+            border-color: rgba(153, 27, 27, 0.25);
+        }
+
+        .btn-stu-delete:hover {
+            background: #991b1b;
+            color: #ffffff;
+            border-color: #991b1b;
+        }
+
+        /* Edit Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            padding: 1rem;
+        }
+
+        .modal-overlay.is-active {
+            display: flex;
+        }
+
+        .modal-card {
+            background: #ffffff;
+            width: 100%;
+            max-width: 520px;
+            padding: 2rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-card h3 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 0.3rem;
+            color: #111111;
+            letter-spacing: -0.01em;
+        }
+
+        .modal-card p.modal-sub {
+            font-size: 0.88rem;
+            color: #6a6f7c;
+            margin-bottom: 1.4rem;
+        }
+
+        .modal-form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+            margin-bottom: 1.1rem;
+        }
+
+        .modal-form-group label {
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: #4b5162;
+        }
+
+        .modal-form-group input,
+        .modal-form-group select {
+            padding: 0.65rem 0.85rem;
+            font-size: 0.92rem;
+            font-family: inherit;
+            border: 1px solid rgba(0, 0, 0, 0.2);
+            border-radius: 0;
+            outline: none;
+            color: #111111;
+        }
+
+        .modal-form-group input:focus,
+        .modal-form-group select:focus {
+            border-color: #6f58ad;
+            box-shadow: 0 0 0 2px rgba(111, 88, 173, 0.15);
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.6rem;
+            margin-top: 1.6rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(0, 0, 0, 0.08);
+        }
+
+        .btn-modal-cancel {
+            padding: 0.65rem 1.2rem;
+            background: #ffffff;
+            color: #111111;
+            border: 1px solid rgba(0, 0, 0, 0.15);
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .btn-modal-cancel:hover {
+            background: #f5f5f5;
+        }
+
+        .btn-modal-save {
+            padding: 0.65rem 1.4rem;
+            background: #111111;
+            color: #ffffff;
+            border: 1px solid #111111;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .btn-modal-save:hover {
+            background: #2e3040;
+        }
+
+        /* ===== EXPANDED STUDENT DETAIL ROW ===== */
+        .student-detail-row td {
+            padding: 0 !important;
+            border-bottom: 1px solid rgba(0,0,0,0.08);
+        }
+
+        .student-detail-panel {
+            background: #f9f9fb;
+            border-top: 2px solid #9f96ee;
+            padding: 1.6rem 1.8rem;
+        }
+
+        .detail-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.2rem;
+        }
+
+        .detail-header h4 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #111111;
+            letter-spacing: -0.01em;
+        }
+
+        .btn-close-detail {
+            padding: 0.35rem 0.7rem;
+            background: transparent;
+            border: 1px solid rgba(0,0,0,0.15);
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            color: #4b5162;
+        }
+
+        .btn-close-detail:hover {
+            background: #111111;
+            color: #ffffff;
+            border-color: #111111;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem 2rem;
+            margin-bottom: 1.4rem;
+        }
+
+        .detail-field {
+            display: flex;
+            flex-direction: column;
+            gap: 0.2rem;
+        }
+
+        .detail-field-label {
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #717682;
+        }
+
+        .detail-field-value {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #111111;
+        }
+
+        .detail-incidents-section {
+            margin-top: 1.2rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(0,0,0,0.08);
+        }
+
+        .detail-incidents-section h5 {
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: #4b5162;
+            margin-bottom: 0.8rem;
+        }
+
+        .detail-incidents-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .detail-incident-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.6rem 0.8rem;
+            background: #ffffff;
+            border: 1px solid rgba(0,0,0,0.06);
+            font-size: 0.88rem;
+        }
+
+        .detail-incident-item .inc-id {
+            font-weight: 700;
+            color: #6f58ad;
+            font-size: 0.82rem;
+            min-width: 100px;
+        }
+
+        .detail-incident-item .inc-date {
+            color: #717682;
+            font-size: 0.82rem;
+            min-width: 90px;
+        }
+
+        .detail-incident-item .inc-desc {
+            flex: 1;
+            color: #1a1a1a;
+        }
+
+        .detail-no-incidents {
+            color: #717682;
+            font-size: 0.88rem;
+            font-style: italic;
+        }
+
+        .detail-actions {
+            margin-top: 1rem;
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-detail-edit {
+            padding: 0.45rem 1rem;
+            background: #111111;
+            color: #ffffff;
+            border: 1px solid #111111;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .btn-detail-edit:hover {
+            background: #2e3040;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 1100px) {
+            .page-title-banner { flex-direction: column; align-items: flex-start; }
+            .table-section { padding: 2rem 1.5rem; }
+        }
+
+        @media (max-width: 768px) {
+            .page-wrapper { padding: 0 1rem; }
+            .filter-bar { flex-direction: column; align-items: stretch; }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Top Navigation Header -->
+    <header class="site-header">
+        <a href="index.html" class="brand-logo">
+            Sentinel Edu<span class="brand-dot"></span>
+        </a>
+
+        <nav>
+            <ul class="nav-links">
+                <li><a href="dashboard.html">Dashboard</a></li>
+                <li><a href="students.html" style="font-weight: 700; color: #000;">Students</a></li>
+                <li><a href="incidents.html">Incidents</a></li>
+                <li><a href="engine.html">Engine</a></li>
+            </ul>
+        </nav>
+
+        <div class="header-actions">
+            <a href="login.html" class="login-btn">
+                <span class="login-avatar">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                    </svg>
+                </span>
+                Staff Login
+            </a>
+            <a href="signup.html" class="btn-enroll-header">Request Access</a>
+        </div>
+    </header>
+
+    <main class="page-wrapper">
+
+        <!-- Title Banner -->
+        <section class="page-title-banner">
+            <div class="page-banner-left">
+                <div class="page-subtitle">National Triage Registry</div>
+                <h1>Student Behavioral Registry</h1>
+                <p>Search, monitor, and assess student records according to the National School Discipline Matrix. All data is synchronized with Ministry education records.</p>
+            </div>
+            <div class="page-banner-stats">
+                <div class="banner-stat">
+                    <div class="banner-stat-value" id="statActiveStudents">--</div>
+                    <div class="banner-stat-label">Active Students</div>
+                </div>
+                <div class="banner-stat">
+                    <div class="banner-stat-value" id="statOpenCases">--</div>
+                    <div class="banner-stat-label">Open Cases</div>
+                </div>
+                <div class="banner-stat">
+                    <div class="banner-stat-value" id="statPriorityL3">--</div>
+                    <div class="banner-stat-label">Priority Level 3</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Search / Filter Bar -->
+        <div class="filter-bar">
+            <label for="searchStudent">Search:</label>
+            <input type="text" id="searchStudent" class="filter-input" placeholder="Student ID, Name, or School…" oninput="filterTable()">
+
+            <label for="filterDistrict">District:</label>
+            <select id="filterDistrict" class="filter-select" onchange="filterTable()">
+                <option value="">All Districts</option>
+                <option>St. George East District</option>
+                <option>Victoria Educational District</option>
+                <option>Caroni Educational District</option>
+                <option>Tobago Educational District</option>
+                <option>St. Patrick Educational District</option>
+                <option>Nariva/Mayaro District</option>
+            </select>
+
+            <label for="filterTriage">Triage Level:</label>
+            <select id="filterTriage" class="filter-select" onchange="filterTable()">
+                <option value="">All Levels</option>
+                <option value="0">No Active Case</option>
+                <option value="1">Level 1</option>
+                <option value="2">Level 2</option>
+                <option value="3">Level 3</option>
+            </select>
+
+            <button class="btn-filter" onclick="resetFilters()">Reset</button>
+        </div>
+
+        <!-- Students Table -->
+        <section class="table-section">
+            <div class="table-section-header">
+                <div class="table-section-title">Student Records</div>
+                <div class="table-section-count" id="recordCount">Showing 15 records</div>
+            </div>
+
+            <div class="students-table-wrap">
+                <table class="students-table" id="studentsTable">
+                    <thead>
+                        <tr>
+                            <th>Student ID</th>
+                            <th>Name / Form</th>
+                            <th>Institution / District</th>
+                            <th>Active Incidents</th>
+                            <th>Triage Level</th>
+                            <th>Last Review</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="studentsBody">
+                        <!-- Populated dynamically via API/Supabase -->
+                        <tr><td colspan="7" style="text-align: center; color: #717682; padding: 2.5rem;">Loading student registry records…</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Modal for Editing Student File -->
+    <div class="modal-overlay" id="editStudentModal">
+        <div class="modal-card">
+            <h3 id="modalStudentTitle">Update Student File</h3>
+            <p class="modal-sub">Administrative Record & Triage Modification</p>
+            <form id="editStudentForm" onsubmit="saveStudentUpdate(event)">
+                <input type="hidden" id="editStudentId">
+                <div class="modal-form-group">
+                    <label for="editStuName">Full Name</label>
+                    <input type="text" id="editStuName" required>
+                </div>
+                <div class="modal-form-group">
+                    <label for="editStuForm">Form / Grade</label>
+                    <input type="text" id="editStuForm" placeholder="e.g. Form 4-B" required>
+                </div>
+                <div class="modal-form-group">
+                    <label for="editStuSchool">Institution / School</label>
+                    <input type="text" id="editStuSchool" required>
+                </div>
+                <div class="modal-form-group">
+                    <label for="editStuDistrict">District</label>
+                    <input type="text" id="editStuDistrict" required>
+                </div>
+                <div class="modal-form-group">
+                    <label for="editStuTriage">Triage Level</label>
+                    <select id="editStuTriage">
+                        <option value="0">Level 0 (No Active Case)</option>
+                        <option value="1">Level 1 (Guidance / Low Risk)</option>
+                        <option value="2">Level 2 (Dean Escalation)</option>
+                        <option value="3">Level 3 (High Priority / Intervention)</option>
+                    </select>
+                </div>
+                <div class="modal-form-group">
+                    <label for="editStuIncidents">Active Incidents Count</label>
+                    <input type="number" id="editStuIncidents" min="0" value="0">
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-modal-cancel" onclick="closeStudentModal()">Cancel</button>
+                    <button type="submit" class="btn-modal-save">Save Student Record</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Seed Database & Shared Header/Auth Script -->
+    <script src="data/seed.js"></script>
+    <script src="auth.js"></script>
+    <script>
+        let allStudents = (window.SENTINEL_SEED_DATA && Array.isArray(window.SENTINEL_SEED_DATA.students))
+            ? [...window.SENTINEL_SEED_DATA.students]
+            : [];
+        let allIncidents = (window.SENTINEL_SEED_DATA && Array.isArray(window.SENTINEL_SEED_DATA.incidents))
+            ? [...window.SENTINEL_SEED_DATA.incidents]
+            : [];
+        let isMinistryUser = false;
+        let expandedStudentId = null;
+
+        function getApiUrl(path) {
+            const base = (typeof API_BASE !== 'undefined' && API_BASE) ? API_BASE : 'http://localhost:5000';
+            if (window.location.protocol === 'http:' || window.location.protocol === 'https:') {
+                if (!window.location.port || window.location.port === '5000') {
+                    return path;
+                }
+            }
+            return `${base}${path.startsWith('/') ? '' : '/'}${path}`;
+        }
+
+        // ACCESS GUARD: Ministry Officers and Principals
+        (function() {
+            const userData = typeof getLoggedInUserData === 'function' ? getLoggedInUserData() : null;
+            if (userData && userData.role) {
+                const r = userData.role.toLowerCase();
+                const canAccess = r.includes('ministry') || r.includes('officer') || r.includes('principal');
+                if (!canAccess) {
+                    window.location.replace(getDashboardUrl(userData));
+                    return;
+                }
+                isMinistryUser = r.includes('ministry') || r.includes('officer');
+            }
+        })();
+
+        const FALLBACK_STUDENTS = [
+            { id: "stu_001", studentId: "STU-2026-001", name: "Marcus J. Williams", form: "Form 4-B", school: "Port of Spain North Secondary", district: "St. George East District", incidentCount: 2, triageLevel: 2, lastReview: "Oct 25, 2026" },
+            { id: "stu_002", studentId: "STU-2026-002", name: "Alicia M. Rampersad", form: "Form 2-A", school: "San Fernando East Technical", district: "Victoria Educational District", incidentCount: 1, triageLevel: 1, lastReview: "Oct 24, 2026" },
+            { id: "stu_003", studentId: "STU-2026-003", name: "Denzil T. Mohammed", form: "Form 5-C", school: "Chaguanas Senior Comprehensive", district: "Caroni Educational District", incidentCount: 4, triageLevel: 3, lastReview: "Oct 26, 2026" },
+            { id: "stu_004", studentId: "STU-2026-004", name: "Priya S. Singh", form: "Form 3-D", school: "Arima Central Secondary", district: "St. George East District", incidentCount: 2, triageLevel: 2, lastReview: "Oct 22, 2026" },
+            { id: "stu_005", studentId: "STU-2026-005", name: "Jonah A. Clarke", form: "Form 1-C", school: "Scarborough Secondary School", district: "Tobago Educational District", incidentCount: 1, triageLevel: 1, lastReview: "Oct 21, 2026" },
+            { id: "stu_006", studentId: "STU-2026-006", name: "Kezia N. Baptiste", form: "Form 4-A", school: "Princes Town West Secondary", district: "Victoria Educational District", incidentCount: 3, triageLevel: 3, lastReview: "Oct 26, 2026" },
+            { id: "stu_007", studentId: "STU-2026-007", name: "Ryan O. Phillip", form: "Form 2-C", school: "Siparia Regional Secondary", district: "St. Patrick Educational District", incidentCount: 1, triageLevel: 1, lastReview: "Oct 20, 2026" },
+            { id: "stu_008", studentId: "STU-2026-008", name: "Natasha R. Persad", form: "Form 3-A", school: "Couva West Secondary", district: "Caroni Educational District", incidentCount: 0, triageLevel: 0, lastReview: "Oct 18, 2026" },
+            { id: "stu_009", studentId: "STU-2026-009", name: "Devon I. Charles", form: "Form 5-B", school: "Belmont Secondary School", district: "St. George East District", incidentCount: 2, triageLevel: 2, lastReview: "Oct 17, 2026" },
+            { id: "stu_010", studentId: "STU-2026-010", name: "Sophia L. Hernandez", form: "Form 1-A", school: "Rio Claro Secondary", district: "Nariva/Mayaro District", incidentCount: 1, triageLevel: 1, lastReview: "Oct 15, 2026" },
+            { id: "stu_011", studentId: "STU-2026-011", name: "Isaiah K. Thomas", form: "Form 4-D", school: "St. George's College Secondary", district: "St. George East District", incidentCount: 5, triageLevel: 3, lastReview: "Oct 27, 2026" },
+            { id: "stu_012", studentId: "STU-2026-012", name: "Aaliya F. Ali", form: "Form 3-B", school: "Naparima Girls' High School", district: "Victoria Educational District", incidentCount: 0, triageLevel: 0, lastReview: "Oct 14, 2026" },
+            { id: "stu_013", studentId: "STU-2026-013", name: "Curtis M. John", form: "Form 2-D", school: "Mason Hall Secondary", district: "Tobago Educational District", incidentCount: 2, triageLevel: 2, lastReview: "Oct 13, 2026" },
+            { id: "stu_014", studentId: "STU-2026-014", name: "Jasmine T. Ramkhelawan", form: "Form 1-B", school: "Montrose Government Secondary", district: "Caroni Educational District", incidentCount: 1, triageLevel: 1, lastReview: "Oct 12, 2026" },
+            { id: "stu_015", studentId: "STU-2026-015", name: "Tristan L. Gonzales", form: "Form 5-A", school: "Fyzabad Secondary School", district: "St. Patrick Educational District", incidentCount: 2, triageLevel: 2, lastReview: "Oct 11, 2026" }
+        ];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderStudentsTable(allStudents);
+            updateStudentStats();
+            loadStudentsData();
+            window.addEventListener('focus', () => {
+                loadStudentsData();
+            });
+        });
+
+        const SUPABASE_REST_URL = "https://wrumedevccqkopguaxdi.supabase.co/rest/v1";
+        const SUPABASE_ANON_KEY = "sb_publishable_zpd_lzgRqghcN-0X7qw7SA_I2hAZHXH";
+
+        async function fetchStudentsLive() {
+            const endpoints = ['http://localhost:5000/api/students', '/api/students'];
+            for (const ep of endpoints) {
+                try {
+                    const res = await fetch(ep);
+                    if (res.ok) {
+                        const data = await res.json();
+                        if (Array.isArray(data) && data.length > 0) return data;
+                    }
+                } catch (_) {}
+            }
+
+            try {
+                const res = await fetch(`${SUPABASE_REST_URL}/students?select=*&order=name.asc`, {
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+                    }
+                });
+                if (res.ok) {
+                    const raw = await res.json();
+                    if (Array.isArray(raw) && raw.length > 0) {
+                        return raw.map(st => ({
+                            id: st.id,
+                            studentNumber: st.student_number || st.id,
+                            studentId: st.student_number || st.id,
+                            name: st.name,
+                            firstName: st.first_name,
+                            lastName: st.last_name,
+                            classId: st.class_id,
+                            schoolId: st.school_id,
+                            school: st.school || 'Port of Spain North Secondary',
+                            district: st.district || 'St. George East District',
+                            form: st.form,
+                            incidentCount: st.incident_count || 0,
+                            triageLevel: st.triage_level || 0,
+                            attendance: st.attendance || 95,
+                            status: st.status || 'Active'
+                        }));
+                    }
+                }
+            } catch (_) {}
+
+            try {
+                const res = await fetch('data/database.json');
+                if (res.ok) {
+                    const db = await res.json();
+                    if (db && Array.isArray(db.students) && db.students.length > 0) return db.students;
+                }
+            } catch (_) {}
+
+            return FALLBACK_STUDENTS;
+        }
+
+        async function fetchIncidentsLive() {
+            let list = [];
+            const endpoints = ['http://localhost:5000/api/incidents', '/api/incidents'];
+            for (const ep of endpoints) {
+                try {
+                    const res = await fetch(ep);
+                    if (res.ok) {
+                        const data = await res.json();
+                        if (Array.isArray(data) && data.length > 0) {
+                            list = data;
+                            break;
+                        }
+                    }
+                } catch (_) {}
+            }
+
+            if (list.length === 0) {
+                try {
+                    const res = await fetch(`${SUPABASE_REST_URL}/incidents?select=*&order=created_at.desc`, {
+                        headers: {
+                            'apikey': SUPABASE_ANON_KEY,
+                            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+                        }
+                    });
+                    if (res.ok) {
+                        const raw = await res.json();
+                        if (Array.isArray(raw) && raw.length > 0) list = raw;
+                    }
+                } catch (_) {}
+            }
+
+            return list;
+        }
+
+        async function loadStudentsData() {
+            try {
+                const [stus, incs] = await Promise.all([
+                    fetchStudentsLive(),
+                    fetchIncidentsLive()
+                ]);
+
+                allStudents = (Array.isArray(stus) && stus.length > 0) ? stus : FALLBACK_STUDENTS;
+                allIncidents = Array.isArray(incs) ? incs : [];
+
+                renderStudentsTable(allStudents);
+                updateStudentStats();
+            } catch (err) {
+                console.warn('Live students pull notice, falling back:', err);
+                allStudents = FALLBACK_STUDENTS;
+                renderStudentsTable(allStudents);
+                updateStudentStats();
+            }
+        }
+
+        function updateStudentStats() {
+            const activeCount = allStudents.filter(s => (s.status || 'Active').toLowerCase() === 'active').length || allStudents.length;
+            const openCount = allIncidents.filter(i => (i.status || '').toLowerCase() === 'open').length;
+            const l3Count = allStudents.filter(s => parseInt(s.triageLevel) === 3).length;
+
+            const elActive = document.getElementById('statActiveStudents');
+            const elOpen = document.getElementById('statOpenCases');
+            const elL3 = document.getElementById('statPriorityL3');
+
+            if (elActive) elActive.textContent = activeCount.toLocaleString();
+            if (elOpen) elOpen.textContent = openCount.toLocaleString();
+            if (elL3) elL3.textContent = l3Count.toLocaleString();
+        }
+
+        function renderStudentsTable(students) {
+            const tbody = document.getElementById('studentsBody');
+            if (!tbody) return;
+
+            if (!students || students.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #717682; padding: 2rem;">No student records found.</td></tr>`;
+                document.getElementById('recordCount').textContent = 'Showing 0 records';
+                return;
+            }
+
+            tbody.innerHTML = students.map(s => {
+                const idDisplay = s.studentId || s.id;
+                const triageLvl = s.triageLevel !== undefined ? s.triageLevel : 0;
+                const triageClass = `triage-${triageLvl}`;
+                const triageText = triageLvl === 0 ? 'No Active Case' : `Level ${triageLvl}`;
+                const incCount = s.incidentCount !== undefined ? s.incidentCount : 0;
+                const lastRev = s.lastReview || 'Oct 2026';
+
+                let actionHtml = `<button type="button" class="btn-view-student" onclick="toggleStudentDetail('${s.id}')">View</button>`;
+                if (isMinistryUser) {
+                    actionHtml = `
+                        <div class="student-actions-cell">
+                            <button type="button" class="btn-view-student" onclick="toggleStudentDetail('${s.id}')">View</button>
+                            <button type="button" class="btn-stu-edit" onclick="openStudentModal('${s.id}')">Edit</button>
+                            <button type="button" class="btn-stu-delete" onclick="deleteStudentFile('${s.id}', '${s.name.replace(/'/g, "\\'")}')">Delete</button>
+                        </div>
+                    `;
+                }
+
+                return `
+                    <tr data-district="${s.district || ''}" data-triage="${triageLvl}" id="stu-row-${s.id}">
+                        <td><span class="student-id-badge">${idDisplay}</span></td>
+                        <td>
+                            <div class="student-name">${s.name}</div>
+                            <div class="student-form">${s.form || ''}</div>
+                        </td>
+                        <td>
+                            <span class="school-name">${s.school || 'Unassigned School'}</span>
+                            <span class="school-district">${s.district || ''}</span>
+                        </td>
+                        <td>${incCount}</td>
+                        <td><span class="triage-badge ${triageClass}">${triageText}</span></td>
+                        <td>${lastRev}</td>
+                        <td>${actionHtml}</td>
+                    </tr>
+                `;
+            }).join('');
+
+            document.getElementById('recordCount').textContent = `Showing ${students.length} record${students.length !== 1 ? 's' : ''}`;
+        }
+
+        function toggleStudentDetail(id) {
+            const existingDetail = document.getElementById(`detail-row-${id}`);
+            if (existingDetail) {
+                existingDetail.remove();
+                if (expandedStudentId === id) {
+                    expandedStudentId = null;
+                    return;
+                }
+            }
+
+            // Remove previous open detail row if different
+            if (expandedStudentId) {
+                const prev = document.getElementById(`detail-row-${expandedStudentId}`);
+                if (prev) prev.remove();
+            }
+
+            const student = allStudents.find(s => s.id === id || s.studentId === id);
+            if (!student) return;
+
+            expandedStudentId = id;
+
+            // Find incidents for this student
+            const studentIncidents = (allIncidents || []).filter(inc => {
+                const sName = (student.name || '').toLowerCase();
+                const incStudent = (inc.studentName || inc.student || '').toLowerCase();
+                const sId = (student.studentId || student.id || '').toLowerCase();
+                const incStuId = (inc.studentId || '').toLowerCase();
+
+                const matchId = incStuId && (incStuId === sId || incStuId === (student.id || '').toLowerCase());
+                const matchName = incStudent && sName && (incStudent.includes(sName) || sName.includes(incStudent));
+                return matchId || matchName;
+            });
+
+            const targetRow = document.getElementById(`stu-row-${id}`);
+            if (!targetRow) return;
+
+            const triageLvl = student.triageLevel !== undefined ? student.triageLevel : 0;
+            const triageClass = `triage-${triageLvl}`;
+            const triageText = triageLvl === 0 ? 'Level 0 (No Active Case)' : `Level ${triageLvl}`;
+            const activeIncCount = student.incidentCount !== undefined ? student.incidentCount : studentIncidents.length;
+
+            const detailHtml = `
+                <tr class="student-detail-row" id="detail-row-${id}">
+                    <td colspan="7">
+                        <div class="student-detail-panel">
+                            <div class="detail-header">
+                                <div>
+                                    <h4>Student File: ${student.name}</h4>
+                                    <span style="font-size: 0.85rem; color: #717682;">
+                                        ID: <strong>${student.studentId || student.id}</strong> • Form: <strong>${student.form || 'N/A'}</strong> • Institution: <strong>${student.school || 'Unassigned School'}</strong>
+                                    </span>
+                                </div>
+                                <button type="button" class="btn-close-detail" onclick="toggleStudentDetail('${id}')">✕ Close</button>
+                            </div>
+
+                            <div class="detail-grid">
+                                <div class="detail-field">
+                                    <span class="detail-field-label">Student ID</span>
+                                    <span class="detail-field-value student-id-badge">${student.studentId || student.id}</span>
+                                </div>
+                                <div class="detail-field">
+                                    <span class="detail-field-label">Full Name</span>
+                                    <span class="detail-field-value">${student.name}</span>
+                                </div>
+                                <div class="detail-field">
+                                    <span class="detail-field-label">Form / Grade</span>
+                                    <span class="detail-field-value">${student.form || 'N/A'}</span>
+                                </div>
+                                <div class="detail-field">
+                                    <span class="detail-field-label">Institution / School</span>
+                                    <span class="detail-field-value">${student.school || 'Unassigned School'}</span>
+                                </div>
+                                <div class="detail-field">
+                                    <span class="detail-field-label">Educational District</span>
+                                    <span class="detail-field-value">${student.district || 'Unassigned District'}</span>
+                                </div>
+                                <div class="detail-field">
+                                    <span class="detail-field-label">Triage Level</span>
+                                    <span class="detail-field-value"><span class="triage-badge ${triageClass}">${triageText}</span></span>
+                                </div>
+                                <div class="detail-field">
+                                    <span class="detail-field-label">Active Incidents</span>
+                                    <span class="detail-field-value">${activeIncCount}</span>
+                                </div>
+                                <div class="detail-field">
+                                    <span class="detail-field-label">Last Review Date</span>
+                                    <span class="detail-field-value">${student.lastReview || 'Oct 2026'}</span>
+                                </div>
+                            </div>
+
+                            <div class="detail-incidents-section">
+                                <h5>Disciplinary Incident History (${studentIncidents.length})</h5>
+                                ${studentIncidents.length > 0 ? `
+                                    <div class="detail-incidents-list">
+                                        ${studentIncidents.map(inc => {
+                                            const statusColor = (inc.status || '').toLowerCase() === 'resolved' ? '#15803d' :
+                                                                (inc.status || '').toLowerCase() === 'escalated' ? '#b91c1c' : '#b45309';
+                                            return `
+                                                <div class="detail-incident-item">
+                                                    <span class="inc-id">${inc.incidentId || inc.id}</span>
+                                                    <span class="inc-date">${inc.date || 'Oct 2026'}</span>
+                                                    <span style="font-weight: 700; font-size: 0.8rem; text-transform: uppercase;">${inc.matrix || 'Level 1 Matrix'}</span>
+                                                    <span class="inc-desc">${inc.description || inc.action || 'Discipline incident record'}</span>
+                                                    <span style="font-weight: 600; font-size: 0.82rem; color: ${statusColor};">${inc.status || 'Open'}</span>
+                                                </div>
+                                            `;
+                                        }).join('')}
+                                    </div>
+                                ` : `
+                                    <p class="detail-no-incidents">No disciplinary incidents logged on file for this student.</p>
+                                `}
+                            </div>
+
+                            <div class="detail-actions">
+                                <button type="button" class="btn-detail-edit" onclick="openStudentModal('${id}')">Edit / Update Student File</button>
+                                ${isMinistryUser ? `<button type="button" class="btn-stu-delete" style="padding: 0.45rem 1rem; font-size: 0.85rem;" onclick="deleteStudentFile('${id}', '${student.name.replace(/'/g, "\\'")}')">Delete Student File</button>` : ''}
+                                <button type="button" class="btn-modal-cancel" onclick="toggleStudentDetail('${id}')">Close</button>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            `;
+
+            targetRow.insertAdjacentHTML('afterend', detailHtml);
+        }
+
+        function openStudentModal(id) {
+            const student = allStudents.find(s => s.id === id || s.studentId === id);
+            if (!student) return;
+
+            document.getElementById('editStudentId').value = student.id;
+            document.getElementById('modalStudentTitle').textContent = `Update Student File: ${student.name}`;
+            document.getElementById('editStuName').value = student.name || '';
+            document.getElementById('editStuForm').value = student.form || '';
+            document.getElementById('editStuSchool').value = student.school || '';
+            document.getElementById('editStuDistrict').value = student.district || '';
+            document.getElementById('editStuTriage').value = String(student.triageLevel !== undefined ? student.triageLevel : 0);
+            document.getElementById('editStuIncidents').value = student.incidentCount !== undefined ? student.incidentCount : 0;
+
+            document.getElementById('editStudentModal').classList.add('is-active');
+        }
+
+        function closeStudentModal() {
+            document.getElementById('editStudentModal').classList.remove('is-active');
+        }
+
+        async function saveStudentUpdate(e) {
+            e.preventDefault();
+            const id = document.getElementById('editStudentId').value;
+            const payload = {
+                name: document.getElementById('editStuName').value.trim(),
+                form: document.getElementById('editStuForm').value.trim(),
+                school: document.getElementById('editStuSchool').value.trim(),
+                district: document.getElementById('editStuDistrict').value.trim(),
+                triageLevel: parseInt(document.getElementById('editStuTriage').value),
+                incidentCount: parseInt(document.getElementById('editStuIncidents').value)
+            };
+
+            try {
+                let res;
+                try {
+                    res = await fetch(`/api/students/${id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                } catch (_) {
+                    res = await fetch(getApiUrl(`/api/students/${id}`), {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                }
+
+                if (res && res.ok) {
+                    const data = await res.json();
+                    const idx = allStudents.findIndex(s => s.id === id);
+                    if (idx !== -1) {
+                        allStudents[idx] = { ...allStudents[idx], ...data.student };
+                    }
+                    renderStudentsTable(allStudents);
+                    updateStudentStats();
+                    closeStudentModal();
+
+                    // If the detail panel was open, refresh it with new values
+                    if (expandedStudentId === id) {
+                        toggleStudentDetail(id);
+                    }
+                } else {
+                    // Update local object so user gets immediate visual feedback even if offline
+                    const idx = allStudents.findIndex(s => s.id === id);
+                    if (idx !== -1) {
+                        allStudents[idx] = { ...allStudents[idx], ...payload };
+                        renderStudentsTable(allStudents);
+                        updateStudentStats();
+                        if (expandedStudentId === id) toggleStudentDetail(id);
+                    }
+                    closeStudentModal();
+                }
+            } catch (err) {
+                console.error('Error updating student file:', err);
+                const idx = allStudents.findIndex(s => s.id === id);
+                if (idx !== -1) {
+                    allStudents[idx] = { ...allStudents[idx], ...payload };
+                    renderStudentsTable(allStudents);
+                    updateStudentStats();
+                    if (expandedStudentId === id) toggleStudentDetail(id);
+                }
+                closeStudentModal();
+            }
+        }
+
+        async function deleteStudentFile(id, name) {
+            if (!confirm(`Are you sure you want to permanently delete the student file for ${name}?`)) {
+                return;
+            }
+
+            try {
+                let res;
+                try {
+                    res = await fetch(`/api/students/${id}`, { method: 'DELETE' });
+                } catch (_) {
+                    res = await fetch(getApiUrl(`/api/students/${id}`), { method: 'DELETE' });
+                }
+
+                if (expandedStudentId === id) {
+                    const detail = document.getElementById(`detail-row-${id}`);
+                    if (detail) detail.remove();
+                    expandedStudentId = null;
+                }
+
+                allStudents = allStudents.filter(s => s.id !== id && s.studentId !== id);
+                renderStudentsTable(allStudents);
+                updateStudentStats();
+            } catch (err) {
+                console.error('Error deleting student file:', err);
+                allStudents = allStudents.filter(s => s.id !== id && s.studentId !== id);
+                renderStudentsTable(allStudents);
+                updateStudentStats();
+            }
+        }
+
+        function filterTable() {
+            if (expandedStudentId) {
+                const openDetail = document.getElementById(`detail-row-${expandedStudentId}`);
+                if (openDetail) openDetail.remove();
+                expandedStudentId = null;
+            }
+
+            const searchVal = document.getElementById('searchStudent').value.toLowerCase();
+            const districtVal = document.getElementById('filterDistrict').value.toLowerCase();
+            const triageVal = document.getElementById('filterTriage').value;
+            const rows = document.querySelectorAll('#studentsBody tr:not(.student-detail-row)');
+            let visibleCount = 0;
+
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                const district = row.getAttribute('data-district') || '';
+                const triage = row.getAttribute('data-triage') || '';
+
+                const matchSearch = !searchVal || text.includes(searchVal);
+                const matchDistrict = !districtVal || district.toLowerCase() === districtVal;
+                const matchTriage = !triageVal || triage === triageVal;
+
+                if (matchSearch && matchDistrict && matchTriage) {
+                    row.style.display = '';
+                    visibleCount++;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            document.getElementById('recordCount').textContent = `Showing ${visibleCount} record${visibleCount !== 1 ? 's' : ''}`;
+        }
+
+        function resetFilters() {
+            document.getElementById('searchStudent').value = '';
+            document.getElementById('filterDistrict').value = '';
+            document.getElementById('filterTriage').value = '';
+            filterTable();
+        }
+    </script>
+</body>
+
+</html>

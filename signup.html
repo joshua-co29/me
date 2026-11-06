@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Request Access / Staff Registration - Sentinel Edu</title>
+
+    <!-- Google Fonts: Google Sans & Product Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Product+Sans:wght@400;700&display=swap"
+        rel="stylesheet">
+
+    <!-- External Stylesheet -->
+    <link rel="stylesheet" href="style/style.css">
+    <style>
+        .signup-page-wrap {
+            min-height: calc(100vh - 80px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(to bottom, rgba(10, 11, 14, 0.75), rgba(10, 11, 14, 0.9)), url('image/home.png');
+            background-size: cover;
+            background-position: center;
+            padding: 3rem 1.5rem;
+        }
+
+        .signup-box {
+            background: #ffffff;
+            color: #111111;
+            width: 100%;
+            max-width: 480px;
+            padding: 3rem 2.8rem;
+            border-radius: 4px;
+            box-shadow: 0 24px 48px rgba(0, 0, 0, 0.35);
+        }
+
+        .signup-box-header {
+            margin-bottom: 1.8rem;
+        }
+
+        .signup-box-title {
+            font-size: 1.85rem;
+            font-weight: 700;
+            color: #111111;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.02em;
+        }
+
+        .signup-box-subtitle {
+            font-size: 0.92rem;
+            color: #5e6472;
+            line-height: 1.5;
+        }
+
+        .form-group {
+            margin-bottom: 1.3rem;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: #222222;
+            margin-bottom: 0.4rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            font-size: 0.92rem;
+            font-family: inherit;
+            border: 1px solid rgba(0, 0, 0, 0.15);
+            border-radius: 3px;
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .form-control:focus {
+            border-color: var(--accent-lilac);
+            box-shadow: 0 0 0 3px rgba(159, 150, 238, 0.25);
+        }
+
+        .btn-continue-signup {
+            width: 100%;
+            padding: 0.95rem 1.5rem;
+            background: #111111;
+            color: #ffffff;
+            font-size: 1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            font-family: inherit;
+            letter-spacing: -0.01em;
+            margin-top: 0.5rem;
+        }
+
+        .btn-continue-signup:hover {
+            background: #2a2c35;
+        }
+
+        .signup-footer {
+            margin-top: 1.5rem;
+            text-align: center;
+            font-size: 0.88rem;
+            color: #6c717e;
+        }
+
+        .signup-footer a {
+            color: #4f46e5;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .signup-footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Top Navigation Header -->
+    <header class="site-header">
+        <a href="index.html" class="brand-logo">
+            Sentinel Edu<span class="brand-dot"></span>
+        </a>
+
+        <nav>
+            <ul class="nav-links">
+                <li><a href="index.html#academics">Programs</a></li>
+                <li><a href="engine.html">Engine</a></li>
+                <li><a href="index.html#footer">Contact</a></li>
+            </ul>
+        </nav>
+
+        <div class="header-actions">
+            <a href="login.html" class="login-btn">
+                <span class="login-avatar">
+                    <svg viewBox="0 0 24 24">
+                        <path
+                            d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                    </svg>
+                </span>
+                Staff Login
+            </a>
+            <a href="signup.html" class="btn-enroll-header" style="background: #111111; color: #ffffff;">Request Access</a>
+        </div>
+    </header>
+
+    <!-- Main Signup Container -->
+    <main class="signup-page-wrap">
+        <div class="signup-box">
+            <div class="signup-box-header">
+                <h1 class="signup-box-title">Create Staff Account</h1>
+                <p class="signup-box-subtitle">Register to manage school incident logs, track student triage, and collaborate across institutions.</p>
+            </div>
+
+            <form id="signupForm" onsubmit="handleSignup(event)">
+                <div class="form-group">
+                    <label for="fullName" class="form-label">Full Name</label>
+                    <input type="text" id="fullName" class="form-control" placeholder="e.g. Dean R. Mohammed" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email" class="form-label">Official Email</label>
+                    <input type="email" id="email" class="form-control" placeholder="e.g. r.mohammed@moe.edu.tt" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="role" class="form-label">Role / Position</label>
+                    <select id="role" class="form-control" required>
+                        <option value="">Select your role...</option>
+                        <option value="Dean of Discipline">Dean of Discipline</option>
+                        <option value="Guidance Counselor">Guidance Counselor</option>
+                        <option value="Principal / Vice-Principal">Principal / Vice-Principal</option>
+                        <option value="Ministry Education Officer">Ministry Education Officer</option>
+                        <option value="School Social Worker">School Social Worker</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="password" class="form-label">Create Password</label>
+                    <input type="password" id="password" class="form-control" placeholder="Minimum 6 characters" required minlength="6">
+                </div>
+
+                <div id="signupAlert" style="display: none; margin-top: 1rem; padding: 0.8rem 1rem; border-radius: 3px; font-size: 0.88rem; background: #fee2e2; color: #991b1b; border: 1px solid #fecaca;"></div>
+
+                <button type="submit" class="btn-continue-signup">
+                    Create Account & Continue &rarr;
+                </button>
+            </form>
+
+            <div class="signup-footer">
+                Already have an authorized staff account? <a href="login.html">Log In here</a>
+            </div>
+        </div>
+    </main>
+
+    <!-- Shared Header & Auth Script -->
+    <script src="auth.js"></script>
+    <script>
+        async function handleSignup(e) {
+            e.preventDefault();
+            const fullName = document.getElementById('fullName').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const role = document.getElementById('role').value;
+            const password = document.getElementById('password').value;
+            const submitBtn = document.querySelector('.btn-continue-signup');
+            const alertBox = document.getElementById('signupAlert');
+
+            if (!fullName || !email || !password || !role) return;
+
+            alertBox.style.display = 'none';
+            const originalBtnText = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = 'Creating Account in Database...';
+
+            try {
+                const result = await performSignup(fullName, email, password, role);
+                redirectByRole(result.user);
+            } catch (err) {
+                if (err.message && !err.message.includes('fetch')) {
+                    alertBox.textContent = err.message;
+                    alertBox.style.display = 'block';
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalBtnText;
+                } else {
+                    console.log('Server offline, saving locally:', fullName);
+                    const mockUser = { name: `${fullName} (${role})`, email, role };
+                    localStorage.setItem('sentinel_user', JSON.stringify(mockUser));
+                    redirectByRole(mockUser);
+                }
+            }
+        }
+    </script>
+</body>
+
+</html>
+

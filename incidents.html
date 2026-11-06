@@ -1,0 +1,1391 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Incidents Log - Sentinel Edu</title>
+    <meta name="description" content="Real-time school incident tracking — log and classify incidents under the Ministry of Education National School Discipline Matrix.">
+
+    <!-- Google Fonts: Google Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Product+Sans:wght@400;700&display=swap" rel="stylesheet">
+
+    <!-- Shared Stylesheet -->
+    <link rel="stylesheet" href="style/style.css">
+
+    <style>
+        body {
+            background-color: #ffffff;
+            color: #121316;
+            font-family: var(--font-family);
+        }
+
+        /* ===== PAGE WRAPPER ===== */
+        .page-wrapper {
+            max-width: 1400px;
+            margin: 2.5rem auto 4rem;
+            padding: 0 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        /* ===== PAGE TITLE BANNER ===== */
+        .page-title-banner {
+            background: transparent;
+            border: none;
+            padding: 2.5rem 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .page-subtitle {
+            font-size: 0.88rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #5e6472;
+            margin-bottom: 0.5rem;
+        }
+
+        .page-title-banner h1 {
+            font-size: clamp(1.8rem, 2.8vw, 2.6rem);
+            font-weight: 800;
+            color: #111111;
+            letter-spacing: -0.025em;
+            line-height: 1.1;
+        }
+
+        .page-title-banner p {
+            font-size: 1rem;
+            color: #5e6472;
+            margin-top: 0.7rem;
+            max-width: 520px;
+        }
+
+        .btn-log-incident {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.55rem;
+            padding: 0.9rem 1.8rem;
+            background: #111111;
+            color: #ffffff;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
+            transition: background 0.2s ease;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .btn-log-incident:hover {
+            background: #2e3040;
+        }
+
+        /* ===== LOG FORM ===== */
+        .log-form-section {
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid rgba(0,0,0,0.08);
+            padding: 2rem 0;
+            display: none;
+        }
+
+        .log-form-section.is-open {
+            display: block;
+        }
+
+        .log-form-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #111111;
+            letter-spacing: -0.02em;
+            margin-bottom: 1.8rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem 2rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-group label {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #4b5162;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .form-control {
+            padding: 0.75rem 1rem;
+            border: 1px solid rgba(0, 0, 0, 0.15);
+            background: #ffffff;
+            font-size: 0.92rem;
+            font-family: inherit;
+            outline: none;
+            color: #111111;
+            transition: border-color 0.2s ease;
+            border-radius: 0;
+        }
+
+        .form-control:focus {
+            border-color: #6f58ad;
+            box-shadow: 0 0 0 3px rgba(111, 88, 173, 0.15);
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 90px;
+        }
+
+        .form-actions {
+            margin-top: 1.8rem;
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn-submit-incident {
+            padding: 0.85rem 2rem;
+            background: #111111;
+            color: #ffffff;
+            border: none;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            transition: background 0.2s ease;
+        }
+
+        .btn-submit-incident:hover { background: #2e3040; }
+
+        .btn-cancel {
+            padding: 0.85rem 1.5rem;
+            background: transparent;
+            color: #111111;
+            border: 1px solid rgba(0,0,0,0.2);
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.2s ease;
+        }
+
+        .btn-cancel:hover {
+            background: rgba(0,0,0,0.05);
+        }
+
+        /* ===== FILTER BAR ===== */
+        .filter-bar {
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid rgba(0,0,0,0.08);
+            padding: 1.2rem 0;
+            display: flex;
+            gap: 1.2rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .filter-bar label {
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: #4b5162;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            white-space: nowrap;
+        }
+
+        .filter-input, .filter-select {
+            padding: 0.6rem 1rem;
+            border: 1px solid rgba(0, 0, 0, 0.15);
+            background: #ffffff;
+            font-size: 0.9rem;
+            font-family: inherit;
+            outline: none;
+            color: #111111;
+            border-radius: 0;
+            transition: border-color 0.2s ease;
+        }
+
+        .filter-input { flex: 1; min-width: 200px; }
+        .filter-select { min-width: 170px; }
+        .filter-input:focus, .filter-select:focus { border-color: #6f58ad; }
+
+        .btn-filter {
+            padding: 0.6rem 1.4rem;
+            background: #111111;
+            color: #ffffff;
+            border: none;
+            font-size: 0.88rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .btn-filter:hover { background: #2e3040; }
+
+        /* ===== INCIDENTS TABLE ===== */
+        .table-section {
+            background: transparent;
+            border: none;
+            padding: 2.5rem 0;
+        }
+
+        .table-section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 1.8rem;
+            padding-bottom: 1.2rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+        }
+
+        .table-section-title {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #111111;
+            letter-spacing: -0.02em;
+        }
+
+        .table-section-meta {
+            font-size: 0.88rem;
+            color: #717682;
+        }
+
+        .incidents-table-wrap {
+            width: 100%;
+            overflow-x: auto;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+        }
+
+        .incidents-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            background: #ffffff;
+        }
+
+        .incidents-table th {
+            font-size: 0.8rem;
+            color: #4b5162;
+            background: #f5f5f5;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            padding: 1rem 1.2rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .incidents-table td {
+            padding: 1rem 1.2rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            font-size: 0.92rem;
+            color: #1a1a1a;
+            vertical-align: middle;
+        }
+
+        .incidents-table tr:last-child td { border-bottom: none; }
+        .incidents-table tr:hover td { background-color: #faf8f2; }
+
+        .incident-id {
+            font-weight: 700;
+            color: #6f58ad;
+            font-size: 0.85rem;
+        }
+
+        .school-name {
+            font-weight: 600;
+            color: #111111;
+            display: block;
+        }
+
+        .school-district {
+            font-size: 0.8rem;
+            color: #717682;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0;
+            background: transparent;
+            border: none;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .status-level-1 { background: transparent; color: #b45309; border: none; } /* Level 1: Soft Amber / Muted Yellow */
+        .status-level-2 { background: transparent; color: #ea580c; border: none; } /* Level 2: Warm Orange */
+        .status-level-3 { background: transparent; color: #991b1b; border: none; } /* Level 3: Deep Red / Crimson */
+
+        .action-badge {
+            font-size: 0.88rem;
+            color: #2e3040;
+        }
+
+        .date-text {
+            font-size: 0.88rem;
+            color: #5e6472;
+            white-space: nowrap;
+        }
+
+        /* ===== CRUD ACTIONS ===== */
+        .inc-actions-cell {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .btn-inc-edit,
+        .btn-inc-delete {
+            padding: 0.35rem 0.65rem;
+            font-size: 0.78rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            border: 1px solid rgba(0, 0, 0, 0.15);
+            background: #ffffff;
+            color: #111111;
+            transition: all 0.15s ease;
+            text-decoration: none;
+            border-radius: 0px;
+        }
+
+        .btn-inc-edit:hover {
+            background: #111111;
+            color: #ffffff;
+            border-color: #111111;
+        }
+
+        .btn-inc-delete {
+            color: #991b1b;
+            border-color: rgba(153, 27, 27, 0.25);
+        }
+
+        .btn-inc-delete:hover {
+            background: #991b1b;
+            color: #ffffff;
+            border-color: #991b1b;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            padding: 1rem;
+        }
+
+        .modal-overlay.is-active {
+            display: flex;
+        }
+
+        .modal-card {
+            background: #ffffff;
+            width: 100%;
+            max-width: 520px;
+            padding: 2rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-card h3 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 0.3rem;
+            color: #111111;
+            letter-spacing: -0.01em;
+        }
+
+        .modal-card p.modal-sub {
+            font-size: 0.88rem;
+            color: #6a6f7c;
+            margin-bottom: 1.4rem;
+        }
+
+        .modal-form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+            margin-bottom: 1.1rem;
+        }
+
+        .modal-form-group label {
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: #4b5162;
+        }
+
+        .modal-form-group input,
+        .modal-form-group select,
+        .modal-form-group textarea {
+            padding: 0.65rem 0.85rem;
+            font-size: 0.92rem;
+            font-family: inherit;
+            border: 1px solid rgba(0, 0, 0, 0.2);
+            border-radius: 0;
+            outline: none;
+            color: #111111;
+        }
+
+        .modal-form-group input:focus,
+        .modal-form-group select:focus,
+        .modal-form-group textarea:focus {
+            border-color: #6f58ad;
+            box-shadow: 0 0 0 2px rgba(111, 88, 173, 0.15);
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.6rem;
+            margin-top: 1.6rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(0, 0, 0, 0.08);
+        }
+
+        .btn-modal-cancel {
+            padding: 0.65rem 1.2rem;
+            background: #ffffff;
+            color: #111111;
+            border: 1px solid rgba(0, 0, 0, 0.15);
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .btn-modal-cancel:hover {
+            background: #f5f5f5;
+        }
+
+        .btn-modal-save {
+            padding: 0.65rem 1.4rem;
+            background: #111111;
+            color: #ffffff;
+            border: 1px solid #111111;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .btn-modal-save:hover {
+            background: #2e3040;
+        }
+
+        /* ===== TOAST ===== */
+        .toast-notification {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: #111111;
+            color: #ffffff;
+            padding: 1rem 1.8rem;
+            font-size: 0.95rem;
+            font-weight: 600;
+            z-index: 9999;
+            opacity: 0;
+            transform: translateY(12px);
+            transition: opacity 0.35s ease, transform 0.35s ease;
+            pointer-events: none;
+        }
+
+        .toast-notification.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 1100px) {
+            .page-title-banner { flex-direction: column; align-items: flex-start; }
+            .form-grid { grid-template-columns: 1fr; }
+            .table-section { padding: 2rem 1.5rem; }
+        }
+
+        @media (max-width: 768px) {
+            .page-wrapper { padding: 0 1rem; }
+            .filter-bar { flex-direction: column; align-items: stretch; }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Top Navigation Header -->
+    <header class="site-header">
+        <a href="index.html" class="brand-logo">
+            Sentinel Edu<span class="brand-dot"></span>
+        </a>
+
+        <nav>
+            <ul class="nav-links">
+                <li><a href="dashboard.html">Dashboard</a></li>
+                <li><a href="students.html">Students</a></li>
+                <li><a href="incidents.html" style="font-weight: 700; color: #000;">Incidents</a></li>
+                <li><a href="engine.html">Engine</a></li>
+            </ul>
+        </nav>
+
+        <div class="header-actions">
+            <a href="login.html" class="login-btn">
+                <span class="login-avatar">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                    </svg>
+                </span>
+                Staff Login
+            </a>
+            <a href="signup.html" class="btn-enroll-header">Request Access</a>
+        </div>
+    </header>
+
+    <main class="page-wrapper">
+
+        <!-- Page Title Banner -->
+        <section class="page-title-banner">
+            <div>
+                <div class="page-subtitle">National Discipline Matrix</div>
+                <h1>Real-Time Incident Tracking</h1>
+                <p>Log and classify incidents under the Ministry of Education National School Discipline Matrix. Track severity, escalation status, and resolution actions.</p>
+            </div>
+            <button class="btn-log-incident" id="toggleFormBtn" onclick="toggleForm()">
+                + Log New Incident
+            </button>
+        </section>
+
+        <!-- Log Incident Form (hidden by default, opens when button clicked) -->
+        <section class="log-form-section" id="logFormSection">
+            <div class="log-form-title">Log New Incident</div>
+            <form onsubmit="submitIncident(event)">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="incStudentId">Student Name or ID</label>
+                        <input type="text" id="incStudentId" class="form-control" placeholder="e.g. Marcus Aurelius or STU-2026-001" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="incStudentForm">Student Form / Class</label>
+                        <input type="text" id="incStudentForm" class="form-control" placeholder="e.g. Form 4-B" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="incSchool">School / Institution</label>
+                        <input type="text" id="incSchool" class="form-control" placeholder="e.g. Arima Central Secondary" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="incDistrict">Educational District</label>
+                        <select id="incDistrict" class="form-control" required>
+                            <option value="">Select district…</option>
+                            <option>St. George East District</option>
+                            <option>Victoria Educational District</option>
+                            <option>Caroni Educational District</option>
+                            <option>Tobago Educational District</option>
+                            <option>St. Patrick Educational District</option>
+                            <option>Nariva/Mayaro District</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="incMatrix">Discipline Matrix Level</label>
+                        <select id="incMatrix" class="form-control" required>
+                            <option value="">Select level…</option>
+                            <option value="Level 1 Matrix">Level 1 — Minor Infraction</option>
+                            <option value="Level 2 Matrix">Level 2 — Moderate Infraction</option>
+                            <option value="Level 3 Matrix">Level 3 — Severe Infraction</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="incAction">Initial Action Taken</label>
+                        <select id="incAction" class="form-control" required>
+                            <option value="">Select action…</option>
+                            <option>Guidance Counseling Referral</option>
+                            <option>Peer Mediation Protocol</option>
+                            <option>Parent Conference Logged</option>
+                            <option>Dean Formal Review</option>
+                            <option>Ministry Escalated Review</option>
+                            <option>External Support Assigned</option>
+                        </select>
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="incDescription">Incident Description</label>
+                        <textarea id="incDescription" class="form-control" placeholder="Briefly describe the incident circumstances…" required></textarea>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-submit-incident">Submit Incident Report</button>
+                    <button type="button" class="btn-cancel" onclick="toggleForm()">Cancel</button>
+                </div>
+            </form>
+        </section>
+
+        <!-- Filter Bar -->
+        <div class="filter-bar">
+            <label>Search:</label>
+            <input type="text" id="searchInc" class="filter-input" placeholder="Incident ID, school, or action…" oninput="filterIncidents()">
+
+            <label>Matrix Level:</label>
+            <select id="filterLevel" class="filter-select" onchange="filterIncidents()">
+                <option value="">All Levels</option>
+                <option value="level-1">Level 1</option>
+                <option value="level-2">Level 2</option>
+                <option value="level-3">Level 3</option>
+            </select>
+
+            <button class="btn-filter" onclick="resetIncFilters()">Reset</button>
+        </div>
+
+        <!-- Incidents Table -->
+        <section class="table-section">
+            <div class="table-section-header">
+                <div class="table-section-title">Incident Records</div>
+                <div class="table-section-meta" id="incRecordCount">Showing records</div>
+            </div>
+
+            <div class="incidents-table-wrap">
+                <table class="incidents-table" id="incidentsTable">
+                    <thead>
+                        <tr>
+                            <th>Incident ID</th>
+                            <th>Date</th>
+                            <th>Student / Form</th>
+                            <th>Institution / District</th>
+                            <th>Discipline Matrix</th>
+                            <th>Action Taken</th>
+                            <th>Status</th>
+                            <th id="incActionsHeader" style="text-align: right; display: none;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="incidentsBody">
+                        <!-- Populated dynamically via API/Supabase -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Modal for Editing Incident Record -->
+    <div class="modal-overlay" id="editIncidentModal">
+        <div class="modal-card">
+            <h3 id="modalIncidentTitle">Update Incident Record</h3>
+            <p class="modal-sub">Administrative Incident Review & Matrix Classification</p>
+            <form id="editIncidentForm" onsubmit="saveIncidentUpdate(event)">
+                <input type="hidden" id="editIncidentId">
+                <div class="modal-form-group">
+                    <label for="editStudentName">Student / Class</label>
+                    <input type="text" id="editStudentName" required>
+                </div>
+                <div class="modal-form-group">
+                    <label for="editSchool">Institution / School</label>
+                    <input type="text" id="editSchool" required>
+                </div>
+                <div class="modal-form-group">
+                    <label for="editDistrict">District</label>
+                    <input type="text" id="editDistrict" required>
+                </div>
+                <div class="modal-form-group">
+                    <label for="editMatrix">Discipline Matrix</label>
+                    <select id="editMatrix">
+                        <option value="Level 1 Matrix">Level 1 Matrix (Minor Infraction)</option>
+                        <option value="Level 2 Matrix">Level 2 Matrix (Moderate Violation)</option>
+                        <option value="Level 3 Matrix">Level 3 Matrix (Severe / Criminal)</option>
+                    </select>
+                </div>
+                <div class="modal-form-group">
+                    <label for="editAction">Status / Action Taken</label>
+                    <input type="text" id="editAction" required placeholder="e.g. Dean Formal Review">
+                </div>
+                <div class="modal-form-group">
+                    <label for="editStatus">Case Status</label>
+                    <select id="editStatus">
+                        <option value="Open">Open</option>
+                        <option value="Resolved">Resolved</option>
+                        <option value="Escalated">Escalated</option>
+                    </select>
+                </div>
+                <div class="modal-form-group">
+                    <label for="editDescription">Incident Description</label>
+                    <textarea id="editDescription" rows="3" placeholder="Brief circumstances..."></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-modal-cancel" onclick="closeEditModal()">Cancel</button>
+                    <button type="submit" class="btn-modal-save">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    </main>
+
+    <!-- Modal for Editing Incident (Ministry Officer Only) -->
+    <div class="modal-overlay" id="editIncidentModal">
+        <div class="modal-card">
+            <h3 id="modalIncidentTitle">Update Incident Record</h3>
+            <p class="modal-sub">Administrative Incident Review &amp; Matrix Classification</p>
+            <form id="editIncidentForm" onsubmit="saveIncidentUpdate(event)">
+                <input type="hidden" id="editIncidentId">
+                <div class="modal-form-group">
+                    <label for="editStudentName">Student / Class</label>
+                    <input type="text" id="editStudentName" required>
+                </div>
+                <div class="modal-form-group">
+                    <label for="editSchool">Institution / School</label>
+                    <input type="text" id="editSchool" required>
+                </div>
+                <div class="modal-form-group">
+                    <label for="editDistrict">District</label>
+                    <input type="text" id="editDistrict" required>
+                </div>
+                <div class="modal-form-group">
+                    <label for="editMatrix">Discipline Matrix</label>
+                    <select id="editMatrix">
+                        <option value="Level 1 Matrix">Level 1 Matrix (Minor Infraction)</option>
+                        <option value="Level 2 Matrix">Level 2 Matrix (Moderate Violation)</option>
+                        <option value="Level 3 Matrix">Level 3 Matrix (Severe / Criminal)</option>
+                    </select>
+                </div>
+                <div class="modal-form-group">
+                    <label for="editAction">Action Taken</label>
+                    <input type="text" id="editAction" required placeholder="e.g. Dean Formal Review">
+                </div>
+                <div class="modal-form-group">
+                    <label for="editStatus">Case Status</label>
+                    <select id="editStatus">
+                        <option value="Open">Open</option>
+                        <option value="Resolved">Resolved</option>
+                        <option value="Escalated">Escalated</option>
+                    </select>
+                </div>
+                <div class="modal-form-group">
+                    <label for="editDescription">Incident Description</label>
+                    <textarea id="editDescription" rows="3" placeholder="Brief circumstances..."></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-modal-cancel" onclick="closeEditModal()">Cancel</button>
+                    <button type="submit" class="btn-modal-save">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast notification -->
+    <div class="toast-notification" id="toastMsg">✓ Incident logged successfully</div>
+
+    <!-- Custom Delete Confirm Dialog (browser confirm() can be suppressed) -->
+    <div id="deleteConfirmOverlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.55); z-index:9999; align-items:center; justify-content:center;">
+        <div style="background:#fff; border-radius:12px; padding:2rem 2.5rem; max-width:420px; width:90%; box-shadow:0 8px 32px rgba(0,0,0,0.22); text-align:center;">
+            <div style="font-size:2.2rem; margin-bottom:0.5rem;">🗑️</div>
+            <h3 style="margin:0 0 0.5rem; color:#111; font-size:1.1rem;">Delete Incident?</h3>
+            <p id="deleteConfirmMsg" style="color:#555; font-size:0.92rem; margin:0 0 1.5rem;"></p>
+            <div style="display:flex; gap:0.75rem; justify-content:center;">
+                <button onclick="confirmDeleteCancel()" style="padding:0.6rem 1.5rem; border:1px solid #d1d5db; border-radius:8px; background:#f9fafb; color:#374151; font-size:0.9rem; cursor:pointer;">Cancel</button>
+                <button id="confirmDeleteOkBtn" onclick="confirmDeleteOk()" style="padding:0.6rem 1.5rem; border:none; border-radius:8px; background:#dc2626; color:#fff; font-size:0.9rem; font-weight:600; cursor:pointer;">Yes, Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Seed Database & Shared Header/Auth Script -->
+    <script src="data/seed.js"></script>
+    <script src="auth.js"></script>
+    <script>
+        // ── GLOBALS (must be declared before DOMContentLoaded runs) ──────────
+        let allIncidents = (window.SENTINEL_SEED_DATA && Array.isArray(window.SENTINEL_SEED_DATA.incidents))
+            ? [...window.SENTINEL_SEED_DATA.incidents]
+            : [];
+        let isMinistryUser = false;
+
+        function getApiUrl(path) {
+            const base = (typeof API_BASE !== 'undefined' && API_BASE) ? API_BASE : 'http://localhost:5000';
+            if (window.location.protocol === 'http:' || window.location.protocol === 'https:') {
+                if (!window.location.port || window.location.port === '5000') {
+                    return path;
+                }
+            }
+            return `${base}${path.startsWith('/') ? '' : '/'}${path}`;
+        }
+
+        // AUTH GUARD - check role for Ministry edit/delete permissions
+        (function() {
+            const userData = typeof getLoggedInUserData === 'function' ? getLoggedInUserData() : null;
+            if (userData) {
+                const r = (userData.role || '').toLowerCase();
+                isMinistryUser = r.includes('ministry') || r.includes('officer');
+            }
+        })();
+
+        function toggleForm() {
+            const section = document.getElementById('logFormSection');
+            if (!section) return;
+            section.classList.toggle('is-open');
+            const btn = document.getElementById('toggleFormBtn');
+            if (btn) {
+                btn.textContent = section.classList.contains('is-open') ? '✕ Cancel' : '+ Log New Incident';
+            }
+            if (section.classList.contains('is-open')) {
+                section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                setTimeout(() => {
+                    const idInput = document.getElementById('incStudentId');
+                    if (idInput && !idInput.value) idInput.focus();
+                }, 100);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const userData = typeof getLoggedInUserData === 'function' ? getLoggedInUserData() : null;
+            if (userData) {
+                const r = (userData.role || '').toLowerCase();
+                isMinistryUser = r.includes('ministry') || r.includes('officer');
+
+                const schoolInput = document.getElementById('incSchool');
+                if (schoolInput && !schoolInput.value && userData.schoolName) {
+                    schoolInput.value = userData.schoolName;
+                }
+                const districtSelect = document.getElementById('incDistrict');
+                if (districtSelect && !districtSelect.value) {
+                    districtSelect.value = userData.district || 'St. George East District';
+                }
+            }
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const studentParam = urlParams.get('student');
+            const formParam = urlParams.get('form') || urlParams.get('class');
+
+            if (studentParam) {
+                const sEl = document.getElementById('incStudentId');
+                if (sEl) sEl.value = studentParam;
+            }
+            if (formParam) {
+                const fEl = document.getElementById('incStudentForm');
+                if (fEl) fEl.value = formParam;
+            }
+
+            if (urlParams.get('action') === 'new' || window.location.hash === '#new') {
+                const section = document.getElementById('logFormSection');
+                if (section && !section.classList.contains('is-open')) {
+                    toggleForm();
+                }
+            }
+
+            renderIncidentsTable(allIncidents);
+            loadIncidents();
+            window.addEventListener('focus', () => {
+                loadIncidents();
+            });
+        });
+
+        const FALLBACK_INCIDENTS = [
+            { id: "inc_001", incidentId: "#INC-2026-089", date: "28 Oct 2026", studentName: "Marcus J. Williams", form: "Form 4-B", school: "Port of Spain North Secondary", district: "St. George East District", matrix: "Level 2 Matrix", level: 2, action: "Dean Formal Review", status: "Open" },
+            { id: "inc_002", incidentId: "#INC-2026-088", date: "28 Oct 2026", studentName: "Denzil T. Mohammed", form: "Form 5-C", school: "Chaguanas Senior Comprehensive", district: "Caroni Educational District", matrix: "Level 3 Matrix", level: 3, action: "Ministry Escalated Review", status: "Escalated" },
+            { id: "inc_003", incidentId: "#INC-2026-087", date: "27 Oct 2026", studentName: "Alicia M. Rampersad", form: "Form 2-A", school: "San Fernando East Technical", district: "Victoria Educational District", matrix: "Level 1 Matrix", level: 1, action: "Peer Mediation Protocol", status: "Resolved" },
+            { id: "inc_004", incidentId: "#INC-2026-086", date: "27 Oct 2026", studentName: "Kezia N. Baptiste", form: "Form 4-A", school: "Princes Town West Secondary", district: "Victoria Educational District", matrix: "Level 3 Matrix", level: 3, action: "External Support Assigned", status: "Open" },
+            { id: "inc_005", incidentId: "#INC-2026-085", date: "26 Oct 2026", studentName: "Priya S. Singh", form: "Form 3-D", school: "Arima Central Secondary", district: "St. George East District", matrix: "Level 2 Matrix", level: 2, action: "Parent Conference Logged", status: "Open" },
+            { id: "inc_006", incidentId: "#INC-2026-084", date: "26 Oct 2026", studentName: "Jonah A. Clarke", form: "Form 1-C", school: "Scarborough Secondary School", district: "Tobago Educational District", matrix: "Level 1 Matrix", level: 1, action: "Guidance Counselor Referral", status: "Resolved" },
+            { id: "inc_007", incidentId: "#INC-2026-083", date: "25 Oct 2026", studentName: "Ryan O. Phillip", form: "Form 2-C", school: "Siparia Regional Secondary", district: "St. Patrick Educational District", matrix: "Level 1 Matrix", level: 1, action: "Detention Assigned", status: "Resolved" },
+            { id: "inc_008", incidentId: "#INC-2026-082", date: "25 Oct 2026", studentName: "Isaiah K. Thomas", form: "Form 4-D", school: "St. George's College Secondary", district: "St. George East District", matrix: "Level 3 Matrix", level: 3, action: "Ministry Escalated Review", status: "Escalated" },
+            { id: "inc_009", incidentId: "#INC-2026-081", date: "24 Oct 2026", studentName: "Devon I. Charles", form: "Form 5-B", school: "Belmont Secondary School", district: "St. George East District", matrix: "Level 2 Matrix", level: 2, action: "Dean Formal Review", status: "Open" },
+            { id: "inc_010", incidentId: "#INC-2026-080", date: "24 Oct 2026", studentName: "Sophia L. Hernandez", form: "Form 1-A", school: "Rio Claro Secondary", district: "Nariva/Mayaro District", matrix: "Level 1 Matrix", level: 1, action: "Warning Issued", status: "Resolved" }
+        ];
+
+        const SUPABASE_REST_URL = "https://wrumedevccqkopguaxdi.supabase.co/rest/v1";
+        const SUPABASE_ANON_KEY = "sb_publishable_zpd_lzgRqghcN-0X7qw7SA_I2hAZHXH";
+
+        async function loadIncidents() {
+            let loaded = [];
+
+            // 1. Local Express API
+            const endpoints = ['http://localhost:5000/api/incidents', '/api/incidents'];
+            for (const ep of endpoints) {
+                try {
+                    const res = await fetch(ep);
+                    if (res.ok) {
+                        const data = await res.json();
+                        if (Array.isArray(data) && data.length > 0) {
+                            loaded = data;
+                            break;
+                        }
+                    }
+                } catch (_) {}
+            }
+
+            // 2. Direct online Supabase REST fetch if empty or primary
+            if (loaded.length === 0) {
+                try {
+                    const res = await fetch(`${SUPABASE_REST_URL}/incidents?select=*&order=created_at.desc`, {
+                        headers: {
+                            'apikey': SUPABASE_ANON_KEY,
+                            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+                        }
+                    });
+                    if (res.ok) {
+                        const raw = await res.json();
+                        if (Array.isArray(raw) && raw.length > 0) {
+                            loaded = raw.map(inc => ({
+                                id: inc.id,
+                                incidentId: inc.incident_id || inc.id,
+                                studentId: inc.student_id,
+                                studentName: inc.student_name,
+                                classId: inc.class_id,
+                                form: inc.form,
+                                schoolId: inc.school_id,
+                                school: inc.school || 'Port of Spain North Secondary',
+                                district: inc.district || 'St. George East District',
+                                matrix: inc.matrix || 'Level 1 Matrix',
+                                level: parseInt(inc.level || 1),
+                                action: inc.action || 'Under Review',
+                                description: inc.description || '',
+                                status: (inc.status && inc.status.toLowerCase() === 'resolved') ? 'Resolved' :
+                                        (inc.status && inc.status.toLowerCase() === 'escalated') ? 'Escalated' : 'Open',
+                                loggedById: inc.logged_by_id,
+                                loggedBy: inc.logged_by || 'Staff Member',
+                                date: inc.date || 'Oct 2026',
+                                createdAt: inc.created_at
+                            }));
+                        }
+                    }
+                } catch (err) {
+                    console.warn('[Supabase Direct Incidents Fetch]:', err.message);
+                }
+            }
+
+            // 3. Fallback to seed data or disk
+            if (loaded.length === 0) {
+                if (window.SENTINEL_SEED_DATA && Array.isArray(window.SENTINEL_SEED_DATA.incidents) && window.SENTINEL_SEED_DATA.incidents.length > 0) {
+                    loaded = [...window.SENTINEL_SEED_DATA.incidents];
+                } else {
+                    try {
+                        const res = await fetch('data/database.json');
+                        if (res.ok) {
+                            const db = await res.json();
+                            if (db && Array.isArray(db.incidents)) loaded = db.incidents;
+                        }
+                    } catch (_) {}
+                }
+            }
+
+            if (loaded.length === 0) loaded = FALLBACK_INCIDENTS;
+
+            allIncidents = loaded;
+            renderIncidentsTable(allIncidents);
+            const actionsHeader = document.getElementById('incActionsHeader');
+            if (actionsHeader && isMinistryUser) actionsHeader.style.display = '';
+        }
+
+        function renderIncidentsTable(incidents) {
+            const tbody = document.getElementById('incidentsBody');
+            if (!tbody) return;
+
+            if (!incidents || incidents.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:#717682; padding:2rem;">No incident records found.</td></tr>`;
+                document.getElementById('incRecordCount').textContent = 'Showing 0 records';
+                return;
+            }
+
+            tbody.innerHTML = incidents.map(inc => {
+                const matrixText = inc.matrix || 'Level 1 Matrix';
+                const levelNum = inc.level || (matrixText.includes('3') ? 3 : matrixText.includes('2') ? 2 : 1);
+                const badgeClass = `status-level-${levelNum}`;
+                const dataLevel = `level-${levelNum}`;
+                const statusText = inc.status || 'Open';
+                const statusColor = statusText.toLowerCase() === 'resolved' ? '#15803d' :
+                                    statusText.toLowerCase() === 'escalated' ? '#b91c1c' : '#b45309';
+                const safeId   = inc.id;
+                const safeCode = (inc.incidentId || inc.id).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+                const actionsCol = isMinistryUser ? `
+                    <td style="text-align: right;">
+                        <div class="inc-actions-cell" style="justify-content: flex-end;">
+                            <button class="btn-inc-edit" onclick="openEditModal('${safeId}')">Edit</button>
+                            <button class="btn-inc-delete" onclick="deleteIncident('${safeId}', '${safeCode}')">Delete</button>
+                        </div>
+                    </td>` : '';
+
+                return `
+                    <tr data-level="${dataLevel}" id="inc-row-${inc.id}">
+                        <td><span class="incident-id">${inc.incidentId || inc.id}</span></td>
+                        <td class="date-text">${inc.date || 'Oct 2026'}</td>
+                        <td>${inc.studentName || inc.student || 'Unknown'}<br><small style="color:#717682;">${inc.form || ''}</small></td>
+                        <td>
+                            <span class="school-name">${inc.school || 'Unassigned'}</span>
+                            <span class="school-district">${inc.district || ''}</span>
+                        </td>
+                        <td><span class="status-badge ${badgeClass}">${matrixText}</span></td>
+                        <td class="action-badge">${inc.action || 'Under Review'}</td>
+                        <td><span style="color:${statusColor}; font-weight:600; font-size:0.85rem;">${statusText}</span></td>
+                        ${actionsCol}
+                    </tr>
+                `;
+            }).join('');
+
+            document.getElementById('incRecordCount').textContent = `Showing ${incidents.length} record${incidents.length !== 1 ? 's' : ''}`;
+        }
+
+        function openEditModal(incId) {
+            const inc = allIncidents.find(i => i.id === incId || i.incidentId === incId);
+            if (!inc) return;
+
+            document.getElementById('editIncidentId').value = inc.id;
+            document.getElementById('modalIncidentTitle').textContent = `Update Incident ${inc.incidentId || inc.id}`;
+            document.getElementById('editStudentName').value = inc.studentName || inc.student || '';
+            document.getElementById('editSchool').value = inc.school || '';
+            document.getElementById('editDistrict').value = inc.district || '';
+            document.getElementById('editAction').value = inc.action || '';
+            document.getElementById('editStatus').value = inc.status || 'Open';
+            document.getElementById('editDescription').value = inc.description || '';
+
+            const matrixVal = inc.matrix || 'Level 1 Matrix';
+            if (matrixVal.includes('3')) document.getElementById('editMatrix').value = 'Level 3 Matrix';
+            else if (matrixVal.includes('2')) document.getElementById('editMatrix').value = 'Level 2 Matrix';
+            else document.getElementById('editMatrix').value = 'Level 1 Matrix';
+
+            document.getElementById('editIncidentModal').classList.add('is-active');
+        }
+
+        function closeEditModal() {
+            document.getElementById('editIncidentModal').classList.remove('is-active');
+        }
+
+        async function saveIncidentUpdate(e) {
+            e.preventDefault();
+            const id = document.getElementById('editIncidentId').value;
+            const matrix = document.getElementById('editMatrix').value;
+            const level = matrix.includes('3') ? 3 : matrix.includes('2') ? 2 : 1;
+            const status = document.getElementById('editStatus').value;
+
+            const payload = {
+                studentName: document.getElementById('editStudentName').value.trim(),
+                school: document.getElementById('editSchool').value.trim(),
+                district: document.getElementById('editDistrict').value.trim(),
+                matrix, level,
+                action: document.getElementById('editAction').value.trim(),
+                status: status,
+                description: document.getElementById('editDescription').value.trim()
+            };
+
+            let updated = false;
+
+            // 1. Try local API endpoints
+            const endpoints = [`/api/incidents/${id}`, getApiUrl(`/api/incidents/${id}`)];
+            for (const ep of endpoints) {
+                try {
+                    const res = await fetch(ep, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    if (res.ok) {
+                        const data = await res.json();
+                        const idx = allIncidents.findIndex(i => i.id === id || i.incidentId === id);
+                        if (idx !== -1) allIncidents[idx] = { ...allIncidents[idx], ...data.incident };
+                        updated = true;
+                        break;
+                    }
+                } catch (_) {}
+            }
+
+            // 2. Direct online Supabase REST PATCH
+            try {
+                const sbRes = await fetch(`${SUPABASE_REST_URL}/incidents?id=eq.${id}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        student_name: payload.studentName,
+                        school: payload.school,
+                        district: payload.district,
+                        matrix: payload.matrix,
+                        level: payload.level,
+                        action: payload.action,
+                        status: payload.status,
+                        description: payload.description
+                    })
+                });
+                if (sbRes.ok) updated = true;
+            } catch (err) {
+                console.warn('[Supabase Direct Patch]:', err.message);
+            }
+
+            // Update in memory & UI
+            const idx = allIncidents.findIndex(i => i.id === id || i.incidentId === id);
+            if (idx !== -1) {
+                allIncidents[idx] = { ...allIncidents[idx], ...payload };
+            }
+            renderIncidentsTable(allIncidents);
+            closeEditModal();
+            showToast('✓ Incident updated successfully');
+        }
+
+        // ── Custom Delete Confirmation (replaces browser confirm() which can be suppressed) ──
+        let _pendingDeleteId   = null;
+        let _pendingDeleteCode = null;
+
+        function confirmDeleteCancel() {
+            _pendingDeleteId   = null;
+            _pendingDeleteCode = null;
+            document.getElementById('deleteConfirmOverlay').style.display = 'none';
+        }
+
+        async function confirmDeleteOk() {
+            document.getElementById('deleteConfirmOverlay').style.display = 'none';
+            const id   = _pendingDeleteId;
+            const code = _pendingDeleteCode;
+            _pendingDeleteId   = null;
+            _pendingDeleteCode = null;
+            if (!id) return;
+
+            const btn = document.getElementById('confirmDeleteOkBtn');
+            if (btn) btn.disabled = true;
+
+            // 1. Try local Express API (absolute URL first so it works from any port)
+            const apiEndpoints = [
+                `http://localhost:5000/api/incidents/${id}`,
+                getApiUrl(`/api/incidents/${id}`)
+            ];
+            for (const ep of apiEndpoints) {
+                try {
+                    const res = await fetch(ep, { method: 'DELETE' });
+                    if (res.ok) break;
+                } catch (_) {}
+            }
+
+            // 2. Direct online Supabase REST DELETE (always runs to keep Supabase in sync)
+            try {
+                await fetch(`${SUPABASE_REST_URL}/incidents?id=eq.${encodeURIComponent(id)}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+                    }
+                });
+            } catch (_) {}
+
+            // 3. Remove from memory & re-render immediately
+            allIncidents = allIncidents.filter(i => i.id !== id && i.incidentId !== id && i.incidentId !== code);
+            renderIncidentsTable(allIncidents);
+            showToast('✓ Incident deleted');
+
+            if (btn) btn.disabled = false;
+        }
+
+        async function deleteIncident(id, code) {
+            _pendingDeleteId   = id;
+            _pendingDeleteCode = code;
+            document.getElementById('deleteConfirmMsg').textContent =
+                `Permanently delete incident ${code}? This action cannot be undone.`;
+            document.getElementById('deleteConfirmOverlay').style.display = 'flex';
+        }
+
+        async function submitIncident(e) {
+            e.preventDefault();
+
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Saving…';
+            }
+
+            const rawStudent  = document.getElementById('incStudentId').value.trim();
+            const studentForm = document.getElementById('incStudentForm').value.trim();
+            const school      = document.getElementById('incSchool').value.trim();
+            const district    = document.getElementById('incDistrict').value;
+            const matrix      = document.getElementById('incMatrix').value;
+            const action      = document.getElementById('incAction').value;
+            const descEl      = document.getElementById('incDescription');
+            const description = descEl ? descEl.value.trim() : '';
+
+            const matrixLevel = matrix.toLowerCase().includes('level 3') ? 3 :
+                                matrix.toLowerCase().includes('level 2') ? 2 : 1;
+
+            const today = new Date();
+            const dateStr = today.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+            const newNumericId = Math.floor(Math.random() * 900) + 100;
+            const newIncidentCode = `#INC-2026-${newNumericId}`;
+            const uniqueDbId = 'inc_' + Date.now();
+
+            const currentUser = typeof getLoggedInUserData === 'function' ? getLoggedInUserData() : null;
+
+            // Resolve student if known
+            let resolvedStudentName = rawStudent;
+            let resolvedStudentId = null;
+            let studentClassId = studentForm.replace(/\s+/g, '') || 'cls_1A';
+            const studentsList = (window.SENTINEL_SEED_DATA && Array.isArray(window.SENTINEL_SEED_DATA.students)) ? window.SENTINEL_SEED_DATA.students : [];
+            const matchedStu = studentsList.find(s =>
+                (s.id && s.id.toLowerCase() === rawStudent.toLowerCase()) ||
+                (s.studentNumber && s.studentNumber.toLowerCase() === rawStudent.toLowerCase()) ||
+                (s.name && s.name.toLowerCase() === rawStudent.toLowerCase()) ||
+                (s.name && s.name.toLowerCase().includes(rawStudent.toLowerCase()))
+            );
+            if (matchedStu) {
+                resolvedStudentName = matchedStu.name;
+                resolvedStudentId = matchedStu.id;
+                if (matchedStu.classId) studentClassId = matchedStu.classId;
+            }
+
+            const incidentObj = {
+                id: uniqueDbId,
+                incidentId: newIncidentCode,
+                studentId: resolvedStudentId,
+                studentName: resolvedStudentName || 'Student',
+                classId: studentClassId,
+                form: studentForm,
+                schoolId: currentUser ? (currentUser.schoolId || 'sch_001') : 'sch_001',
+                school: school || (currentUser ? currentUser.schoolName : 'Port of Spain North Secondary'),
+                district: district || 'St. George East District',
+                matrix: matrix,
+                level: matrixLevel,
+                action: action,
+                description: description,
+                status: 'Open',
+                loggedById: currentUser ? currentUser.id : 'usr_teacher_01',
+                loggedBy: currentUser ? currentUser.name : 'Staff Member',
+                date: dateStr,
+                createdAt: today.toISOString()
+            };
+
+            let savedSuccessfully = false;
+
+            // 1. Try local Express API endpoints
+            const apiEndpoints = ['http://localhost:5000/api/incidents', '/api/incidents'];
+            for (const ep of apiEndpoints) {
+                try {
+                    const res = await fetch(ep, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(incidentObj)
+                    });
+                    if (res.ok) {
+                        const data = await res.json();
+                        if (data && data.incident) {
+                            incidentObj.id = data.incident.id || incidentObj.id;
+                            incidentObj.incidentId = data.incident.incidentId || incidentObj.incidentId;
+                        }
+                        savedSuccessfully = true;
+                        break;
+                    }
+                } catch (_) {}
+            }
+
+            // 2. Direct online Supabase REST insert (always executes if Express didn't handle it, or syncs to Supabase)
+            try {
+                const sbPayload = {
+                    id: incidentObj.id,
+                    incident_id: incidentObj.incidentId,
+                    student_id: incidentObj.studentId || null,
+                    student_name: incidentObj.studentName,
+                    class_id: incidentObj.classId,
+                    form: incidentObj.form,
+                    school_id: incidentObj.schoolId,
+                    school: incidentObj.school,
+                    district: incidentObj.district,
+                    matrix: incidentObj.matrix,
+                    level: incidentObj.level,
+                    action: incidentObj.action,
+                    description: incidentObj.description,
+                    status: incidentObj.status,
+                    logged_by_id: incidentObj.loggedById,
+                    logged_by: incidentObj.loggedBy,
+                    date: incidentObj.date,
+                    created_at: incidentObj.createdAt
+                };
+
+                const sbRes = await fetch(`${SUPABASE_REST_URL}/incidents`, {
+                    method: 'POST',
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                        'Content-Type': 'application/json',
+                        'Prefer': 'return=representation'
+                    },
+                    body: JSON.stringify(sbPayload)
+                });
+
+                if (sbRes.ok) {
+                    savedSuccessfully = true;
+                }
+            } catch (err) {
+                console.warn('[Supabase Direct Save]:', err.message);
+            }
+
+            // Update memory & UI
+            allIncidents.unshift(incidentObj);
+            renderIncidentsTable(allIncidents);
+
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Submit Incident Report';
+            }
+
+            showToast('✓ Incident logged successfully & saved to record');
+            e.target.reset();
+            toggleForm();
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toastMsg');
+            if (!toast) return;
+            toast.textContent = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        function filterIncidents() {
+            const search = document.getElementById('searchInc').value.toLowerCase();
+            const level  = document.getElementById('filterLevel').value;
+            const rows   = document.querySelectorAll('#incidentsBody tr');
+            let count = 0;
+
+            rows.forEach(row => {
+                const text     = row.textContent.toLowerCase();
+                const rowLevel = row.getAttribute('data-level');
+                const matchSearch = !search || text.includes(search);
+                const matchLevel  = !level  || rowLevel === level;
+                if (matchSearch && matchLevel) { row.style.display = ''; count++; }
+                else row.style.display = 'none';
+            });
+
+            document.getElementById('incRecordCount').textContent = `Showing ${count} record${count !== 1 ? 's' : ''}`;
+        }
+
+        function resetIncFilters() {
+            document.getElementById('searchInc').value = '';
+            document.getElementById('filterLevel').value = '';
+            filterIncidents();
+        }
+
+        function updateIncCount() {
+            const count = document.querySelectorAll('#incidentsBody tr').length;
+            document.getElementById('incRecordCount').textContent = `Showing ${count} records`;
+        }
+    </script>
+</body>
+
+</html>

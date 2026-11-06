@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentinel Edu </title>
+
+    <!-- Google Fonts: Google Sans & Product Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Product+Sans:wght@400;700&display=swap"
+        rel="stylesheet">
+
+    <!-- External Stylesheet -->
+    <link rel="stylesheet" href="style/style.css">
+</head>
+
+<body>
+
+    <!-- Top Navigation Header -->
+    <header class="site-header">
+        <a href="index.html" class="brand-logo">
+            Sentinel Edu<span class="brand-dot"></span>
+        </a>
+
+        <nav>
+            <ul class="nav-links">
+                <li><a href="#academics">Programs</a></li>
+                <li><a href="engine.html">Engine</a></li>
+                <li><a href="#footer">Contact</a></li>
+            </ul>
+        </nav>
+
+        <div class="header-actions">
+            <a href="login.html" class="login-btn">
+                <span class="login-avatar">
+                    <svg viewBox="0 0 24 24">
+                        <path
+                            d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                    </svg>
+                </span>
+                Staff Login
+            </a>
+            <a href="signup.html" class="btn-enroll-header">Request Access</a>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <main>
+        <section class="hero-section" id="academics">
+            <div class="hero-title-container">
+                <h1 class="hero-title">
+                    SENTINEL Edu: NATIONAL EDUCATION DECISION SUPPORT SYSTEM
+                </h1>
+            </div>
+
+            <div class="hero-bottom-grid">
+                <div class="hero-tagline-col">
+                    <p class="hero-tagline">
+                        Centralized behavioral analytics, multi-level student triage scoring, and real-time incident
+                        tracking for Ministry officials and school deans.
+                    </p>
+                    <a href="login.html" class="hero-enroll-link">
+                        Staff Login<span>&rarr;</span>
+                    </a>
+                </div>
+
+                <!-- Newsletter Subscription Box -->
+                <div class="newsletter-card">
+                    <h2 class="newsletter-title">Subscribe to our Mailing List</h2>
+                    <form class="newsletter-form"
+                        onsubmit="event.preventDefault(); alert('Thank you for subscribing!');">
+                        <div class="newsletter-input-group">
+                            <input type="email" required class="newsletter-input" placeholder="Enter your email here *">
+                        </div>
+                        <label class="newsletter-consent">
+                            <input type="checkbox" required>
+                            <span>Yes, subscribe me to your newsletter. *</span>
+                        </label>
+                        <button type="submit" class="btn-join">Join Now</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 5: Resources -->
+        <section class="section-resources" id="resources">
+            <div class="resources-header">
+                <div class="resources-title-group">
+                    <h2>RESOURCES</h2>
+                    <p>National educational policies, discipline matrices, and evidence-based frameworks.</p>
+                </div>
+            </div>
+
+            <div class="resources-cards-grid">
+                <!-- Resource 1 -->
+                <article class="resource-card">
+                    <div class="resource-content">
+                        <span class="resource-meta">Ministry of Education · Policy Guideline</span>
+                        <h3 class="resource-heading">Trinidad and Tobago National School Code of Conduct</h3>
+                        <p class="resource-excerpt">
+                            Official guidelines defining ethical standards, expectations, student rights, and
+                            institutional compliance standards for all national primary and secondary institutions.
+                        </p>
+                        <div class="resource-links"
+                            style="margin-top: 1.2rem; display: flex; flex-direction: column; gap: 0.6rem;">
+                            <a href="https://storage.moe.gov.tt/wpdevelopment/2026/03/NSCC-2026.pdf" target="_blank"
+                                rel="noopener noreferrer"
+                                style="font-weight: 600; color: #111111; text-decoration: underline;">
+                                Ministry of Education - National School Code of Conduct (PDF) &rarr;
+                            </a>
+                            <a href="https://uwispace.sta.uwi.edu/items/7f6b2331-69de-49c0-a42b-655842fe22ac"
+                                target="_blank" rel="noopener noreferrer"
+                                style="font-size: 0.9rem; color: #5e6472; text-decoration: underline;">
+                                UWISpace Repository Copy &rarr;
+                            </a>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Resource 2 -->
+                <article class="resource-card">
+                    <div class="resource-content">
+                        <span class="resource-meta">UNICEF · Research &amp; Methodology</span>
+                        <h3 class="resource-heading">UNICEF Data Must Speak (DMS) Methodology &amp; Framework</h3>
+                        <p class="resource-excerpt">
+                            A global initiative utilizing granular educational data and positive deviance research to
+                            evaluate school performance, resource allocation, and student behaviors.
+                        </p>
+                        <div class="resource-links"
+                            style="margin-top: 1.2rem; display: flex; flex-direction: column; gap: 0.6rem;">
+                            <a href="https://www.unicef.org/media/117616/file/Data%20Must%20Speak%20Practical%20Implementation%20Guide.pdf"
+                                target="_blank" rel="noopener noreferrer"
+                                style="font-weight: 600; color: #111111; text-decoration: underline;">
+                                UNICEF Data Must Speak: Practical Implementation Guide (PDF) &rarr;
+                            </a>
+                            <a href="https://www.unicef.org/innocenti/reports/learning-schools" target="_blank"
+                                rel="noopener noreferrer"
+                                style="font-size: 0.9rem; color: #5e6472; text-decoration: underline;">
+                                UNICEF Innocenti - Learning from Schools: Data Must Speak &rarr;
+                            </a>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Resource 3 -->
+                <article class="resource-card">
+                    <div class="resource-content">
+                        <span class="resource-meta">Ministry of Education · Triage &amp; Sanctions</span>
+                        <h3 class="resource-heading">Trinidad and Tobago National School Discipline Matrix</h3>
+                        <p class="resource-excerpt">
+                            Standardized multi-tiered operational framework classifying student infractions,
+                            interventions, and proportional behavioral disciplinary measures across schools.
+                        </p>
+                        <div class="resource-links"
+                            style="margin-top: 1.2rem; display: flex; flex-direction: column; gap: 0.6rem;">
+                            <a href="https://storage.moe.gov.tt/corporate/2022/09/School-Discipline-Matrix-Approved.pdf"
+                                target="_blank" rel="noopener noreferrer"
+                                style="font-weight: 600; color: #111111; text-decoration: underline;">
+                                Ministry of Education - School Discipline Matrix (PDF) &rarr;
+                            </a>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <!-- SECTION 6: Quote Banner -->
+        <section class="section-quote">
+            <blockquote class="quote-text">
+                “SUCCESS IS NOT FINAL, FAILURE IS NOT FATAL: IT IS THE COURAGE TO CONTINUE THAT COUNTS.”
+            </blockquote>
+            <cite class="quote-author">Winston Churchill</cite>
+        </section>
+    </main>
+
+    <!-- SECTION 7: Footer -->
+    <footer class="site-footer" id="footer">
+        <div class="footer-top">
+            <div class="footer-column">
+                <h4>Follow</h4>
+                <ul class="footer-links">
+                    <li><a href="#">LinkedIn</a></li>
+                    <li><a href="#">Facebook</a></li>
+                    <li><a href="#">Instagram</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-column">
+                <h4>Info</h4>
+                <p style="margin-bottom: 0.5rem;">123-456-7890</p>
+                <p><a href="mailto:info@mysite.com">Info@mysite.com</a></p>
+            </div>
+
+            <div class="footer-column">
+                <h4>Address</h4>
+                <p>500 Terry Francine St</p>
+                <p>San Francisco, CA 94158</p>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <a href="index.html" class="brand-logo" style="color: #ffffff;">
+                Sentinel Edu<span class="brand-dot"></span>
+            </a>
+
+            <div class="footer-legal-links">
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms &amp; Conditions</a>
+                <a href="#">Refund Policy</a>
+                <a href="#">Accessibility statement</a>
+            </div>
+
+            <button class="btn-scroll-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" title="Back to top">
+                &uarr;
+            </button>
+        </div>
+    </footer>
+
+    <!-- Shared Header & Auth Script -->
+    <script src="auth.js"></script>
+</body>
+
+</html>

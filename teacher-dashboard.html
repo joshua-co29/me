@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Dashboard – Sentinel Edu</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Product+Sans:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style/style.css">
+    <style>
+        :root { --accent-lilac: #9f96ee; }
+        body { background: #ffffff !important; font-family: 'Google Sans', sans-serif; scroll-behavior: smooth; color: #111; }
+        .dash-wrap { max-width: 1200px; margin: 0 auto; padding: 2.5rem 1.5rem; background: #ffffff; }
+        .page-header { margin-bottom: 2rem; }
+        .page-header h1 { font-size: 1.6rem; font-weight: 700; color: #111; letter-spacing: -0.02em; margin: 0 0 0.3rem; }
+        .page-header p  { font-size: 0.9rem; color: #6b7280; margin: 0; }
+        .metrics-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+        .metric-card { background: #ffffff; border: 1px solid rgba(0,0,0,0.08); border-radius: 4px; padding: 1.4rem 1.5rem; box-shadow: none; }
+        .metric-label { font-size: 0.78rem; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; }
+        .metric-value { font-size: 2rem; font-weight: 800; color: #111; letter-spacing: -0.03em; line-height: 1; }
+        .metric-sub   { font-size: 0.78rem; color: #9ca3af; margin-top: 0.3rem; }
+        
+        .section-card { background: #ffffff; border: 1px solid rgba(0,0,0,0.08); border-radius: 4px; margin-bottom: 1.8rem; overflow: hidden; scroll-margin-top: 90px; box-shadow: none; }
+        .section-head { background: #ffffff; padding: 1.1rem 1.5rem; border-bottom: 1px solid rgba(0,0,0,0.07); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.6rem; }
+        .section-head h2 { font-size: 0.97rem; font-weight: 700; color: #111; margin: 0; }
+        .section-head span { font-size: 0.8rem; color: #9ca3af; }
+        
+        .classes-grid { background: #ffffff; display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1rem; padding: 1.5rem; }
+        .class-chip { 
+            border: 1px solid rgba(0,0,0,0.1); 
+            border-radius: 4px; 
+            padding: 1.1rem 1.25rem; 
+            background: #ffffff; 
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: none;
+        }
+        .class-chip:hover { 
+            background: #ffffff; 
+            border-color: var(--accent-lilac);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(159,150,238,0.15);
+        }
+        .class-chip.active { 
+            background: #ffffff; 
+            border: 2px solid var(--accent-lilac); 
+            box-shadow: 0 4px 12px rgba(159,150,238,0.2);
+        }
+        .class-chip-label { font-size: 1.05rem; font-weight: 700; color: #111; margin-bottom: 0.2rem; }
+        .class-chip-form  { font-size: 0.8rem; color: #6b7280; }
+        .class-chip-count { margin-top: 0.6rem; font-size: 0.82rem; color: #6b7280; }
+        .class-chip-count strong { color: #111; }
+        
+        /* Class tabs */
+        .class-tabs-bar { display: flex; gap: 0.5rem; padding: 0.8rem 1.5rem; background: #ffffff; border-bottom: 1px solid rgba(0,0,0,0.06); flex-wrap: wrap; }
+        .class-tab-btn {
+            padding: 0.45rem 1rem;
+            border-radius: 20px;
+            border: 1px solid rgba(0,0,0,0.12);
+            background: #ffffff;
+            color: #444;
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            font-family: inherit;
+        }
+        .class-tab-btn:hover { background: #eeecfb; color: #5243aa; }
+        .class-tab-btn.active { background: #111; color: #fff; border-color: #111; }
+
+        .data-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; background: #ffffff; }
+        .data-table th { padding: 0.75rem 1.5rem; text-align: left; font-size: 0.72rem; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: 0.06em; border-bottom: 1px solid rgba(0,0,0,0.07); background: #ffffff; }
+        .data-table td { padding: 0.9rem 1.5rem; border-bottom: 1px solid rgba(0,0,0,0.05); color: #222; vertical-align: middle; background: #ffffff; }
+        .data-table tr:last-child td { border-bottom: none; }
+        .data-table tr:hover td { background: #fafafa; }
+
+        .badge-l1 { font-weight: 700; color: #b45309; }
+        .badge-l2 { font-weight: 700; color: #ea580c; }
+        .badge-l3 { font-weight: 700; color: #991b1b; }
+        .badge-l0 { font-weight: 600; color: #15803d; }
+
+        .status-pill { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; }
+        .status-open       { background: #fef3c7; color: #92400e; }
+        .status-resolved   { background: #d1fae5; color: #065f46; }
+        .status-escalated  { background: #fee2e2; color: #991b1b; }
+
+        .btn-log { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.55rem 1.1rem; background: #111; color: #fff; border: none; border-radius: 3px; font-size: 0.85rem; font-weight: 600; cursor: pointer; font-family: inherit; transition: background 0.2s; text-decoration: none; }
+        .btn-log:hover { background: #2a2c35; }
+        .btn-table-action {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.35rem 0.75rem;
+            border-radius: 3px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            background: #eeecfb;
+            color: #5243aa;
+            border: 1px solid #dcd7f8;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            font-family: inherit;
+        }
+        .btn-table-action:hover { background: #5243aa; color: #fff; }
+
+        .empty-state { padding: 2.5rem 1.5rem; text-align: center; color: #9ca3af; font-size: 0.9rem; }
+        .loading-text { padding: 1.5rem; text-align: center; color: #9ca3af; font-size: 0.9rem; }
+
+        /* === Full-Screen Incident Modal === */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 99999;
+            background: #ffffff;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        .modal-overlay.open {
+            display: block !important;
+        }
+        .modal-fullscreen {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .modal-banner {
+            background: #ffffff;
+            border-bottom: 1px solid rgba(0,0,0,0.08);
+            padding: 2.5rem 3rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+        .modal-banner-left { flex: 1; }
+        .modal-banner-subtitle {
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #5e6472;
+            margin-bottom: 0.5rem;
+        }
+        .modal-banner-title {
+            font-size: clamp(1.6rem, 2.5vw, 2.4rem);
+            font-weight: 800;
+            color: #111111;
+            letter-spacing: -0.025em;
+            line-height: 1.1;
+            margin: 0 0 0.6rem;
+        }
+        .modal-banner-desc {
+            font-size: 0.95rem;
+            color: #5e6472;
+            max-width: 520px;
+            margin: 0;
+            line-height: 1.55;
+        }
+        .modal-close-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            background: #111111;
+            color: #ffffff;
+            border: none;
+            font-size: 0.88rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            white-space: nowrap;
+            flex-shrink: 0;
+            align-self: flex-start;
+        }
+        .modal-close-btn:hover { background: #2e3040; }
+        .modal-form-body {
+            padding: 2.5rem 3rem 4rem;
+            max-width: 960px;
+            width: 100%;
+        }
+        .inc-log-form-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #111111;
+            letter-spacing: -0.02em;
+            margin-bottom: 1.8rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(0,0,0,0.08);
+        }
+        .inc-form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem 2rem;
+        }
+        .inc-form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+        .inc-form-group.inc-full-width { grid-column: 1 / -1; }
+        .inc-form-group label {
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: #4b5162;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .inc-form-control {
+            padding: 0.75rem 1rem;
+            border: 1px solid rgba(0,0,0,0.15);
+            background: #ffffff;
+            font-size: 0.92rem;
+            font-family: inherit;
+            outline: none;
+            color: #111111;
+            transition: border-color 0.2s ease;
+            border-radius: 0;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .inc-form-control:focus {
+            border-color: #9f96ee;
+            box-shadow: 0 0 0 3px rgba(159,150,238,0.2);
+        }
+        textarea.inc-form-control { resize: vertical; min-height: 110px; }
+        .inc-form-actions {
+            margin-top: 2rem;
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        .btn-submit-inc {
+            padding: 0.85rem 2rem;
+            background: #111111;
+            color: #ffffff;
+            border: none;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            transition: background 0.2s ease;
+            border-radius: 0;
+        }
+        .btn-submit-inc:hover { background: #2e3040; }
+        .btn-submit-inc:disabled { background: #888; cursor: not-allowed; }
+        .btn-cancel-inc {
+            padding: 0.85rem 1.5rem;
+            background: transparent;
+            color: #111111;
+            border: 1px solid rgba(0,0,0,0.2);
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            border-radius: 0;
+        }
+        .btn-cancel-inc:hover { background: rgba(0,0,0,0.05); }
+        @media (max-width: 768px) {
+            .modal-banner, .modal-form-body { padding: 1.5rem; }
+            .inc-form-grid { grid-template-columns: 1fr; }
+            .inc-form-group.inc-full-width { grid-column: 1; }
+        }
+    </style>
+</head>
+<body>
+
+<header class="site-header">
+    <a href="index.html" class="brand-logo">Sentinel Edu<span class="brand-dot"></span></a>
+    <nav><ul class="nav-links"></ul></nav>
+    <div class="header-actions"></div>
+</header>
+
+<main class="dash-wrap">
+    <div class="page-header">
+        <h1 id="pageTitle">Teacher Dashboard</h1>
+        <p id="pageSubtitle">Loading your assigned classes and incidents…</p>
+    </div>
+
+    <!-- Summary Metrics -->
+    <div class="metrics-row">
+        <div class="metric-card">
+            <div class="metric-label">Assigned Classes</div>
+            <div class="metric-value" id="metClasses">–</div>
+            <div class="metric-sub">your class roster</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-label">Incidents Logged</div>
+            <div class="metric-value" id="metTotal">–</div>
+            <div class="metric-sub">by you this term</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-label">Open Cases</div>
+            <div class="metric-value" id="metOpen">–</div>
+            <div class="metric-sub">awaiting resolution</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-label">Level 3 Cases</div>
+            <div class="metric-value" id="metL3" style="color:#991b1b;">–</div>
+            <div class="metric-sub">high severity</div>
+        </div>
+    </div>
+
+    <!-- 1. Assigned Classes Section (ID for in-page anchors) -->
+    <div class="section-card" id="classes">
+        <div class="section-head">
+            <div>
+                <h2>My Assigned Classes</h2>
+                <div style="font-size: 0.8rem; color: #6b7280; margin-top: 2px;">Click a class card to view its student roll below</div>
+            </div>
+            <span id="classCount">–</span>
+        </div>
+        <div class="classes-grid" id="classesGrid">
+            <div class="loading-text">Loading classes…</div>
+        </div>
+    </div>
+
+    <!-- 2. Class Roll / Students Roster Section -->
+    <div class="section-card" id="class-roll">
+        <div class="section-head">
+            <div>
+                <h2 id="classRollTitle">Class Roll &amp; Students</h2>
+                <div style="font-size: 0.8rem; color: #6b7280; margin-top: 2px;" id="classRollSubtitle">Select a class above to inspect enrolled students</div>
+            </div>
+            <span id="studentCountBadge">–</span>
+        </div>
+        
+        <!-- Class Selector Tabs -->
+        <div class="class-tabs-bar" id="classTabsBar"></div>
+
+        <div id="classRollBody">
+            <div class="loading-text">Select a class above to load student list…</div>
+        </div>
+    </div>
+
+    <!-- 3. My Incidents Log Section -->
+    <div class="section-card" id="incidents">
+        <div class="section-head">
+            <div>
+                <h2>My Incident Log</h2>
+                <div style="font-size: 0.8rem; color: #6b7280; margin-top: 2px;">Incidents you logged across your assigned classes</div>
+            </div>
+            <a href="incidents.html?action=new" class="btn-log">
+                <svg viewBox="0 0 20 20" fill="currentColor" style="width:15px;height:15px;"><path d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"/></svg>
+                Log Incident
+            </a>
+        </div>
+        <div id="incidentsBody">
+            <div class="loading-text">Loading incidents…</div>
+        </div>
+    </div>
+</main>
+
+<!-- Log Incident Modal — Real-Time Incident Tracking Form -->
+<div class="modal-overlay" id="logModal">
+    <div class="modal-fullscreen">
+
+        <!-- Banner Header -->
+        <div class="modal-banner">
+            <div class="modal-banner-left">
+                <div class="modal-banner-subtitle">National Discipline Matrix</div>
+                <h2 class="modal-banner-title">Real-Time Incident Tracking</h2>
+                <p class="modal-banner-desc">Log and classify incidents under the Ministry of Education National School Discipline Matrix. Track severity, escalation status, and resolution actions.</p>
+            </div>
+            <button type="button" class="modal-close-btn" onclick="closeLogModal()">
+                <svg viewBox="0 0 20 20" fill="currentColor" style="width:13px;height:13px;"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+                Cancel
+            </button>
+        </div>
+
+        <!-- Form Body -->
+        <div class="modal-form-body">
+            <div class="inc-log-form-title">Log New Incident</div>
+            <form id="incidentForm" onsubmit="submitIncident(event)">
+                <div class="inc-form-grid">
+                    <div class="inc-form-group">
+                        <label for="iStudentName">Student ID / Name</label>
+                        <input type="text" id="iStudentName" class="inc-form-control" placeholder="e.g. STU-2026-001 or Kayla Ramkissoon" required>
+                    </div>
+                    <div class="inc-form-group">
+                        <label for="iClass">Student Form / Class</label>
+                        <select id="iClass" class="inc-form-control" required>
+                            <option value="">Select class…</option>
+                        </select>
+                    </div>
+                    <div class="inc-form-group">
+                        <label for="iSchool">School / Institution</label>
+                        <input type="text" id="iSchool" class="inc-form-control" placeholder="e.g. Port of Spain North Secondary">
+                    </div>
+                    <div class="inc-form-group">
+                        <label for="iDistrict">Educational District</label>
+                        <select id="iDistrict" class="inc-form-control">
+                            <option value="">Select district…</option>
+                            <option>St. George East District</option>
+                            <option>Victoria Educational District</option>
+                            <option>Caroni Educational District</option>
+                            <option>Tobago Educational District</option>
+                            <option>St. Patrick Educational District</option>
+                            <option>Nariva/Mayaro District</option>
+                        </select>
+                    </div>
+                    <div class="inc-form-group">
+                        <label for="iMatrix">Discipline Matrix Level</label>
+                        <select id="iMatrix" class="inc-form-control" required>
+                            <option value="">Select level…</option>
+                            <option value="1">Level 1 — Minor Infraction</option>
+                            <option value="2">Level 2 — Moderate Infraction</option>
+                            <option value="3">Level 3 — Severe Infraction</option>
+                        </select>
+                    </div>
+                    <div class="inc-form-group">
+                        <label for="iAction">Initial Action Taken</label>
+                        <select id="iAction" class="inc-form-control" required>
+                            <option value="">Select action…</option>
+                            <option>Guidance Counseling Referral</option>
+                            <option>Peer Mediation Protocol</option>
+                            <option>Parent Conference Logged</option>
+                            <option>Dean Formal Review</option>
+                            <option>Ministry Escalated Review</option>
+                            <option>External Support Assigned</option>
+                            <option>Verbal Warning Issued</option>
+                        </select>
+                    </div>
+                    <div class="inc-form-group inc-full-width">
+                        <label for="iDesc">Incident Description</label>
+                        <textarea id="iDesc" class="inc-form-control" placeholder="Briefly describe the incident circumstances…" required></textarea>
+                    </div>
+                </div>
+                <div id="modalAlert" style="display:none; padding:0.75rem 1rem; background:#fee2e2; color:#991b1b; font-size:0.87rem; margin-top:1.2rem; border-left:3px solid #ef4444;"></div>
+                <div class="inc-form-actions">
+                    <button type="submit" class="btn-submit-inc" id="btnSubmitInc">Submit Incident Report</button>
+                    <button type="button" class="btn-cancel-inc" onclick="closeLogModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+
+    </div>
+</div>
+
+<script src="data/seed.js"></script>
+<script src="auth.js"></script>
+<script>
+const API_BASE = 'http://localhost:5000';
+const SUPABASE_REST_URL = "https://wrumedevccqkopguaxdi.supabase.co/rest/v1";
+const SUPABASE_ANON_KEY = "sb_publishable_zpd_lzgRqghcN-0X7qw7SA_I2hAZHXH";
+
+let currentUser     = null;
+let myClasses       = [];
+let myIncidents     = [];
+let activeClassId   = null;
+let currentStudents = [];
+
+document.addEventListener('DOMContentLoaded', async () => {
+    currentUser = getLoggedInUserData();
+    if (!currentUser) { window.location.href = 'login.html'; return; }
+    if (currentUser.role && !currentUser.role.toLowerCase().includes('teacher')) {
+        redirectByRole(currentUser); return;
+    }
+
+    document.getElementById('pageTitle').textContent = `Welcome, ${currentUser.name || 'Teacher'}`;
+    document.getElementById('pageSubtitle').textContent =
+        `${currentUser.schoolName || 'Your School'} · Teacher Portal`;
+
+    // Immediately open modal if ?action=log or #log was requested
+    if (window.location.search.includes('action=log') || window.location.hash === '#log') {
+        openLogModal();
+    }
+
+    await Promise.all([loadClasses(), loadIncidents()]);
+
+    if (window.location.hash && window.location.hash !== '#log') {
+        const target = document.querySelector(window.location.hash);
+        if (target) {
+            setTimeout(() => target.scrollIntoView({ behavior: 'smooth', block: 'start' }), 200);
+        }
+    }
+});
+
+async function loadClasses() {
+    try {
+        const res = await fetch(`${API_BASE}/api/classes/by-teacher/${currentUser.id}`);
+        const data = await res.json();
+        myClasses = Array.isArray(data) ? data : [];
+    } catch { myClasses = []; }
+
+    renderClasses();
+
+    if (myClasses.length > 0) {
+        selectClass(myClasses[0].id);
+    }
+}
+
+async function loadIncidents() {
+    let list = [];
+    try {
+        const res = await fetch(`${API_BASE}/api/incidents/by-teacher/${currentUser.id}`);
+        if (res.ok) {
+            const data = await res.json();
+            if (Array.isArray(data) && data.length > 0) list = data;
+        }
+    } catch (_) {}
+
+    if (list.length === 0) {
+        try {
+            const res = await fetch(`${SUPABASE_REST_URL}/incidents?logged_by_id=eq.${currentUser.id}&order=created_at.desc`, {
+                headers: {
+                    'apikey': SUPABASE_ANON_KEY,
+                    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+                }
+            });
+            if (res.ok) {
+                const raw = await res.json();
+                if (Array.isArray(raw) && raw.length > 0) {
+                    list = raw.map(inc => ({
+                        id: inc.id,
+                        incidentId: inc.incident_id || inc.id,
+                        studentName: inc.student_name,
+                        student: inc.student_name,
+                        classId: inc.class_id,
+                        form: inc.form,
+                        matrix: inc.matrix,
+                        level: parseInt(inc.level || 1),
+                        action: inc.action,
+                        description: inc.description,
+                        status: inc.status,
+                        loggedById: inc.logged_by_id,
+                        loggedBy: inc.logged_by,
+                        date: inc.date,
+                        createdAt: inc.created_at
+                    }));
+                }
+            }
+        } catch (_) {}
+    }
+
+    if (list.length === 0 && window.SENTINEL_SEED_DATA && Array.isArray(window.SENTINEL_SEED_DATA.incidents)) {
+        list = window.SENTINEL_SEED_DATA.incidents.filter(i => i.loggedById === currentUser.id);
+    }
+
+    myIncidents = list;
+    renderIncidents();
+    updateMetrics();
+}
+
+function renderClasses() {
+    const grid = document.getElementById('classesGrid');
+    document.getElementById('classCount').textContent =
+        `${myClasses.length} assigned class${myClasses.length !== 1 ? 'es' : ''}`;
+    document.getElementById('metClasses').textContent = myClasses.length;
+
+    // Modal select — keep default placeholder option
+    const sel = document.getElementById('iClass');
+    sel.innerHTML = '<option value="">Select class…</option>' + myClasses.map(c =>
+        `<option value="${c.id}">${c.label || c.id}</option>`).join('');
+
+    // Class selector tabs
+    const tabsBar = document.getElementById('classTabsBar');
+    tabsBar.innerHTML = myClasses.map(cls =>
+        `<button class="class-tab-btn ${cls.id === activeClassId ? 'active' : ''}" onclick="selectClass('${cls.id}')">${cls.label || cls.id}</button>`
+    ).join('');
+
+    if (!myClasses.length) {
+        grid.innerHTML = '<div class="empty-state">No classes currently assigned to your profile.</div>';
+        return;
+    }
+
+    grid.innerHTML = myClasses.map(cls => {
+        const cnt = myIncidents.filter(i => i.classId === cls.id).length;
+        const isActive = cls.id === activeClassId ? 'active' : '';
+        return `<div class="class-chip ${isActive}" id="chip_${cls.id}" onclick="selectClass('${cls.id}', true)">
+            <div class="class-chip-label">${cls.label || cls.id}</div>
+            <div class="class-chip-form">${cls.form || 'General Form'}</div>
+            <div class="class-chip-count"><strong>${cnt}</strong> incident${cnt !== 1 ? 's' : ''} logged</div>
+            <div style="margin-top: 0.5rem; font-size: 0.76rem; color: var(--accent-lilac); font-weight: 700;">View Students &rarr;</div>
+        </div>`;
+    }).join('');
+}
+
+async function selectClass(classId, scrollToRoll = false) {
+    activeClassId = classId;
+    const cls = myClasses.find(c => c.id === classId);
+    if (!cls) return;
+
+    // Update active state in grid and tabs
+    document.querySelectorAll('.class-chip').forEach(el => el.classList.remove('active'));
+    const activeChip = document.getElementById(`chip_${classId}`);
+    if (activeChip) activeChip.classList.add('active');
+
+    document.querySelectorAll('.class-tab-btn').forEach(b => {
+        b.classList.toggle('active', b.textContent === (cls.label || cls.id));
+    });
+
+    document.getElementById('classRollTitle').textContent = `Class Roll — ${cls.label || cls.id}`;
+    document.getElementById('classRollSubtitle').textContent = `Active student roster for ${cls.form || 'Form'}`;
+
+    const rollBody = document.getElementById('classRollBody');
+    rollBody.innerHTML = '<div class="loading-text">Loading student roster…</div>';
+
+    try {
+        const res = await fetch(`${API_BASE}/api/students/by-class/${classId}`);
+        const data = await res.json();
+        currentStudents = Array.isArray(data) ? data : [];
+    } catch {
+        currentStudents = [];
+    }
+
+    renderClassRoll(cls);
+
+    if (scrollToRoll) {
+        document.getElementById('class-roll').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+}
+
+function renderClassRoll(cls) {
+    const rollBody = document.getElementById('classRollBody');
+    document.getElementById('studentCountBadge').textContent =
+        `${currentStudents.length} student${currentStudents.length !== 1 ? 's' : ''}`;
+
+    if (!currentStudents.length) {
+        rollBody.innerHTML = `<div class="empty-state">No students found registered in ${cls.label || cls.id}.</div>`;
+        return;
+    }
+
+    rollBody.innerHTML = `
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Student Name</th>
+                <th>Student ID</th>
+                <th>Form</th>
+                <th>Total Incidents</th>
+                <th>Triage Level</th>
+                <th style="text-align: right;">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            ${currentStudents.map(st => `
+            <tr>
+                <td><strong>${st.name || (st.firstName + ' ' + st.lastName)}</strong></td>
+                <td style="font-family: monospace; font-size: 0.8rem; color: #555;">${st.studentNumber || st.id}</td>
+                <td><span style="display:inline-block;padding:2px 7px;background:#eeecfb;color:#5243aa;border-radius:2px;font-size:0.75rem;font-weight:700;">${st.form || cls.form || '–'}</span></td>
+                <td><strong>${st.incidentCount || 0}</strong></td>
+                <td>${lvlBadge(st.triageLevel)}</td>
+                <td style="text-align: right;">
+                    <button class="btn-table-action" onclick="window.location.href='incidents.html?action=new&student=' + encodeURIComponent('${escapeQuotes(st.name || (st.firstName + ' ' + st.lastName))}') + '&form=' + encodeURIComponent('${cls.form || cls.label}')">
+                        <svg viewBox="0 0 20 20" fill="currentColor" style="width:12px;height:12px;"><path d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"/></svg>
+                        Log Incident
+                    </button>
+                </td>
+            </tr>`).join('')}
+        </tbody>
+    </table>`;
+}
+
+function renderIncidents() {
+    const el = document.getElementById('incidentsBody');
+    if (!myIncidents.length) {
+        el.innerHTML = '<div class="empty-state">No incidents logged yet. Use "Log Incident" to report behavior.</div>';
+        return;
+    }
+    el.innerHTML = `<table class="data-table">
+        <thead><tr>
+            <th>Date</th><th>Student</th><th>Class</th>
+            <th>Incident</th><th>Level</th><th>Status</th><th>Action Taken</th>
+        </tr></thead>
+        <tbody>${myIncidents.map(inc => `<tr>
+            <td style="white-space:nowrap;">${fmtDate(inc.date)}</td>
+            <td><strong>${inc.studentName || '–'}</strong></td>
+            <td><span style="font-weight:600;color:#5243aa;">${inc.classId || '–'}</span></td>
+            <td>${inc.matrix || '–'}</td>
+            <td>${lvlBadge(inc.level || inc.triageLevel)}</td>
+            <td>${statusPill(inc.status)}</td>
+            <td style="color:#6b7280;">${inc.action || '–'}</td>
+        </tr>`).join('')}</tbody>
+    </table>`;
+}
+
+function updateMetrics() {
+    document.getElementById('metTotal').textContent = myIncidents.length;
+    document.getElementById('metOpen').textContent  = myIncidents.filter(i => (i.status||'').toLowerCase() === 'open').length;
+    document.getElementById('metL3').textContent    = myIncidents.filter(i => parseInt(i.level || i.triageLevel) === 3).length;
+    if (myClasses.length) renderClasses();
+}
+
+function lvlBadge(lvl) {
+    const n = parseInt(lvl) || 0;
+    if (n === 1) return `<span class="badge-l1">Level 1</span>`;
+    if (n === 2) return `<span class="badge-l2">Level 2</span>`;
+    if (n === 3) return `<span class="badge-l3">Level 3</span>`;
+    return `<span class="badge-l0">Level 0 (Normal)</span>`;
+}
+
+function statusPill(s) {
+    const v = (s || '').toLowerCase();
+    if (v === 'open')      return `<span class="status-pill status-open">Open</span>`;
+    if (v === 'resolved')  return `<span class="status-pill status-resolved">Resolved</span>`;
+    if (v === 'escalated') return `<span class="status-pill status-escalated">Escalated</span>`;
+    return `<span class="status-pill status-open">Open</span>`;
+}
+
+function fmtDate(d) {
+    if (!d) return '–';
+    try { return new Date(d).toLocaleDateString('en-TT', { day:'numeric', month:'short', year:'numeric' }); }
+    catch { return d; }
+}
+
+function escapeQuotes(str) {
+    return (str || '').replace(/'/g, "\\'");
+}
+
+function openLogModal(prefillStudent = null, prefillClass = null) {
+    const modal = document.getElementById('logModal');
+    if (!modal) return;
+
+    const alertEl = document.getElementById('modalAlert');
+    if (alertEl) alertEl.style.display = 'none';
+
+    const form = document.getElementById('incidentForm');
+    if (form) form.reset();
+
+    if (prefillStudent) {
+        const sEl = document.getElementById('iStudentName');
+        if (sEl) sEl.value = prefillStudent;
+    }
+    const cEl = document.getElementById('iClass');
+    if (cEl) {
+        if (prefillClass) {
+            cEl.value = prefillClass;
+        } else if (activeClassId) {
+            cEl.value = activeClassId;
+        } else if (myClasses && myClasses.length === 1) {
+            cEl.value = myClasses[0].id;
+        }
+    }
+    // Pre-fill school name from logged-in user
+    const schoolEl = document.getElementById('iSchool');
+    if (schoolEl && currentUser && currentUser.schoolName) schoolEl.value = currentUser.schoolName;
+    const districtEl = document.getElementById('iDistrict');
+    if (districtEl && !districtEl.value) {
+        districtEl.value = (currentUser && currentUser.district) || 'St. George East District';
+    }
+
+    modal.classList.add('open');
+    modal.style.display = 'block';
+    modal.scrollTop = 0;
+    window.scrollTo({ top: 0, behavior: 'instant' });
+    document.body.style.overflow = 'hidden';
+
+    setTimeout(() => {
+        const el = document.getElementById('iStudentName');
+        if (el) el.focus();
+    }, 50);
+}
+window.openLogModal = openLogModal;
+
+function closeLogModal() {
+    const modal = document.getElementById('logModal');
+    if (modal) {
+        modal.classList.remove('open');
+        modal.style.display = 'none';
+    }
+    document.body.style.overflow = '';
+}
+window.closeLogModal = closeLogModal;
+
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        const modal = document.getElementById('logModal');
+        if (modal && modal.classList.contains('open')) closeLogModal();
+    }
+});
+
+async function submitIncident(event) {
+    if (event) event.preventDefault();
+    const studentName = document.getElementById('iStudentName').value.trim();
+    const classId     = document.getElementById('iClass').value;
+    const level       = parseInt(document.getElementById('iMatrix').value);  // 1, 2, or 3
+    const action      = document.getElementById('iAction').value;
+    const description = document.getElementById('iDesc').value.trim();
+    const schoolEl    = document.getElementById('iSchool');
+    const districtEl  = document.getElementById('iDistrict');
+    const school      = schoolEl ? schoolEl.value.trim() : '';
+    const district    = districtEl ? districtEl.value : '';
+    const alertEl     = document.getElementById('modalAlert');
+    const btn         = document.getElementById('btnSubmitInc');
+
+    alertEl.style.display = 'none';
+    if (!studentName || !classId || !level || !action) {
+        alertEl.textContent = 'Please fill in all required fields (Student Name, Class, Level, Action).';
+        alertEl.style.display = 'block'; return;
+    }
+
+    const cls = myClasses.find(c => c.id === classId);
+    btn.disabled = true; btn.textContent = 'Submitting…';
+
+    const newId = `#INC-2026-${Math.floor(Math.random() * 900) + 100}`;
+    const today = new Date();
+    const dateStr = today.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+    const incidentObj = {
+        id: 'inc_' + Date.now(),
+        incidentId: newId,
+        studentName,
+        student: studentName,
+        classId,
+        level,
+        action,
+        description,
+        matrix: `Level ${level} Matrix`,
+        school: school || (currentUser.schoolName || 'Port of Spain North Secondary'),
+        district: district || (currentUser.district || 'St. George East District'),
+        schoolId: currentUser.schoolId || 'sch_001',
+        loggedById: currentUser.id,
+        loggedBy: currentUser.name,
+        form: cls ? cls.form : '',
+        status: 'Open',
+        date: dateStr,
+        createdAt: today.toISOString()
+    };
+
+    let saved = false;
+
+    // 1. Try local Express API
+    try {
+        const res = await fetch(`${API_BASE}/api/incidents`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(incidentObj)
+        });
+        if (res.ok) saved = true;
+    } catch (_) {}
+
+    // 2. Direct online Supabase REST fallback
+    if (!saved) {
+        try {
+            const sbRes = await fetch(`${SUPABASE_REST_URL}/incidents`, {
+                method: 'POST',
+                headers: {
+                    'apikey': SUPABASE_ANON_KEY,
+                    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                    'Content-Type': 'application/json',
+                    'Prefer': 'return=representation'
+                },
+                body: JSON.stringify({
+                    id: incidentObj.id,
+                    incident_id: incidentObj.incidentId,
+                    student_name: incidentObj.studentName,
+                    class_id: incidentObj.classId,
+                    form: incidentObj.form,
+                    school_id: incidentObj.schoolId,
+                    school: incidentObj.school,
+                    district: incidentObj.district,
+                    matrix: incidentObj.matrix,
+                    level: incidentObj.level,
+                    action: incidentObj.action,
+                    description: incidentObj.description,
+                    status: incidentObj.status,
+                    logged_by_id: incidentObj.loggedById,
+                    logged_by: incidentObj.loggedBy,
+                    date: incidentObj.date,
+                    created_at: incidentObj.createdAt
+                })
+            });
+            if (sbRes.ok) saved = true;
+        } catch (_) {}
+    }
+
+    closeLogModal();
+    document.getElementById('incidentForm').reset();
+    await Promise.all([loadIncidents(), selectClass(activeClassId || classId)]);
+
+    btn.disabled = false; btn.textContent = 'Submit Incident Report';
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff Login - Sentinel Edu</title>
+
+    <!-- Google Fonts: Google Sans & Product Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Product+Sans:wght@400;700&display=swap"
+        rel="stylesheet">
+
+    <!-- External Stylesheet -->
+    <link rel="stylesheet" href="style/style.css">
+    <style>
+        .login-page-wrap {
+            min-height: calc(100vh - 80px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(to bottom, rgba(10, 11, 14, 0.75), rgba(10, 11, 14, 0.9)), url('image/home.png');
+            background-size: cover;
+            background-position: center;
+            padding: 3rem 1.5rem;
+        }
+
+        .login-box {
+            background: #ffffff;
+            color: #111111;
+            width: 100%;
+            max-width: 460px;
+            padding: 3.5rem 3rem;
+            border-radius: 4px;
+            box-shadow: 0 24px 48px rgba(0, 0, 0, 0.35);
+        }
+
+        .login-box-header {
+            margin-bottom: 2rem;
+        }
+
+        .login-box-title {
+            font-size: 1.85rem;
+            font-weight: 700;
+            color: #111111;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.02em;
+        }
+
+        .login-box-subtitle {
+            font-size: 0.95rem;
+            color: #5e6472;
+            line-height: 1.5;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #222222;
+            margin-bottom: 0.4rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.85rem 1rem;
+            font-size: 0.95rem;
+            font-family: inherit;
+            border: 1px solid rgba(0, 0, 0, 0.15);
+            border-radius: 3px;
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .form-control:focus {
+            border-color: var(--accent-lilac);
+            box-shadow: 0 0 0 3px rgba(159, 150, 238, 0.25);
+        }
+
+        .login-remember {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.88rem;
+            margin-bottom: 1.8rem;
+        }
+
+        .login-remember label {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            cursor: pointer;
+            color: #444444;
+        }
+
+        .btn-continue-login {
+            width: 100%;
+            padding: 0.95rem 1.5rem;
+            background: #111111;
+            color: #ffffff;
+            font-size: 1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            font-family: inherit;
+            letter-spacing: -0.01em;
+        }
+
+        .btn-continue-login:hover {
+            background: #2a2c35;
+        }
+
+        .demo-hint {
+            margin-top: 1.5rem;
+            padding: 0.85rem 1rem;
+            background: #f4f3ff;
+            border-left: 3px solid var(--accent-lilac);
+            font-size: 0.85rem;
+            color: #4f46e5;
+            line-height: 1.4;
+        }
+
+        /* Demo accounts panel */
+        .demo-accounts {
+            margin-top: 1.5rem;
+            border: 1px solid rgba(0,0,0,0.1);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        .demo-accounts-header {
+            padding: 0.6rem 0.9rem;
+            background: #f8f8fa;
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: #444;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 1px solid rgba(0,0,0,0.08);
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .demo-accounts-row {
+            display: block;
+            padding: 0.55rem 0.9rem;
+            font-size: 0.8rem;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        .demo-accounts-row:last-child { border-bottom: none; }
+        .demo-accounts-row:hover { background: #f0eeff; }
+        .demo-role-badge {
+            display: inline-block;
+            padding: 2px 7px;
+            border-radius: 4px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 2px;
+        }
+        .demo-email { color: #444; font-family: monospace; font-size: 0.77rem; }
+    </style>
+</head>
+
+<body>
+
+    <!-- Top Navigation Header (Copied from Homepage) -->
+    <header class="site-header">
+        <a href="index.html" class="brand-logo">
+            Sentinel Edu<span class="brand-dot"></span>
+        </a>
+
+        <nav>
+            <ul class="nav-links">
+                <li><a href="index.html#academics">Programs</a></li>
+                <li><a href="engine.html">Engine</a></li>
+                <li><a href="index.html#footer">Contact</a></li>
+            </ul>
+        </nav>
+
+        <div class="header-actions">
+            <a href="login.html" class="login-btn">
+                <span class="login-avatar">
+                    <svg viewBox="0 0 24 24">
+                        <path
+                            d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                    </svg>
+                </span>
+                Staff Login
+            </a>
+            <a href="signup.html" class="btn-enroll-header">Request Access</a>
+        </div>
+    </header>
+
+    <!-- Main Login Container -->
+    <main class="login-page-wrap">
+        <div class="login-box">
+            <div class="login-box-header">
+                <h1 class="login-box-title">Staff Portal Login</h1>
+                <p class="login-box-subtitle">Access student triage analytics, incident logs, and institutional support systems.</p>
+            </div>
+
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label for="staffName" class="form-label">Full Name or Email</label>
+                    <input type="text" id="staffName" class="form-control" placeholder="e.g. s.ali@posns.edu.tt" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" id="password" class="form-control" placeholder="••••••••" required>
+                </div>
+
+                <div class="login-remember">
+                    <label>
+                        <input type="checkbox" checked>
+                        <span>Remember credentials</span>
+                    </label>
+                    <a href="reset-password.html" style="color: #6366f1; text-decoration: none;">Forgot password?</a>
+                </div>
+
+                <button type="submit" class="btn-continue-login">
+                    Continue to Dashboard &rarr;
+                </button>
+            </form>
+
+            <div id="loginAlert" style="display: none; margin-top: 1.2rem; padding: 0.8rem 1rem; border-radius: 3px; font-size: 0.88rem; background: #fee2e2; color: #991b1b; border: 1px solid #fecaca;"></div>
+
+            <!-- Server status indicator -->
+            <div id="serverStatus" style="display:flex; align-items:center; gap:0.45rem; margin-top:1rem; font-size:0.8rem; color:#9ca3af;">
+                <span id="serverDot" style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#d1d5db;"></span>
+                <span id="serverStatusText">Checking server…</span>
+            </div>
+
+            <div class="demo-accounts">
+                <div class="demo-accounts-header">
+                    <svg viewBox="0 0 20 20" fill="currentColor" style="width:13px;height:13px;"><path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"/></svg>
+                    Demo Accounts — click any role for instant switch
+                </div>
+                <div class="demo-accounts-row" onclick="quickSwitch('s.ramjattan@moe.gov.tt')">
+                    <div class="demo-role-badge" style="background:#6d28d9; color:#ffffff;">Ministry Officer</div>
+                    <div class="demo-email">s.ramjattan@moe.gov.tt</div>
+                </div>
+                <div class="demo-accounts-row" onclick="quickSwitch('g.fitzwilliam@posns.edu.tt')">
+                    <div class="demo-role-badge" style="background:#b45309; color:#ffffff;">Principal</div>
+                    <div class="demo-email">g.fitzwilliam@posns.edu.tt</div>
+                </div>
+                <div class="demo-accounts-row" onclick="quickSwitch('r.mohammed@posns.edu.tt')">
+                    <div class="demo-role-badge" style="background:#b91c1c; color:#ffffff;">Dean</div>
+                    <div class="demo-email">r.mohammed@posns.edu.tt</div>
+                </div>
+                <div class="demo-accounts-row" onclick="quickSwitch('t.boodoo@posns.edu.tt')">
+                    <div class="demo-role-badge" style="background:#047857; color:#ffffff;">Counselor</div>
+                    <div class="demo-email">t.boodoo@posns.edu.tt</div>
+                </div>
+                <div class="demo-accounts-row" onclick="quickSwitch('s.ali@posns.edu.tt')">
+                    <div class="demo-role-badge" style="background:#0284c7; color:#ffffff;">Teacher</div>
+                    <div class="demo-email">s.ali@posns.edu.tt</div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Shared Header & Auth Script -->
+    <script src="auth.js"></script>
+    <script>
+        async function handleLogin(e) {
+            e.preventDefault();
+            const staffInput = document.getElementById('staffName').value.trim();
+            const password = document.getElementById('password').value;
+            const submitBtn = document.querySelector('.btn-continue-login');
+            const alertBox = document.getElementById('loginAlert');
+
+            if (!staffInput) return;
+
+            alertBox.style.display = 'none';
+            const originalBtnText = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = 'Signing in…';
+
+            try {
+                const result = await performLogin(staffInput, password || 'demo1234');
+                submitBtn.innerHTML = 'Success! Redirecting…';
+                redirectByRole(result.user);
+            } catch (err) {
+                alertBox.textContent = err.message || 'Could not sign in. Please verify your details.';
+                alertBox.style.display = 'block';
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalBtnText;
+            }
+        }
+
+        async function quickSwitch(email) {
+            document.getElementById('staffName').value = email;
+            document.getElementById('password').value = 'demo1234';
+            const alertBox = document.getElementById('loginAlert');
+            if (alertBox) alertBox.style.display = 'none';
+            const submitBtn = document.querySelector('.btn-continue-login');
+            submitBtn.innerHTML = 'Switching to ' + email.split('@')[0] + '…';
+            submitBtn.disabled = true;
+
+            const result = await performLogin(email, 'demo1234');
+            submitBtn.innerHTML = 'Success! Redirecting…';
+            redirectByRole(result.user);
+        }
+
+        function fillLogin(email) {
+            quickSwitch(email);
+        }
+
+        // Check server connectivity on page load
+        async function checkServer() {
+            const dot = document.getElementById('serverDot');
+            const txt = document.getElementById('serverStatusText');
+            try {
+                const ctrl = new AbortController();
+                setTimeout(() => ctrl.abort(), 4000);
+                const res = await fetch('http://localhost:5000/api/health', { signal: ctrl.signal });
+                if (res.ok) {
+                    dot.style.background = '#22c55e';
+                    txt.textContent = 'Server connected · Ready to sign in';
+                    txt.style.color = '#15803d';
+                } else {
+                    throw new Error('not ok');
+                }
+            } catch {
+                dot.style.background = '#f59e0b';
+                txt.style.color = '#92400e';
+                txt.textContent = 'Server offline — open http://localhost:5000 first';
+            }
+        }
+        checkServer();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,1086 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Decision Factor Engine - Sentinel Edu</title>
+    <meta name="description" content="National School Discipline Matrix Decision Factor Engine — Severity Weighting Matrix (W_level), risk score calculation, and intervention protocols.">
+
+    <!-- Google Fonts: Google Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Product+Sans:wght@400;700&display=swap" rel="stylesheet">
+
+    <!-- Shared Stylesheet -->
+    <link rel="stylesheet" href="style/style.css">
+
+    <style>
+        body {
+            background-color: #ffffff;
+            color: #121316;
+            font-family: var(--font-family);
+        }
+
+        .page-wrapper {
+            max-width: 1400px;
+            margin: 2.5rem auto 4rem;
+            padding: 0 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .page-title-banner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 2rem;
+            padding: 2rem 0 1rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+        }
+
+        .page-subtitle {
+            font-size: 0.82rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--accent-lilac, #9f96ee);
+            margin-bottom: 0.35rem;
+        }
+
+        .page-title {
+            font-size: 2.4rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            color: #111111;
+            margin: 0;
+            line-height: 1.1;
+        }
+
+        .page-desc {
+            font-size: 0.95rem;
+            color: #555c6d;
+            margin-top: 0.45rem;
+            max-width: 780px;
+            line-height: 1.5;
+        }
+
+        /* Metric Grid */
+        .metric-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.25rem;
+        }
+
+        .engine-metric-card {
+            padding: 1.4rem 1.6rem;
+        }
+
+        .metric-label {
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #636b7b;
+            margin-bottom: 0.35rem;
+        }
+
+        .metric-value {
+            font-size: 2.1rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            color: #111111;
+            line-height: 1.1;
+        }
+
+        .metric-sub {
+            font-size: 0.8rem;
+            color: #717682;
+            margin-top: 0.3rem;
+        }
+
+        /* Tabs Bar */
+        .engine-nav-tabs {
+            display: flex;
+            gap: 0.5rem;
+            border-bottom: 2px solid #e5e7eb;
+            margin-top: 0.5rem;
+        }
+
+        .engine-tab-btn {
+            background: none;
+            border: none;
+            padding: 0.85rem 1.4rem;
+            font-family: inherit;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #64748b;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            transition: all 0.15s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .engine-tab-btn:hover {
+            color: #111827;
+        }
+
+        .engine-tab-btn.active {
+            color: #4f46e5;
+            border-bottom-color: #4f46e5;
+            font-weight: 700;
+        }
+
+        /* Section Container */
+        .engine-section {
+            display: none;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .engine-section.active {
+            display: flex;
+        }
+
+        /* Table Card */
+        .engine-card {
+            background: #ffffff;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.02);
+        }
+
+        .card-header-bar {
+            padding: 1.25rem 1.75rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fafafa;
+        }
+
+        .card-header-bar h3 {
+            margin: 0;
+            font-size: 1.15rem;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+            color: #111111;
+        }
+
+        .card-header-bar p {
+            margin: 0.2rem 0 0;
+            font-size: 0.85rem;
+            color: #64748b;
+        }
+
+        /* Weight Matrix Table */
+        .matrix-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+            text-align: left;
+        }
+
+        .matrix-table th {
+            background: #ffffff;
+            color: #475569;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .matrix-table td {
+            padding: 1.1rem 1.25rem;
+            border-bottom: 1px solid #f1f5f9;
+            vertical-align: top;
+            color: #1e293b;
+        }
+
+        .matrix-table tr:hover {
+            background-color: transparent;
+        }
+
+        .weight-pill {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 48px;
+            height: 32px;
+            padding: 0 0.6rem;
+            font-weight: 800;
+            font-size: 0.95rem;
+            border-radius: 6px;
+        }
+
+        .weight-lvl-1 { background: transparent; color: inherit; border: none; }
+        .weight-lvl-2 { background: transparent; color: inherit; border: none; }
+        .weight-lvl-3 { background: transparent; color: inherit; border: none; }
+        .weight-lvl-4 { background: transparent; color: inherit; border: none; }
+        .weight-lvl-5 { background: #450a0a; color: #ffffff; border: 1px solid #000000; }
+
+        .examples-list {
+            margin: 0;
+            padding-left: 1.2rem;
+            color: #475569;
+            font-size: 0.85rem;
+            line-height: 1.45;
+        }
+
+        .examples-list li {
+            margin-bottom: 0.2rem;
+        }
+
+        /* Simulator Grid */
+        .simulator-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.15fr;
+            gap: 1.5rem;
+        }
+
+        .sim-control-panel {
+            background: #ffffff;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            border-radius: 8px;
+            padding: 1.75rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        .sim-form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        .sim-form-group label {
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #475569;
+        }
+
+        .sim-select, .sim-input {
+            width: 100%;
+            padding: 0.7rem 0.9rem;
+            font-family: inherit;
+            font-size: 0.92rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            background: #ffffff;
+            color: #0f172a;
+        }
+
+        .sim-select:focus, .sim-input:focus {
+            outline: none;
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
+        }
+
+        .btn-calc-engine {
+            padding: 0.85rem 1.5rem;
+            background: #111111;
+            color: #ffffff;
+            border: none;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.15s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .btn-calc-engine:hover {
+            background: #333333;
+        }
+
+        /* Result Panel */
+        .sim-result-card {
+            background: #fafafa;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1.75rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        .score-hero-box {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .score-hero-val {
+            font-size: 3rem;
+            font-weight: 900;
+            letter-spacing: -0.04em;
+            color: #111111;
+            line-height: 1;
+        }
+
+        .triage-badge-hero {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .triage-tier-0 { background: #dcfce7; color: #166534; border: 1px solid #86efac; }
+        .triage-tier-1 { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
+        .triage-tier-2 { background: #ffedd5; color: #9a3412; border: 1px solid #fed7aa; }
+        .triage-tier-3 { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+
+        .protocol-box {
+            background: #ffffff;
+            border-left: 4px solid #4f46e5;
+            padding: 1.2rem;
+            border-radius: 0 6px 6px 0;
+            border-top: 1px solid #e2e8f0;
+            border-right: 1px solid #e2e8f0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .protocol-box h4 {
+            margin: 0 0 0.3rem;
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        .protocol-box p {
+            margin: 0;
+            font-size: 0.88rem;
+            color: #475569;
+            line-height: 1.45;
+        }
+
+        /* Formula Box */
+        .formula-callout {
+            background: #115e59;
+            border: 1px solid #000000;
+            border-radius: 0;
+            padding: 1.1rem 1.4rem;
+            font-size: 0.88rem;
+            color: #f0fdfa;
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        .formula-code {
+            font-family: inherit;
+            font-weight: 800;
+            color: #ffffff;
+            font-size: 1.05rem;
+            letter-spacing: -0.01em;
+        }
+
+        @media (max-width: 900px) {
+            .metric-cards-grid { grid-template-columns: repeat(2, 1fr); }
+            .simulator-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Header Navigation -->
+    <header class="site-header">
+        <a href="index.html" class="brand-logo">
+            Sentinel Edu<span class="brand-dot"></span>
+        </a>
+
+        <nav>
+            <ul class="nav-links">
+                <li><a href="dashboard.html">Dashboard</a></li>
+                <li><a href="students.html">Students</a></li>
+                <li><a href="incidents.html">Incidents</a></li>
+                <li><a href="engine.html" style="font-weight: 700; color: #000;">Engine</a></li>
+            </ul>
+        </nav>
+
+        <div class="header-actions">
+            <a href="login.html" class="login-btn">
+                <span class="login-avatar">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                    </svg>
+                </span>
+                Staff Login
+            </a>
+        </div>
+    </header>
+
+    <div class="page-wrapper">
+
+        <!-- Page Header Banner -->
+        <section class="page-title-banner">
+            <div class="page-banner-left">
+                <div class="page-subtitle">National School Discipline Matrix • Ministry of Education</div>
+                <h1 class="page-title">Decision Factor Engine</h1>
+            </div>
+            <div class="page-banner-right">
+                <a href="incidents.html" class="btn-calc-engine" style="text-decoration:none;">
+                    + Log New Incident
+                </a>
+            </div>
+        </section>
+
+        <!-- Metrics Overview Grid -->
+        <div class="metric-cards-grid">
+            <div class="engine-metric-card">
+                <div class="metric-label">Severity Matrix Scale</div>
+                <div class="metric-value">5</div>
+            </div>
+            <div class="engine-metric-card">
+                <div class="metric-label">Active Triage Tiers</div>
+                <div class="metric-value">4</div>
+            </div>
+            <div class="engine-metric-card">
+                <div class="metric-label">Evaluated Students</div>
+                <div class="metric-value" id="statEvaluatedStudents">38</div>
+            </div>
+            <div class="engine-metric-card">
+                <div class="metric-label">High-Risk Watchlist</div>
+                <div class="metric-value" style="color: #b91c1c;" id="statHighRiskStudents">--</div>
+            </div>
+        </div>
+
+
+
+        <!-- TAB 1: SEVERITY WEIGHTING MATRIX -->
+        <section class="engine-section active" id="matrixTab">
+            <div class="formula-callout">
+                <span style="font-weight: 700; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.05em; color: #a7f3d0;">Core Decision Factor Algorithm:</span>
+                <span class="formula-code">Decision Score (S) = &sum; [ W<sub>level</sub> &times; R(t) &times; M<sub>status</sub> ]</span>
+                <span style="color: #f0fdfa;">Where <strong style="color: #ffffff;">W<sub>level</sub></strong> is the base severity weight, <strong style="color: #ffffff;">R(t)</strong> is the recency multiplier (1.0 within 30d, 0.85 within 90d, 0.70 within 180d, 0.50 &gt;180d), and <strong style="color: #ffffff;">M<sub>status</sub></strong> is the case status multiplier (1.25 for Open, 0.80 for Resolved).</span>
+            </div>
+
+            <div class="engine-card">
+                <div class="card-header-bar">
+                    <div>
+                        <h3>National School Code of Conduct — Severity Weighting Matrix</h3>
+                        <p>Mandatory weight points and protocol triggers established by the Ministry of Education.</p>
+                    </div>
+                </div>
+
+                <table class="matrix-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 12%;">Matrix Level</th>
+                            <th style="width: 12%;">Base Weight (W<sub>level</sub>)</th>
+                            <th style="width: 28%;">Infraction Classification &amp; Scope</th>
+                            <th style="width: 28%;">Prescribed Intervention Protocol</th>
+                            <th style="width: 20%;">Escalation Trigger</th>
+                        </tr>
+                    </thead>
+                    <tbody id="matrixTableBody">
+                        <tr>
+                            <td>
+                                <strong style="font-size: 0.95rem;">Level 1</strong><br>
+                                <span style="font-size: 0.75rem; color: #64748b;">Minor</span>
+                            </td>
+                            <td>
+                                <span class="weight-pill weight-lvl-1">1 pt</span><br>
+                                <small style="color: #64748b; font-size: 0.72rem;">Range: 1–2</small>
+                            </td>
+                            <td>
+                                <strong>Classroom &amp; Procedural Violations</strong>
+                                <ul class="examples-list">
+                                    <li>Tardiness or repeated unpunctuality</li>
+                                    <li>Uniform / grooming code non-compliance</li>
+                                    <li>Missing homework or instructional supplies</li>
+                                    <li>Talking out of turn, eating in class</li>
+                                </ul>
+                            </td>
+                            <td>
+                                <strong>Classroom Teacher Protocol</strong>
+                                <p style="font-size: 0.82rem; color: #475569; margin: 0.2rem 0 0;">Teacher warning, behavioral reflection log, classroom privileges review.</p>
+                            </td>
+                            <td>
+                                <span style="font-weight: 600; font-size: 0.82rem; color: #0f172a;">3 occurrences</span><br>
+                                <small style="color: #64748b;">Escalates to Level 2 review</small>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                <strong style="font-size: 0.95rem;">Level 2</strong><br>
+                                <span style="font-size: 0.75rem; color: #64748b;">Moderate</span>
+                            </td>
+                            <td>
+                                <span class="weight-pill weight-lvl-2">3 pts</span><br>
+                                <small style="color: #64748b; font-size: 0.72rem;">Range: 2–3</small>
+                            </td>
+                            <td>
+                                <strong>Disruptive Conduct &amp; Defiance</strong>
+                                <ul class="examples-list">
+                                    <li>Persistent classroom disruption</li>
+                                    <li>Truancy / unexcused class absence</li>
+                                    <li>Unauthorized smartphone or electronic usage</li>
+                                    <li>Disrespectful language directed at classmates</li>
+                                </ul>
+                            </td>
+                            <td>
+                                <strong>Guidance &amp; Family Protocol</strong>
+                                <p style="font-size: 0.82rem; color: #475569; margin: 0.2rem 0 0;">Mandatory parent conference logged, guidance counselor referral, attendance contract.</p>
+                            </td>
+                            <td>
+                                <span style="font-weight: 600; font-size: 0.82rem; color: #0f172a;">2 occurrences</span><br>
+                                <small style="color: #64748b;">Escalates to Level 3 Dean review</small>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                <strong style="font-size: 0.95rem;">Level 3</strong><br>
+                                <span style="font-size: 0.75rem; color: #64748b;">Serious</span>
+                            </td>
+                            <td>
+                                <span class="weight-pill weight-lvl-3">7 pts</span><br>
+                                <small style="color: #64748b; font-size: 0.72rem;">Range: 5–8</small>
+                            </td>
+                            <td>
+                                <strong>Defiance of Authority &amp; Vandalism</strong>
+                                <ul class="examples-list">
+                                    <li>Direct insubordination / refusal to comply</li>
+                                    <li>Profanity or verbal abuse toward staff</li>
+                                    <li>Vandalism / defacing of school property</li>
+                                    <li>Gambling, unauthorized wagering</li>
+                                    <li>Leaving school grounds without pass</li>
+                                </ul>
+                            </td>
+                            <td>
+                                <strong>Dean Formal Intervention</strong>
+                                <p style="font-size: 0.82rem; color: #475569; margin: 0.2rem 0 0;">Dean of Discipline hearing, formal behavioral contract, peer mediation protocol, restorative task.</p>
+                            </td>
+                            <td>
+                                <span style="font-weight: 600; font-size: 0.82rem; color: #0f172a;">2 occurrences</span><br>
+                                <small style="color: #64748b;">Automatic suspension hearing</small>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                <strong style="font-size: 0.95rem;">Level 4</strong><br>
+                                <span style="font-size: 0.75rem; color: #64748b;">Severe</span>
+                            </td>
+                            <td>
+                                <span class="weight-pill weight-lvl-4">12 pts</span><br>
+                                <small style="color: #64748b; font-size: 0.72rem;">Range: 10–15</small>
+                            </td>
+                            <td>
+                                <strong>Physical Altercation &amp; Endangerment</strong>
+                                <ul class="examples-list">
+                                    <li>Physical fighting causing minor injury</li>
+                                    <li>Systematic bullying or cyberbullying</li>
+                                    <li>Extortion, intimidation, or coercion</li>
+                                    <li>Theft or possession of stolen items</li>
+                                    <li>Alcohol, tobacco, or vaping on compound</li>
+                                </ul>
+                            </td>
+                            <td>
+                                <strong>Administrative Suspension &amp; Case Conference</strong>
+                                <p style="font-size: 0.82rem; color: #475569; margin: 0.2rem 0 0;">In-school/out-of-school suspension (up to 7 days), mandatory multidisciplinary case conference with SSSD officer.</p>
+                            </td>
+                            <td>
+                                <span style="font-weight: 600; font-size: 0.82rem; color: #b91c1c;">1 occurrence</span><br>
+                                <small style="color: #b91c1c;">Immediate administrative action</small>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                <strong style="font-size: 0.95rem; color: #991b1b;">Level 5</strong><br>
+                                <span style="font-size: 0.75rem; color: #991b1b; font-weight: 700;">Critical Misconduct</span>
+                            </td>
+                            <td>
+                                <span class="weight-pill weight-lvl-5">30 pts</span><br>
+                                <small style="color: #64748b; font-size: 0.72rem;">Range: 25–50</small>
+                            </td>
+                            <td>
+                                <strong>Critical Security &amp; Criminal Infractions</strong>
+                                <ul class="examples-list">
+                                    <li>Weapons possession (knives, firearms, bladed tools)</li>
+                                    <li>Possession or distribution of illegal narcotics</li>
+                                    <li>Aggravated assault / grievous bodily harm</li>
+                                    <li>Sexual harassment, sexual assault, indecent acts</li>
+                                    <li>Arson, bomb threats, extortion with violence</li>
+                                </ul>
+                            </td>
+                            <td>
+                                <strong>National Ministry Escalation &amp; Police Referral</strong>
+                                <p style="font-size: 0.82rem; color: #475569; margin: 0.2rem 0 0;">Immediate removal from compound, police report logged, Ministry Education Officer emergency intervention, formal extended suspension / placement review.</p>
+                            </td>
+                            <td>
+                                <span style="font-weight: 700; font-size: 0.85rem; color: #b91c1c;">Immediate Override</span><br>
+                                <small style="color: #b91c1c;">Direct elevation to Tier 3 Crisis</small>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- TAB 2: INTERACTIVE DECISION CALCULATOR -->
+        <section class="engine-section" id="simulatorTab">
+            <div class="simulator-grid">
+                <!-- Left: Controls -->
+                <div class="sim-control-panel">
+                    <h3 style="margin: 0; font-size: 1.2rem; font-weight: 700; color: #111;">Decision Factor Evaluation Tool</h3>
+                    <p style="margin: 0; font-size: 0.85rem; color: #64748b;">Select an existing student or build a simulated scenario to compute the decision score and prescribed intervention.</p>
+
+                    <div class="sim-form-group">
+                        <label for="simStudentSelect">Select Student Profile</label>
+                        <select id="simStudentSelect" class="sim-select" onchange="loadStudentIntoSimulator()">
+                            <option value="">Choose a registered student…</option>
+                        </select>
+                    </div>
+
+                    <div style="height: 1px; background: #e2e8f0; margin: 0.2rem 0;"></div>
+
+                    <div class="sim-form-group">
+                        <label for="simIncidentLevel">Hypothetical Infraction Level</label>
+                        <select id="simIncidentLevel" class="sim-select">
+                            <option value="1">Level 1: Minor Infraction (W = 1 pt)</option>
+                            <option value="2">Level 2: Minor-Moderate Infraction (W = 3 pts)</option>
+                            <option value="3" selected>Level 3: Moderate-Serious Defiance (W = 7 pts)</option>
+                            <option value="4">Level 4: Serious Violence/Theft (W = 12 pts)</option>
+                            <option value="5">Level 5: Critical Misconduct / Weapons / Drugs (W = 30 pts)</option>
+                        </select>
+                    </div>
+
+                    <div class="sim-form-group">
+                        <label for="simRecency">Recency Window</label>
+                        <select id="simRecency" class="sim-select">
+                            <option value="1.0">Active (&le; 30 days) — 100% Weight (R = 1.0)</option>
+                            <option value="0.85">Recent (31–90 days) — 85% Weight (R = 0.85)</option>
+                            <option value="0.70">Medium-Term (91–180 days) — 70% Weight (R = 0.70)</option>
+                            <option value="0.50">Archival (&gt; 180 days) — 50% Weight (R = 0.50)</option>
+                        </select>
+                    </div>
+
+                    <div class="sim-form-group">
+                        <label for="simStatus">Case Status</label>
+                        <select id="simStatus" class="sim-select">
+                            <option value="1.25">Open / Pending Review (+25% Escalation Premium)</option>
+                            <option value="0.80">Resolved / Restorative Protocol Completed (-20%)</option>
+                        </select>
+                    </div>
+
+                    <button type="button" class="btn-calc-engine" onclick="runSimulatorEvaluation()">
+                        <span>⚡</span> Run Decision Evaluation
+                    </button>
+                </div>
+
+                <!-- Right: Results Card -->
+                <div class="sim-result-card" id="simResultCard">
+                    <div class="score-hero-box">
+                        <div>
+                            <div style="font-size: 0.78rem; font-weight: 700; text-transform: uppercase; color: #64748b; letter-spacing: 0.05em;">Calculated Decision Score (S)</div>
+                            <div class="score-hero-val" id="resScoreValue">8.8</div>
+                            <small id="resScoreDetail" style="color: #64748b; font-size: 0.8rem;">Base W: 7 &bull; R: 1.0 &bull; M: 1.25</small>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: #64748b; margin-bottom: 0.4rem;">Assigned Triage Level</div>
+                            <span class="triage-badge-hero triage-tier-1" id="resTriageBadge">Tier 1 — Moderate</span>
+                        </div>
+                    </div>
+
+                    <div class="protocol-box" id="resProtocolBox">
+                        <h4 id="resProtocolTitle">Prescribed Protocol: Guidance Counseling Referral</h4>
+                        <p id="resProtocolDesc">
+                            The student's quantitative risk score falls in Tier 1 (5–14 pts). The school administration must log a parent conference and issue a formal guidance counselor referral for behavioral assessment.
+                        </p>
+                    </div>
+
+                    <div class="engine-card" style="margin: 0; box-shadow: none;">
+                        <div style="padding: 0.9rem 1.2rem; background: #ffffff; border-bottom: 1px solid #e2e8f0; font-weight: 700; font-size: 0.85rem; color: #1e293b;">
+                            Evaluated Student Incident History (<span id="resIncidentCount">0</span> incidents on file)
+                        </div>
+                        <div id="resIncidentList" style="max-height: 220px; overflow-y: auto; padding: 0.5rem 1rem; font-size: 0.85rem; color: #475569;">
+                            <em>No incidents loaded. Pick a student from the dropdown to inspect real files.</em>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 3: NATIONAL STUDENT RISK RANKINGS -->
+        <section class="engine-section" id="studentsTab">
+            <div class="engine-card">
+                <div class="card-header-bar">
+                    <div>
+                        <h3>National Student Risk Rankings (Decision Factor S)</h3>
+                        <p>All enrolled students ranked by quantitative behavioral risk score according to the 5-Level Discipline Matrix.</p>
+                    </div>
+                    <div>
+                        <input type="text" id="searchRanking" class="sim-input" placeholder="Search student name or school…" oninput="filterRankingsTable()" style="width: 260px;">
+                    </div>
+                </div>
+
+                <table class="matrix-table" id="rankingsTable">
+                    <thead>
+                        <tr>
+                            <th style="width: 8%;">Rank</th>
+                            <th style="width: 24%;">Student Information</th>
+                            <th style="width: 22%;">School &amp; District</th>
+                            <th style="width: 14%;">Incident Count</th>
+                            <th style="width: 16%;">Decision Factor (S)</th>
+                            <th style="width: 16%;">Triage Tier</th>
+                        </tr>
+                    </thead>
+                    <tbody id="rankingsTableBody">
+                        <tr>
+                            <td colspan="6" style="text-align: center; padding: 2.5rem; color: #64748b;">
+                                Loading decision engine evaluations…
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- Shared Database & Auth scripts -->
+    <script src="data/seed.js"></script>
+    <script src="auth.js"></script>
+
+    <script>
+        // ── DECISION ENGINE CLIENT LOGIC ──────────────────────────────────────
+        const API_BASE = 'http://localhost:5000';
+        const SUPABASE_REST_URL = "https://wrumedevccqkopguaxdi.supabase.co/rest/v1";
+        const SUPABASE_ANON_KEY = "sb_publishable_zpd_lzgRqghcN-0X7qw7SA_I2hAZHXH";
+
+        let allStudents = [];
+        let allIncidents = [];
+        let evaluatedRankings = [];
+
+        // Severity Weighting Matrix (Step 1 Configuration constants)
+        const WEIGHT_MATRIX = {
+            1: { weight: 1, label: 'Level 1: Minor (1 pt)', range: '1–2' },
+            2: { weight: 3, label: 'Level 2: Minor-Moderate (3 pts)', range: '2–3' },
+            3: { weight: 7, label: 'Level 3: Moderate-Serious (7 pts)', range: '5–8' },
+            4: { weight: 12, label: 'Level 4: Serious (12 pts)', range: '10–15' },
+            5: { weight: 30, label: 'Level 5: Critical Misconduct (30 pts)', range: '25–50' }
+        };
+
+        const TRIAGE_TIERS = [
+            { min: 30, level: 3, label: 'Tier 3 — High Risk / Crisis', class: 'triage-tier-3', action: 'Principal intervention, Ministry Education Officer case conference, SSSD referral.' },
+            { min: 15, level: 2, label: 'Tier 2 — Elevated Risk', class: 'triage-tier-2', action: 'Dean of Discipline formal intervention, behavioral contract, peer mediation.' },
+            { min: 5,  level: 1, label: 'Tier 1 — Moderate Risk', class: 'triage-tier-1', action: 'Guidance counseling referral, parent conference logged, attendance review.' },
+            { min: 0,  level: 0, label: 'Tier 0 — Low Risk', class: 'triage-tier-0', action: 'Normal classroom monitoring; no administrative action required.' }
+        ];
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadEngineData();
+            runSimulatorEvaluation();
+        });
+
+        function switchEngineTab(tabId, btn) {
+            document.querySelectorAll('.engine-section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.engine-tab-btn').forEach(b => b.classList.remove('active'));
+
+            const target = document.getElementById(tabId);
+            if (target) target.classList.add('active');
+            if (btn) btn.classList.add('active');
+        }
+
+        async function loadEngineData() {
+            // 1. Try backend API first
+            try {
+                const res = await fetch(`${API_BASE}/api/engine/students-evaluation`);
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data && Array.isArray(data.evaluations) && data.evaluations.length > 0) {
+                        evaluatedRankings = data.evaluations;
+                        renderRankingsTable(evaluatedRankings);
+                        populateStudentSelect();
+                        updateEngineMetrics();
+                        return;
+                    }
+                }
+            } catch (_) {}
+
+            // 2. Direct online Supabase REST fallback
+            try {
+                const [stuRes, incRes] = await Promise.all([
+                    fetch(`${SUPABASE_REST_URL}/students?select=*&order=name.asc`, {
+                        headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` }
+                    }),
+                    fetch(`${SUPABASE_REST_URL}/incidents?select=*&order=created_at.desc`, {
+                        headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` }
+                    })
+                ]);
+
+                if (stuRes.ok && incRes.ok) {
+                    allStudents = await stuRes.json();
+                    allIncidents = await incRes.json();
+                    computeClientRankings();
+                    return;
+                }
+            } catch (_) {}
+
+            // 3. Seed data fallback
+            if (window.SENTINEL_SEED_DATA) {
+                allStudents = window.SENTINEL_SEED_DATA.students || [];
+                allIncidents = window.SENTINEL_SEED_DATA.incidents || [];
+                computeClientRankings();
+            }
+        }
+
+        function computeClientRankings() {
+            const now = Date.now();
+            const DAY_MS = 24 * 60 * 60 * 1000;
+
+            evaluatedRankings = allStudents.map(st => {
+                const sName = (st.name || '').toLowerCase();
+                const sId = (st.student_number || st.studentNumber || st.id || '').toLowerCase();
+
+                const studentIncs = allIncidents.filter(inc => {
+                    const incStuId = (inc.student_id || inc.studentId || '').toLowerCase();
+                    const incStudent = (inc.student_name || inc.studentName || inc.student || '').toLowerCase();
+                    return (incStuId && (incStuId === sId || incStuId === (st.id || '').toLowerCase())) ||
+                           (incStudent && sName && (incStudent.includes(sName) || sName.includes(incStudent)));
+                });
+
+                let score = 0;
+                let hasL5 = false;
+                studentIncs.forEach(inc => {
+                    let lvl = inc.level ? parseInt(inc.level) : 1;
+                    if (!inc.level && inc.matrix) {
+                        const m = inc.matrix.toLowerCase();
+                        if (m.includes('5')) lvl = 5;
+                        else if (m.includes('4')) lvl = 4;
+                        else if (m.includes('3')) lvl = 3;
+                        else if (m.includes('2')) lvl = 2;
+                    }
+                    if (lvl === 5) hasL5 = true;
+
+                    const base = WEIGHT_MATRIX[lvl] ? WEIGHT_MATRIX[lvl].weight : 1;
+                    let recency = 1.0;
+                    if (inc.created_at || inc.createdAt) {
+                        const days = (now - new Date(inc.created_at || inc.createdAt).getTime()) / DAY_MS;
+                        if (days > 180) recency = 0.50;
+                        else if (days > 90) recency = 0.70;
+                        else if (days > 30) recency = 0.85;
+                    }
+                    const statusMult = (inc.status && inc.status.toLowerCase() === 'resolved') ? 0.8 : 1.25;
+                    score += base * recency * statusMult;
+                });
+
+                const roundedScore = Math.round(score * 10) / 10;
+                let assignedTier = TRIAGE_TIERS[3];
+                for (const t of TRIAGE_TIERS) {
+                    if (roundedScore >= t.min) {
+                        assignedTier = t;
+                        break;
+                    }
+                }
+                if (hasL5) assignedTier = TRIAGE_TIERS[0];
+
+                return {
+                    studentId: st.id,
+                    studentNumber: st.student_number || st.studentNumber || st.id,
+                    name: st.name,
+                    form: st.form || 'General',
+                    school: st.school || 'Port of Spain North Secondary',
+                    district: st.district || 'St. George East District',
+                    incidentCount: studentIncs.length,
+                    incidents: studentIncs,
+                    evaluation: {
+                        score: roundedScore,
+                        triageLevel: assignedTier.level,
+                        triageLabel: assignedTier.label,
+                        triageClass: assignedTier.class,
+                        actionRequired: assignedTier.action
+                    }
+                };
+            });
+
+            evaluatedRankings.sort((a, b) => b.evaluation.score - a.evaluation.score);
+            renderRankingsTable(evaluatedRankings);
+            populateStudentSelect();
+            updateEngineMetrics();
+        }
+
+        function renderRankingsTable(list) {
+            const tbody = document.getElementById('rankingsTableBody');
+            if (!tbody) return;
+
+            if (!list || list.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:2.5rem; color:#64748b;">No student records found.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = list.map((st, idx) => {
+                const evalData = st.evaluation || { score: 0, triageLabel: 'Tier 0', triageClass: 'triage-tier-0' };
+                const tierClass = evalData.triageClass || (evalData.triageLevel === 3 ? 'triage-tier-3' : evalData.triageLevel === 2 ? 'triage-tier-2' : evalData.triageLevel === 1 ? 'triage-tier-1' : 'triage-tier-0');
+
+                return `
+                    <tr>
+                        <td style="font-weight: 800; color: #64748b;">#${idx + 1}</td>
+                        <td>
+                            <strong style="color: #0f172a; font-size: 0.95rem;">${st.name}</strong><br>
+                            <span style="font-size: 0.78rem; color: #64748b;">ID: ${st.studentNumber || st.studentId} • Form: ${st.form}</span>
+                        </td>
+                        <td>
+                            <span style="font-weight: 600; color: #1e293b;">${st.school}</span><br>
+                            <span style="font-size: 0.78rem; color: #64748b;">${st.district}</span>
+                        </td>
+                        <td>
+                            <span style="font-weight: 700; font-size: 0.95rem;">${st.incidentCount}</span>
+                            <span style="font-size: 0.78rem; color: #64748b;">incident${st.incidentCount !== 1 ? 's' : ''}</span>
+                        </td>
+                        <td>
+                            <strong style="font-size: 1.15rem; color: #0f172a;">${evalData.score.toFixed(1)}</strong>
+                            <span style="font-size: 0.75rem; color: #64748b;">pts</span>
+                        </td>
+                        <td>
+                            <span class="triage-badge-hero ${tierClass}" style="font-size: 0.75rem; padding: 0.35rem 0.65rem;">
+                                ${evalData.triageLabel.split('—')[0].trim()}
+                            </span>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function populateStudentSelect() {
+            const select = document.getElementById('simStudentSelect');
+            if (!select) return;
+
+            select.innerHTML = '<option value="">Choose a registered student…</option>' +
+                evaluatedRankings.map(s => `<option value="${s.studentId}">${s.name} (${s.form} • ${s.school}) - ${s.incidentCount} inc</option>`).join('');
+        }
+
+        function updateEngineMetrics() {
+            const statTotal = document.getElementById('statEvaluatedStudents');
+            const statHighRisk = document.getElementById('statHighRiskStudents');
+
+            if (statTotal) statTotal.textContent = evaluatedRankings.length;
+            if (statHighRisk) {
+                const highRiskCount = evaluatedRankings.filter(s => (s.evaluation && s.evaluation.triageLevel >= 2)).length;
+                statHighRisk.textContent = highRiskCount;
+            }
+        }
+
+        function loadStudentIntoSimulator() {
+            const studentId = document.getElementById('simStudentSelect').value;
+            if (!studentId) {
+                runSimulatorEvaluation();
+                return;
+            }
+
+            const student = evaluatedRankings.find(s => s.studentId === studentId);
+            if (!student) return;
+
+            // Render their incidents
+            const countEl = document.getElementById('resIncidentCount');
+            const listEl = document.getElementById('resIncidentList');
+            const incs = student.incidents || [];
+
+            if (countEl) countEl.textContent = incs.length;
+            if (listEl) {
+                if (incs.length === 0) {
+                    listEl.innerHTML = `<em>No logged incidents on file for ${student.name}. Score reflects clean baseline.</em>`;
+                } else {
+                    listEl.innerHTML = incs.map(i => `
+                        <div style="padding: 0.4rem 0; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <strong style="color: #0f172a;">${i.incident_id || i.incidentId || i.id}</strong> —
+                                <span>${i.matrix || ('Level ' + (i.level || 1))}</span>
+                            </div>
+                            <span style="font-size: 0.78rem; font-weight: 600; color: ${(i.status || '').toLowerCase() === 'resolved' ? '#15803d' : '#b45309'};">${i.status || 'Open'}</span>
+                        </div>
+                    `).join('');
+                }
+            }
+
+            // Display their actual calculated score
+            const evalData = student.evaluation;
+            displayEvaluationResult(evalData.score, evalData.triageLevel, evalData.triageLabel, evalData.actionRequired, `Student: ${student.name} (${student.school})`);
+        }
+
+        function runSimulatorEvaluation() {
+            const level = parseInt(document.getElementById('simIncidentLevel').value);
+            const recency = parseFloat(document.getElementById('simRecency').value);
+            const statusMult = parseFloat(document.getElementById('simStatus').value);
+
+            const config = WEIGHT_MATRIX[level] || WEIGHT_MATRIX[1];
+            const baseWeight = config.weight;
+
+            // Score formula
+            const score = Math.round(baseWeight * recency * statusMult * 10) / 10;
+
+            let assignedTier = TRIAGE_TIERS[3];
+            for (const t of TRIAGE_TIERS) {
+                if (score >= t.min) {
+                    assignedTier = t;
+                    break;
+                }
+            }
+            if (level === 5) assignedTier = TRIAGE_TIERS[0]; // Level 5 override
+
+            displayEvaluationResult(score, assignedTier.level, assignedTier.label, assignedTier.action, `W: ${baseWeight} &bull; R: ${recency} &bull; M: ${statusMult}`);
+        }
+
+        function displayEvaluationResult(score, level, label, action, detailText) {
+            const valEl = document.getElementById('resScoreValue');
+            const badgeEl = document.getElementById('resTriageBadge');
+            const detailEl = document.getElementById('resScoreDetail');
+            const titleEl = document.getElementById('resProtocolTitle');
+            const descEl = document.getElementById('resProtocolDesc');
+
+            if (valEl) valEl.textContent = score.toFixed(1);
+            if (detailEl) detailEl.innerHTML = detailText;
+
+            if (badgeEl) {
+                badgeEl.textContent = label;
+                badgeEl.className = 'triage-badge-hero ' + (level === 3 ? 'triage-tier-3' : level === 2 ? 'triage-tier-2' : level === 1 ? 'triage-tier-1' : 'triage-tier-0');
+            }
+
+            if (titleEl) {
+                titleEl.textContent = `Prescribed Protocol (${label.split('—')[0].trim()})`;
+            }
+            if (descEl) {
+                descEl.textContent = action;
+            }
+        }
+
+        function filterRankingsTable() {
+            const q = (document.getElementById('searchRanking').value || '').toLowerCase();
+            const filtered = evaluatedRankings.filter(s =>
+                s.name.toLowerCase().includes(q) ||
+                s.school.toLowerCase().includes(q) ||
+                (s.form && s.form.toLowerCase().includes(q))
+            );
+            renderRankingsTable(filtered);
+        }
+    </script>
+</body>
+
+</html>
