@@ -1,0 +1,1249 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Assigned Classes - Sentinel Edu</title>
+
+    <!-- Google Fonts: Google Sans & Product Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Product+Sans:wght@400;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Shared Stylesheet -->
+    <link rel="stylesheet" href="style/style.css">
+
+    <style>
+        body {
+            background-color: #ffffff;
+            color: #121316;
+            font-family: var(--font-family);
+        }
+
+        .site-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1.5rem;
+            flex-wrap: nowrap;
+        }
+
+        .brand-logo {
+            white-space: nowrap !important;
+            flex-shrink: 0 !important;
+            display: inline-flex !important;
+            align-items: baseline !important;
+        }
+
+        .header-actions {
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+        }
+
+        .page-wrapper {
+            max-width: 1400px;
+            margin: 2.5rem auto 4rem;
+            padding: 0 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2.5rem;
+        }
+
+        /* ===== PAGE TITLE BANNER ===== */
+        .page-title-banner {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+            padding-bottom: 1.5rem;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .page-subtitle {
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #5e6472;
+            margin-bottom: 0.4rem;
+        }
+
+        .page-title {
+            font-size: clamp(2rem, 3.2vw, 2.7rem);
+            font-weight: 800;
+            color: #111111;
+            letter-spacing: -0.025em;
+            line-height: 1.1;
+            margin: 0;
+        }
+
+        .page-banner-counter {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #5e6472;
+        }
+
+        /* ===== CLASS BOXES GRID (Exact Match to User Screenshot) ===== */
+        .classes-section-title {
+            font-size: 1.35rem;
+            font-weight: 800;
+            color: #111111;
+            margin-bottom: 1rem;
+            letter-spacing: -0.01em;
+        }
+
+        .classes-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.4rem;
+        }
+
+        /* Clean square box */
+        .class-box {
+            background: #ffffff;
+            border: 1px solid rgba(0, 0, 0, 0.12);
+            border-radius: 0px !important; /* Square corners */
+            padding: 1.8rem 1.6rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 160px;
+            box-sizing: border-box;
+            position: relative;
+        }
+
+        .class-box:hover {
+            border-color: #111111;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+        }
+
+        /* Active / Selected Class Box (Thick Black Border from Screenshot) */
+        .class-box.is-active {
+            border: 2px solid #111111 !important;
+            background: #ffffff;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+        }
+
+        .class-box-title {
+            font-size: 1.55rem;
+            font-weight: 800;
+            color: #111111;
+            letter-spacing: -0.02em;
+            margin: 0 0 0.35rem;
+        }
+
+        .class-box-form {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #6b7280;
+            margin: 0 0 1.4rem;
+        }
+
+        .class-box-divider {
+            height: 1px;
+            background: rgba(0, 0, 0, 0.07);
+            margin-bottom: 1rem;
+        }
+
+        .class-box-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.88rem;
+        }
+
+        .class-box-incidents {
+            font-weight: 600;
+            color: #111111;
+        }
+
+        .class-box-link {
+            font-weight: 700;
+            color: #111111;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            transition: transform 0.15s ease;
+        }
+
+        .class-box:hover .class-box-link {
+            transform: translateX(3px);
+        }
+
+        /* ===== CLASS ROLL TABLE (Square, Crisp, No Rounded Edges) ===== */
+        .roll-section-wrap {
+            margin-top: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+        }
+
+        .roll-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .roll-title-group h2 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #111111;
+            margin: 0 0 0.2rem;
+            letter-spacing: -0.02em;
+        }
+
+        .roll-title-group p {
+            font-size: 0.85rem;
+            color: #6b7280;
+            margin: 0;
+        }
+
+        .roll-search-box {
+            position: relative;
+            min-width: 280px;
+        }
+
+        .roll-search-box input {
+            width: 100%;
+            padding: 0.6rem 0.9rem 0.6rem 2.2rem;
+            font-size: 0.88rem;
+            font-family: inherit;
+            border: 1px solid rgba(0, 0, 0, 0.18);
+            border-radius: 0px !important; /* Square corners */
+            outline: none;
+            box-sizing: border-box;
+        }
+
+        .roll-search-box input:focus {
+            border-color: #111111;
+        }
+
+        .roll-search-box svg {
+            position: absolute;
+            left: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 15px;
+            height: 15px;
+            fill: #717682;
+        }
+
+        .table-square-wrap {
+            width: 100%;
+            overflow-x: auto;
+            border: 1px solid rgba(0, 0, 0, 0.12);
+            background: #ffffff;
+            border-radius: 0px !important; /* Square corners */
+        }
+
+        .roll-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            border-radius: 0px !important;
+        }
+
+        .roll-table th {
+            font-size: 0.8rem;
+            color: #4b5162;
+            background: #f8fafc;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 1rem 1.2rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+            font-weight: 700;
+            border-radius: 0px !important;
+            white-space: nowrap;
+        }
+
+        .roll-table td {
+            padding: 1.1rem 1.2rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+            font-size: 0.92rem;
+            color: #1a1a1a;
+            vertical-align: middle;
+            border-radius: 0px !important;
+        }
+
+        .roll-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .roll-table tr:hover td {
+            background-color: #fafafa;
+        }
+
+        .student-cell-name {
+            font-weight: 700;
+            color: #111111;
+            display: block;
+        }
+
+        .student-cell-id {
+            font-family: monospace;
+            font-size: 0.8rem;
+            color: #64748b;
+        }
+
+        /* Attendance Rate Badges */
+        .att-rate-badge {
+            display: inline-block;
+            font-weight: 800;
+            font-size: 0.95rem;
+            letter-spacing: -0.01em;
+        }
+
+        .att-good { color: #047857; }
+        .att-warn { color: #d97706; }
+        .att-risk { color: #b91c1c; }
+
+        .btn-view-att {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            background: #ffffff;
+            color: #111111;
+            border: 1px solid rgba(0, 0, 0, 0.2);
+            padding: 0.45rem 0.95rem;
+            font-size: 0.82rem;
+            font-weight: 700;
+            cursor: pointer;
+            border-radius: 0px !important;
+            font-family: inherit;
+            transition: all 0.15s ease;
+        }
+
+        .btn-view-att:hover {
+            background: #111111;
+            color: #ffffff;
+            border-color: #111111;
+        }
+
+        /* ===== ATTENDANCE MINI-BOXES MODAL ===== */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 99999;
+            padding: 1.5rem;
+            box-sizing: border-box;
+        }
+
+        .modal-overlay.is-active {
+            display: flex;
+        }
+
+        .modal-card {
+            background: #ffffff;
+            width: 100%;
+            max-width: 600px;
+            padding: 2.2rem;
+            border: 1px solid rgba(0, 0, 0, 0.15);
+            border-radius: 0px !important; /* Square corners */
+            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.18);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1.4rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+            padding-bottom: 1rem;
+        }
+
+        .modal-header h3 {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: #111111;
+            margin: 0 0 0.3rem;
+            letter-spacing: -0.02em;
+        }
+
+        .modal-header p {
+            font-size: 0.86rem;
+            color: #64748b;
+            margin: 0;
+        }
+
+        .btn-close-modal {
+            background: transparent;
+            border: none;
+            font-size: 1.6rem;
+            line-height: 1;
+            cursor: pointer;
+            color: #64748b;
+        }
+
+        .btn-close-modal:hover {
+            color: #111;
+        }
+
+        .student-info-strip {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 0px;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .strip-name {
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: #111111;
+        }
+
+        .strip-meta {
+            font-size: 0.82rem;
+            color: #64748b;
+        }
+
+        .strip-rate {
+            text-align: right;
+        }
+
+        .strip-rate-val {
+            font-size: 1.5rem;
+            font-weight: 800;
+            line-height: 1;
+        }
+
+        /* Mini Boxes Grid for Past Couple of Days */
+        .days-section-title {
+            font-size: 0.82rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #4b5162;
+            margin-bottom: 0.75rem;
+        }
+
+        .days-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(68px, 1fr));
+            gap: 0.6rem;
+            margin-bottom: 1.8rem;
+        }
+
+        /* Each Mini Box */
+        .day-box {
+            border: 1.5px solid #cbd5e1;
+            border-radius: 0px !important;
+            padding: 0.75rem 0.4rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            user-select: none;
+            background: #ffffff;
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+            align-items: center;
+        }
+
+        .day-box:hover {
+            border-color: #111111;
+            transform: translateY(-2px);
+        }
+
+        /* When Present (Ticked) */
+        .day-box.is-present {
+            border-color: #059669;
+            background: #ecfdf5;
+        }
+
+        /* When Absent (Unticked) */
+        .day-box.is-absent {
+            border-color: #f87171;
+            background: #fef2f2;
+        }
+
+        .day-box-name {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            color: #475569;
+        }
+
+        .day-box-date {
+            font-size: 0.72rem;
+            color: #64748b;
+            font-weight: 600;
+        }
+
+        .day-box-check {
+            width: 22px;
+            height: 22px;
+            border-radius: 0px !important;
+            border: 1.5px solid #94a3b8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            font-weight: 800;
+            background: #ffffff;
+            margin-top: 0.2rem;
+        }
+
+        .day-box.is-present .day-box-check {
+            border-color: #059669;
+            background: #059669;
+            color: #ffffff;
+        }
+
+        .day-box.is-absent .day-box-check {
+            border-color: #dc2626;
+            background: #ffffff;
+            color: #dc2626;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid rgba(0, 0, 0, 0.08);
+            padding-top: 1.2rem;
+        }
+
+        .btn-modal-cancel {
+            padding: 0.65rem 1.2rem;
+            background: #ffffff;
+            color: #111111;
+            border: 1px solid rgba(0, 0, 0, 0.2);
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 0px !important;
+            font-family: inherit;
+        }
+
+        .btn-modal-save {
+            padding: 0.65rem 1.5rem;
+            background: #111111;
+            color: #ffffff;
+            border: 1px solid #111111;
+            font-size: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+            border-radius: 0px !important;
+            font-family: inherit;
+        }
+
+        .btn-modal-save:hover {
+            background: #2e3040;
+        }
+
+        /* ===== Days Nav Bar ===== */
+        .days-nav-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+        }
+
+        .days-nav-btn {
+            background: #f3f4f6;
+            border: 1px solid rgba(0,0,0,0.12);
+            border-radius: 4px;
+            padding: 0.35rem 0.85rem;
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: #374151;
+            cursor: pointer;
+            transition: background 0.15s;
+            font-family: inherit;
+        }
+
+        .days-nav-btn:hover {
+            background: #e5e7eb;
+        }
+
+        .days-nav-btn:disabled {
+            opacity: 0.35;
+            cursor: not-allowed;
+        }
+
+        /* Future-day boxes: greyed out, not toggleable */
+        .day-box.is-future {
+            background: #f9fafb;
+            border-color: rgba(0,0,0,0.08);
+            cursor: not-allowed;
+            opacity: 0.55;
+        }
+
+        .day-box.is-future .day-box-name,
+        .day-box.is-future .day-box-date {
+            color: #9ca3af;
+        }
+
+        .day-box.is-future .day-box-check {
+            color: #d1d5db;
+        }
+
+        /* Toast notification */
+        .toast-popup {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: #111111;
+            color: #ffffff;
+            padding: 0.85rem 1.4rem;
+            border-radius: 0px !important;
+            font-size: 0.9rem;
+            font-weight: 600;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+            display: none;
+            z-index: 100000;
+        }
+        .toast-popup.is-visible {
+            display: block;
+            animation: fadeIn 0.2s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Site Header with Brand and Auth -->
+    <header class="site-header">
+        <a href="index.html" class="brand-logo">
+            Sentinel Edu<span class="brand-dot"></span>
+        </a>
+
+        <nav>
+            <ul class="nav-links">
+                <!-- Populated dynamically by auth.js -->
+            </ul>
+        </nav>
+
+        <div class="header-actions">
+            <!-- Populated dynamically by auth.js -->
+        </div>
+    </header>
+
+    <main class="page-wrapper">
+
+        <!-- Page Title Banner -->
+        <section class="page-title-banner">
+            <div>
+                <div class="page-subtitle" id="bannerSchoolName">Port of Spain North Secondary • Faculty Portal</div>
+                <h1 class="page-title">My Assigned Classes</h1>
+            </div>
+            <div class="page-banner-counter" id="classesCounterText">
+                2 Assigned Classes
+            </div>
+        </section>
+
+        <!-- Classes Boxes Grid (Matching Screenshot) -->
+        <section>
+            <div class="classes-cards-grid" id="classesGrid">
+                <!-- Generated dynamically -->
+            </div>
+        </section>
+
+        <!-- Class Roll Section (Sub-view with No Round Edges) -->
+        <section class="roll-section-wrap" id="classRollSection">
+            <div class="roll-header-row">
+                <div class="roll-title-group">
+                    <h2 id="rollClassTitle">Form 1A — Class Roll</h2>
+                    <p id="rollClassSubtitle">Showing enrolled class members and verified attendance</p>
+                </div>
+                <div class="roll-search-box">
+                    <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+                    <input type="text" id="rollSearchInput" placeholder="Search student name or ID…" oninput="filterRollTable()">
+                </div>
+            </div>
+
+            <!-- Table with NO ROUND EDGES -->
+            <div class="table-square-wrap">
+                <table class="roll-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 32%;">Student Name</th>
+                            <th style="width: 18%;">Student ID</th>
+                            <th style="width: 16%;">Form / Class</th>
+                            <th style="width: 14%;">Attendance</th>
+                            <th style="width: 10%;">Incidents</th>
+                            <th style="width: 10%; text-align: right;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="rollTableBody">
+                        <tr>
+                            <td colspan="6" style="text-align: center; padding: 2.5rem; color: #717682;">
+                                Select a class box above to load class members…
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ===== ATTENDANCE MINI-BOXES MODAL ===== -->
+    <div class="modal-overlay" id="attendanceModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <div>
+                    <h3>Classes Attended</h3>
+                    <p>Tick or untick days to update attendance for the past couple of days</p>
+                </div>
+                <button type="button" class="btn-close-modal" onclick="closeAttendanceModal()">&times;</button>
+            </div>
+
+            <!-- Student Info Strip -->
+            <div class="student-info-strip">
+                <div>
+                    <div class="strip-name" id="modalStudentName">Marcus J. Williams</div>
+                    <div class="strip-meta" id="modalStudentMeta">STU-2026-001 • Form 1A</div>
+                </div>
+                <div class="strip-rate">
+                    <div class="strip-rate-val att-good" id="modalAttRate">84%</div>
+                    <div class="strip-meta" id="modalAttCount">6 of 7 days</div>
+                </div>
+            </div>
+
+            <!-- Mini Boxes Navigator -->
+            <div class="days-nav-bar">
+                <button type="button" class="days-nav-btn" id="daysPrevBtn" onclick="shiftDaysWindow(-1)" title="Previous week">
+                    &#8592; Earlier
+                </button>
+                <div class="days-section-title" id="daysWindowLabel">School Sessions</div>
+                <button type="button" class="days-nav-btn" id="daysNextBtn" onclick="shiftDaysWindow(1)" title="Next week">
+                    Later &#8594;
+                </button>
+            </div>
+            <div class="days-grid" id="daysBoxesGrid">
+                <!-- Generated dynamically with mini boxes -->
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn-modal-cancel" onclick="closeAttendanceModal()">Cancel</button>
+                <button type="button" class="btn-modal-save" onclick="saveStudentAttendance()">Save Attendance</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast-popup" id="toastNotification">✓ Attendance updated</div>
+
+    <!-- Scripts -->
+    <script src="data/seed.js"></script>
+    <script src="auth.js"></script>
+
+    <script>
+        const SUPABASE_REST_URL = "https://wrumedevccqkopguaxdi.supabase.co/rest/v1";
+        const SUPABASE_ANON_KEY = "sb_publishable_zpd_lzgRqghcN-0X7qw7SA_I2hAZHXH";
+
+        let currentUser = null;
+        let myClasses = [];
+        let allStudents = [];
+        let allIncidents = [];
+        let activeClassId = null;
+
+        // Current editing student session state
+        let currentEditStudent = null;
+        let currentStudentDays = []; // array of { date, dayName, isPresent }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            currentUser = (typeof getLoggedInUserData === 'function') ? getLoggedInUserData() : null;
+            if (!currentUser) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            const role = (currentUser.role || '').toLowerCase();
+            if (!role.includes('teacher')) {
+                if (typeof redirectByRole === 'function') redirectByRole(currentUser);
+                else window.location.href = 'dashboard.html';
+                return;
+            }
+
+            const schoolBanner = document.getElementById('bannerSchoolName');
+            if (schoolBanner) {
+                schoolBanner.textContent = `${currentUser.schoolName || 'Port of Spain North Secondary'} • Faculty Portal`;
+            }
+
+            await loadClassesData();
+        });
+
+        async function loadClassesData() {
+            const teacherId = currentUser.id || 'usr_teacher_01';
+            const schId = currentUser.schoolId || 'sch_001';
+            const schName = currentUser.schoolName || '';
+
+            // 1. Initial synchronous populate from seed data
+            if (window.SENTINEL_SEED_DATA) {
+                if (Array.isArray(window.SENTINEL_SEED_DATA.classes)) {
+                    myClasses = window.SENTINEL_SEED_DATA.classes.filter(c =>
+                        c.teacherId === teacherId ||
+                        (Array.isArray(currentUser.assignedClassIds) && currentUser.assignedClassIds.includes(c.id))
+                    );
+                }
+
+                // If seed has no specific classes for this teacher, synthesize from assignedClassIds or defaults
+                if (myClasses.length === 0) {
+                    const fallbackLabels = Array.isArray(currentUser.assignedClassIds) && currentUser.assignedClassIds.length > 0
+                        ? currentUser.assignedClassIds
+                        : ['Form 1A', 'Form 2A (Sample Class)'];
+
+                    myClasses = fallbackLabels.map((lbl, idx) => ({
+                        id: `cls_${idx + 1}`,
+                        label: lbl,
+                        form: lbl.includes('Form') ? lbl.split(' ')[0] + ' ' + (lbl.split(' ')[1] || '1') : `Form ${lbl}`,
+                        schoolId: schId,
+                        teacherId: teacherId
+                    }));
+                }
+
+                if (Array.isArray(window.SENTINEL_SEED_DATA.students)) {
+                    allStudents = window.SENTINEL_SEED_DATA.students.filter(s =>
+                        (s.schoolId || s.school_id) === schId ||
+                        (schName && (s.school || '').toLowerCase().includes(schName.toLowerCase()))
+                    );
+                }
+
+                if (Array.isArray(window.SENTINEL_SEED_DATA.incidents)) {
+                    allIncidents = window.SENTINEL_SEED_DATA.incidents.filter(i =>
+                        (i.schoolId || i.school_id) === schId ||
+                        (schName && (i.school || '').toLowerCase().includes(schName.toLowerCase()))
+                    );
+                }
+            }
+
+            // Sync with backend API if available
+            try {
+                const apiBase = (typeof API_BASE !== 'undefined') ? API_BASE : 'http://localhost:5000';
+                const res = await fetch(`${apiBase}/api/classes/by-teacher/${teacherId}`).catch(() => null);
+                if (res && res.ok) {
+                    const data = await res.json();
+                    if (Array.isArray(data) && data.length > 0) myClasses = data;
+                }
+            } catch (_) {}
+
+            renderClassesBoxes();
+
+            if (myClasses.length > 0) {
+                selectClass(myClasses[0].id);
+            }
+        }
+
+        function renderClassesBoxes() {
+            const grid = document.getElementById('classesGrid');
+            const counter = document.getElementById('classesCounterText');
+            if (!grid) return;
+
+            if (counter) {
+                counter.textContent = `${myClasses.length} Assigned Class${myClasses.length !== 1 ? 'es' : ''}`;
+            }
+
+            if (myClasses.length === 0) {
+                grid.innerHTML = '<div style="color: #64748b; padding: 2rem;">No classes assigned to your profile.</div>';
+                return;
+            }
+
+            grid.innerHTML = myClasses.map(cls => {
+                const isSel = cls.id === activeClassId ? 'is-active' : '';
+                const incCount = allIncidents.filter(i =>
+                    i.classId === cls.id ||
+                    (cls.form && i.form && i.form.toLowerCase().includes(cls.form.toLowerCase())) ||
+                    (cls.label && i.form && i.form.toLowerCase().includes(cls.label.toLowerCase()))
+                ).length;
+
+                return `
+                    <div class="class-box ${isSel}" id="box_${cls.id}" onclick="selectClass('${cls.id}')">
+                        <div>
+                            <div class="class-box-title">${cls.label || cls.id}</div>
+                            <div class="class-box-form">${cls.form || 'Form 1'}</div>
+                        </div>
+                        <div>
+                            <div class="class-box-divider"></div>
+                            <div class="class-box-footer">
+                                <span class="class-box-incidents">${incCount} incident${incCount !== 1 ? 's' : ''}</span>
+                                <span class="class-box-link">View Roll &rarr;</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function selectClass(classId) {
+            activeClassId = classId;
+            const cls = myClasses.find(c => c.id === classId);
+            if (!cls) return;
+
+            // Highlight selected box
+            document.querySelectorAll('.class-box').forEach(b => b.classList.remove('is-active'));
+            const selBox = document.getElementById(`box_${classId}`);
+            if (selBox) selBox.classList.add('is-active');
+
+            const titleEl = document.getElementById('rollClassTitle');
+            if (titleEl) titleEl.textContent = `${cls.label || cls.id} — Class Roll`;
+
+            const subEl = document.getElementById('rollClassSubtitle');
+            if (subEl) subEl.textContent = `Enrolled students in ${cls.form || cls.label} • Verified attendance`;
+
+            renderClassRollTable();
+        }
+
+        function filterRollTable() {
+            renderClassRollTable();
+        }
+
+        function renderClassRollTable() {
+            const tbody = document.getElementById('rollTableBody');
+            if (!tbody) return;
+
+            const cls = myClasses.find(c => c.id === activeClassId);
+            const query = (document.getElementById('rollSearchInput') ? document.getElementById('rollSearchInput').value : '').toLowerCase().trim();
+
+            let students = allStudents.filter(s => {
+                if (!cls) return true;
+                const matchClassId = s.classId && s.classId.toLowerCase() === cls.id.toLowerCase();
+                const matchForm = cls.form && s.form && s.form.toLowerCase().includes(cls.form.toLowerCase());
+                const matchLabel = cls.label && s.form && s.form.toLowerCase().includes(cls.label.toLowerCase());
+                return matchClassId || matchForm || matchLabel;
+            });
+
+            if (students.length === 0) {
+                students = allStudents.slice(0, 10);
+            }
+
+            if (query) {
+                students = students.filter(s => {
+                    const name = (s.name || `${s.firstName || ''} ${s.lastName || ''}`).toLowerCase();
+                    const id = (s.studentId || s.studentNumber || s.id || '').toLowerCase();
+                    return name.includes(query) || id.includes(query);
+                });
+            }
+
+            if (students.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #717682; padding: 2.5rem;">No student records found matching search.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = students.map(s => {
+                const sName = s.name || `${s.firstName || ''} ${s.lastName || ''}`.trim() || 'Student Record';
+                const sId = s.studentId || s.studentNumber || s.id || 'STU-2026';
+                const sForm = s.form || (cls ? cls.form : 'Form 1');
+
+                // Read custom attendance rate if teacher modified it in localStorage
+                const localSavedAtt = getStudentSavedAttendance(s.id);
+                const attVal = localSavedAtt !== null ? localSavedAtt : ((s.attendance !== undefined && s.attendance !== null) ? Number(s.attendance) : 88);
+
+                const attClass = attVal >= 85 ? 'att-good' : (attVal >= 70 ? 'att-warn' : 'att-risk');
+                const incCount = s.incidentCount !== undefined ? s.incidentCount : (allIncidents.filter(i => (i.studentId && i.studentId === s.id) || (i.studentName && i.studentName.toLowerCase() === sName.toLowerCase())).length);
+
+                return `
+                    <tr>
+                        <td>
+                            <div class="student-cell-name">${sName}</div>
+                        </td>
+                        <td>
+                            <span class="student-cell-id">${sId}</span>
+                        </td>
+                        <td>
+                            <span style="font-weight: 600; color: #111;">${sForm}</span>
+                        </td>
+                        <td>
+                            <span class="att-rate-badge ${attClass}">${attVal}%</span>
+                        </td>
+                        <td>
+                            <strong style="color: ${incCount > 2 ? '#b91c1c' : '#111'};">${incCount}</strong>
+                        </td>
+                        <td style="text-align: right;">
+                            <button type="button" class="btn-view-att" onclick="openAttendanceModal('${s.id}')">
+                                <span>View</span>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // ── ATTENDANCE TICK / UNTICK MINI BOXES LOGIC ─────────────────────────
+
+        // How many school days to show per "window" of the navigator
+        const DAYS_PER_WINDOW = 7;
+
+        // How many weeks back/forward to generate (past = -4 weeks, future = +2 weeks)
+        const PAST_WEEKS  = 4;
+        const FUTURE_WEEKS = 2;
+
+        // Current window offset (0 = most-recent window, -1 = one window earlier, +1 = later)
+        let daysWindowOffset = 0;
+
+        // Full ordered list of school-day slots (Mon-Fri only), generated once per modal open
+        // Each entry: { date: 'Nov 10', dayName: 'Mon', isoDate: '2026-11-10', isFuture: bool, isPresent: bool }
+        let allGeneratedDays = [];
+
+        /** Build the full multi-week school-day list around today */
+        function buildAllSchoolDays(studentId, baseRate) {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            const totalDays = (PAST_WEEKS + FUTURE_WEEKS) * 5; // Mon-Fri, ~5 per week
+            const start = new Date(today);
+            start.setDate(start.getDate() - PAST_WEEKS * 7);
+
+            const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+            const dayNames   = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+            // Load any saved days from localStorage
+            let savedMap = {};
+            try {
+                const raw = localStorage.getItem(`sentinel_att_days_${studentId}`);
+                if (raw) {
+                    const saved = JSON.parse(raw);
+                    saved.forEach(d => { savedMap[d.isoDate] = d.isPresent; });
+                }
+            } catch (_) {}
+
+            const result = [];
+            const cursor = new Date(start);
+
+            while (result.length < totalDays || cursor <= new Date(today.getTime() + FUTURE_WEEKS * 7 * 86400000)) {
+                const dow = cursor.getDay();
+                if (dow >= 1 && dow <= 5) { // Mon-Fri
+                    const isoDate = cursor.toISOString().slice(0, 10);
+                    const isFuture = cursor > today;
+                    const dayName  = dayNames[cursor.getDay()];
+                    const dateLabel = `${monthNames[cursor.getMonth()]} ${cursor.getDate()}`;
+
+                    let isPresent;
+                    if (isFuture) {
+                        isPresent = false; // future = not yet attended
+                    } else if (savedMap.hasOwnProperty(isoDate)) {
+                        isPresent = savedMap[isoDate];
+                    } else {
+                        // Fallback: derive from base rate
+                        const isGood = baseRate >= 80;
+                        const dayIdx = result.filter(d => !d.isFuture).length;
+                        isPresent = true;
+                        if (!isGood && dayIdx % 5 === 2) isPresent = false;
+                        if (baseRate < 70 && (dayIdx % 5 === 1 || dayIdx % 5 === 2)) isPresent = false;
+                    }
+
+                    result.push({ isoDate, date: dateLabel, dayName, isFuture, isPresent });
+                }
+                cursor.setDate(cursor.getDate() + 1);
+
+                // Safety: stop after generating enough days
+                if (result.length >= (PAST_WEEKS + FUTURE_WEEKS) * 5 + 10) break;
+            }
+
+            return result;
+        }
+
+        /** Return the slice of allGeneratedDays for the current window */
+        function getCurrentWindowDays() {
+            const total = allGeneratedDays.length;
+            // Window 0 = last DAYS_PER_WINDOW entries that include today or earlier
+            // Window +1 = shift forward, -1 = shift backward
+            const pastOnly = allGeneratedDays.filter(d => !d.isFuture);
+            const futureOnly = allGeneratedDays.filter(d => d.isFuture);
+
+            // Anchor: index of the last past day in allGeneratedDays
+            const anchorIdx = allGeneratedDays.map(d => !d.isFuture).lastIndexOf(true);
+
+            // Window end index (inclusive) based on offset
+            const windowEnd = anchorIdx + (daysWindowOffset * DAYS_PER_WINDOW);
+            const windowStart = windowEnd - DAYS_PER_WINDOW + 1;
+
+            const clampedStart = Math.max(0, windowStart);
+            const clampedEnd   = Math.min(total - 1, windowEnd);
+
+            return allGeneratedDays.slice(clampedStart, clampedEnd + 1);
+        }
+
+        function getStudentSavedAttendance(studentId) {
+            try {
+                const raw = localStorage.getItem(`sentinel_att_rate_${studentId}`);
+                return raw !== null ? Number(raw) : null;
+            } catch {
+                return null;
+            }
+        }
+
+        function openAttendanceModal(studentId) {
+            const student = allStudents.find(s => s.id === studentId);
+            if (!student) return;
+
+            currentEditStudent = student;
+            daysWindowOffset = 0; // reset to current window
+
+            const sName = student.name || `${student.firstName || ''} ${student.lastName || ''}`.trim();
+            const sId = student.studentId || student.studentNumber || student.id;
+            const cls = myClasses.find(c => c.id === activeClassId);
+
+            document.getElementById('modalStudentName').textContent = sName;
+            document.getElementById('modalStudentMeta').textContent = `${sId} • ${cls ? cls.label : (student.form || 'Form 1')}`;
+
+            const baseRate = (student.attendance !== undefined && student.attendance !== null) ? Number(student.attendance) : 85;
+
+            // Build full day list (past + future)
+            allGeneratedDays = buildAllSchoolDays(student.id, baseRate);
+            currentStudentDays = allGeneratedDays; // keep reference
+
+            renderDaysMiniBoxes();
+            document.getElementById('attendanceModal').classList.add('is-active');
+        }
+
+        function closeAttendanceModal() {
+            document.getElementById('attendanceModal').classList.remove('is-active');
+        }
+
+        function shiftDaysWindow(direction) {
+            daysWindowOffset += direction;
+            renderDaysMiniBoxes();
+        }
+
+        function toggleDay(isoDate) {
+            const day = allGeneratedDays.find(d => d.isoDate === isoDate);
+            if (!day || day.isFuture) return; // future days can't be toggled
+            day.isPresent = !day.isPresent;
+            renderDaysMiniBoxes();
+        }
+
+        function renderDaysMiniBoxes() {
+            const grid = document.getElementById('daysBoxesGrid');
+            if (!grid) return;
+
+            // Attendance rate = only past/today days count
+            const pastDays = allGeneratedDays.filter(d => !d.isFuture);
+            const presentCount = pastDays.filter(d => d.isPresent).length;
+            const totalDays = pastDays.length;
+            const rate = totalDays > 0 ? Math.round((presentCount / totalDays) * 100) : 0;
+
+            const rateEl = document.getElementById('modalAttRate');
+            const countEl = document.getElementById('modalAttCount');
+
+            if (rateEl) {
+                rateEl.textContent = `${rate}%`;
+                rateEl.className = `strip-rate-val ${rate >= 85 ? 'att-good' : (rate >= 70 ? 'att-warn' : 'att-risk')}`;
+            }
+            if (countEl) {
+                countEl.textContent = `${presentCount} of ${totalDays} sessions attended`;
+            }
+
+            // Update window label
+            const windowDays = getCurrentWindowDays();
+            const labelEl = document.getElementById('daysWindowLabel');
+            if (labelEl && windowDays.length > 0) {
+                const first = windowDays[0].date;
+                const last  = windowDays[windowDays.length - 1].date;
+                labelEl.textContent = `${first} – ${last}`;
+            }
+
+            // Update arrow buttons
+            const prevBtn = document.getElementById('daysPrevBtn');
+            const nextBtn = document.getElementById('daysNextBtn');
+            const anchorIdx = allGeneratedDays.map(d => !d.isFuture).lastIndexOf(true);
+            const minOffset = -Math.floor(anchorIdx / DAYS_PER_WINDOW);
+            const maxOffset = Math.floor((allGeneratedDays.length - 1 - anchorIdx) / DAYS_PER_WINDOW);
+
+            if (prevBtn) prevBtn.disabled = daysWindowOffset <= minOffset;
+            if (nextBtn) nextBtn.disabled = daysWindowOffset >= maxOffset;
+
+            grid.innerHTML = windowDays.map(d => {
+                if (d.isFuture) {
+                    return `
+                        <div class="day-box is-future" title="Future date — not yet counted">
+                            <span class="day-box-name">${d.dayName}</span>
+                            <span class="day-box-date">${d.date}</span>
+                            <div class="day-box-check">–</div>
+                        </div>
+                    `;
+                }
+                const cls = d.isPresent ? 'is-present' : 'is-absent';
+                const checkSign = d.isPresent ? '✓' : '✕';
+                return `
+                    <div class="day-box ${cls}" onclick="toggleDay('${d.isoDate}')" title="Click to toggle: ${d.dayName} ${d.date}">
+                        <span class="day-box-name">${d.dayName}</span>
+                        <span class="day-box-date">${d.date}</span>
+                        <div class="day-box-check">${checkSign}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function saveStudentAttendance() {
+            if (!currentEditStudent) return;
+
+            // Only count past/today days for the rate
+            const pastDays = allGeneratedDays.filter(d => !d.isFuture);
+            const presentCount = pastDays.filter(d => d.isPresent).length;
+            const totalDays = pastDays.length;
+            const newRate = totalDays > 0 ? Math.round((presentCount / totalDays) * 100) : 0;
+
+            // 1. Update in-memory student object
+            currentEditStudent.attendance = newRate;
+
+            // 2. Persist full day list (including future placeholder states) in localStorage
+            localStorage.setItem(`sentinel_att_rate_${currentEditStudent.id}`, String(newRate));
+            localStorage.setItem(`sentinel_att_days_${currentEditStudent.id}`, JSON.stringify(allGeneratedDays));
+
+            // 3. Sync to API & Supabase
+            try {
+                const apiBase = (typeof API_BASE !== 'undefined') ? API_BASE : 'http://localhost:5000';
+                await fetch(`${apiBase}/api/students/${currentEditStudent.id}`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ attendance: newRate })
+                }).catch(() => null);
+
+                await fetch(`${SUPABASE_REST_URL}/students?id=eq.${currentEditStudent.id}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ attendance: newRate })
+                }).catch(() => null);
+            } catch (_) {}
+
+            closeAttendanceModal();
+            renderClassRollTable();
+
+            showToast(`✓ Attendance updated for ${currentEditStudent.name || 'student'}: ${newRate}%`);
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toastNotification');
+            if (!toast) return;
+            toast.textContent = msg;
+            toast.classList.add('is-visible');
+            setTimeout(() => toast.classList.remove('is-visible'), 3200);
+        }
+    </script>
+
+</body>
+
+</html>

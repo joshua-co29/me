@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Participation Points - Sentinel Edu</title>
+
+    <!-- Google Fonts: Google Sans & Product Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Product+Sans:wght@400;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Shared Stylesheet -->
+    <link rel="stylesheet" href="style/style.css">
+
+    <style>
+        body {
+            background-color: #ffffff;
+            color: #121316;
+            font-family: var(--font-family);
+        }
+
+        .site-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1.5rem;
+            flex-wrap: nowrap;
+        }
+
+        .brand-logo {
+            white-space: nowrap !important;
+            flex-shrink: 0 !important;
+            display: inline-flex !important;
+            align-items: baseline !important;
+        }
+
+        .header-actions {
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+        }
+
+        .page-wrapper {
+            max-width: 1400px;
+            margin: 2.5rem auto 4rem;
+            padding: 0 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2.5rem;
+        }
+
+        /* ===== PAGE TITLE BANNER ===== */
+        .page-title-banner {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+            padding-bottom: 1.5rem;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .page-subtitle {
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #5e6472;
+            margin-bottom: 0.4rem;
+        }
+
+        .page-title {
+            font-size: clamp(2rem, 3.2vw, 2.7rem);
+            font-weight: 800;
+            color: #111111;
+            letter-spacing: -0.025em;
+            line-height: 1.1;
+            margin: 0;
+        }
+
+        /* Class Selector Tabs */
+        .class-selector-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .class-pills-group {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .class-pill-btn {
+            background: #ffffff;
+            border: 1px solid rgba(0, 0, 0, 0.18);
+            color: #333333;
+            padding: 0.5rem 1.1rem;
+            font-size: 0.88rem;
+            font-weight: 700;
+            cursor: pointer;
+            border-radius: 0px !important;
+            transition: all 0.15s ease;
+            font-family: inherit;
+        }
+
+        .class-pill-btn.active,
+        .class-pill-btn:hover {
+            background: #111111;
+            color: #ffffff;
+            border-color: #111111;
+        }
+
+        /* Points Overview Cards */
+        .points-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.2rem;
+        }
+
+        .stat-card-clean {
+            background: #ffffff;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 0px !important;
+            padding: 1.4rem 1.5rem;
+        }
+
+        .stat-card-clean .label {
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #64748b;
+            margin-bottom: 0.4rem;
+        }
+
+        .stat-card-clean .value {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: #111111;
+            line-height: 1.1;
+        }
+
+        .stat-card-clean .sub {
+            font-size: 0.8rem;
+            color: #059669;
+            font-weight: 600;
+            margin-top: 0.4rem;
+        }
+
+        /* Table Design */
+        .table-square-wrap {
+            width: 100%;
+            overflow-x: auto;
+            border: 1px solid rgba(0, 0, 0, 0.12);
+            background: #ffffff;
+            border-radius: 0px !important;
+        }
+
+        .points-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            border-radius: 0px !important;
+        }
+
+        .points-table th {
+            font-size: 0.8rem;
+            color: #4b5162;
+            background: #f8fafc;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 1rem 1.2rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+            font-weight: 700;
+            border-radius: 0px !important;
+            white-space: nowrap;
+        }
+
+        .points-table td {
+            padding: 1.1rem 1.2rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+            font-size: 0.92rem;
+            color: #1a1a1a;
+            vertical-align: middle;
+            border-radius: 0px !important;
+        }
+
+        .points-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .points-table tr:hover td {
+            background-color: #fafafa;
+        }
+
+        .student-name-text {
+            font-weight: 700;
+            color: #111111;
+            display: block;
+        }
+
+        .student-id-sub {
+            font-family: monospace;
+            font-size: 0.8rem;
+            color: #64748b;
+        }
+
+        .points-counter-badge {
+            display: inline-flex;
+            align-items: baseline;
+            gap: 0.25rem;
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: #581c87;
+        }
+
+        .points-counter-badge small {
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: #7e22ce;
+            text-transform: uppercase;
+        }
+
+        .badge-achievement {
+            display: inline-block;
+            padding: 0.25rem 0.65rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .badge-gold { background: #fef3c7; color: #b45309; }
+        .badge-silver { background: #f1f5f9; color: #475569; }
+        .badge-bronze { background: #ffedd5; color: #c2410c; }
+        .badge-starter { background: #f3f4f6; color: #6b7280; }
+
+        .btn-award-pill {
+            padding: 0.35rem 0.65rem;
+            font-size: 0.8rem;
+            font-weight: 700;
+            font-family: inherit;
+            cursor: pointer;
+            border: 1px solid rgba(0, 0, 0, 0.2);
+            background: #ffffff;
+            color: #111111;
+            border-radius: 0px !important;
+            transition: all 0.15s ease;
+        }
+
+        .btn-award-pill:hover {
+            background: #111111;
+            color: #ffffff;
+            border-color: #111111;
+        }
+
+        .btn-award-gold {
+            border-color: #b45309;
+            color: #b45309;
+        }
+
+        .btn-award-gold:hover {
+            background: #b45309;
+            color: #ffffff;
+        }
+
+        /* Toast notification */
+        .toast-popup {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: #111111;
+            color: #ffffff;
+            padding: 0.85rem 1.4rem;
+            border-radius: 0px !important;
+            font-size: 0.9rem;
+            font-weight: 600;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+            display: none;
+            z-index: 100000;
+        }
+        .toast-popup.is-visible {
+            display: block;
+            animation: fadeIn 0.2s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Site Header with Brand and Auth -->
+    <header class="site-header">
+        <a href="index.html" class="brand-logo">
+            Sentinel Edu<span class="brand-dot"></span>
+        </a>
+
+        <nav>
+            <ul class="nav-links">
+                <!-- Populated dynamically by auth.js -->
+            </ul>
+        </nav>
+
+        <div class="header-actions">
+            <!-- Populated dynamically by auth.js -->
+        </div>
+    </header>
+
+    <main class="page-wrapper">
+
+        <!-- Page Title Banner -->
+        <section class="page-title-banner">
+            <div>
+                <div class="page-subtitle" id="bannerSchoolName">Classroom Engagement • Positive Behavior Support</div>
+                <h1 class="page-title">Participation Points</h1>
+            </div>
+            <div>
+                <span id="pointsLeaderboardBadge" style="font-size: 0.95rem; font-weight: 700; color: #581c87;">
+                    🌟 Active Recognition System
+                </span>
+            </div>
+        </section>
+
+        <!-- Stats Overview Cards -->
+        <section class="points-stats-grid">
+            <div class="stat-card-clean">
+                <div class="label">Total Points Awarded</div>
+                <div class="value" id="statTotalPoints">0</div>
+                <div class="sub">Across your classes</div>
+            </div>
+            <div class="stat-card-clean">
+                <div class="label">Top Participating Student</div>
+                <div class="value" id="statTopStudent" style="font-size: 1.5rem; margin-top: 0.4rem;">—</div>
+                <div class="sub" id="statTopScore">Leading classroom engagement</div>
+            </div>
+            <div class="stat-card-clean">
+                <div class="label">Class Engagement Rate</div>
+                <div class="value" id="statEngagementRate">92%</div>
+                <div class="sub">Positive behavioral reinforcement</div>
+            </div>
+        </section>
+
+        <!-- Class Selector & Student Table -->
+        <section style="display: flex; flex-direction: column; gap: 1.2rem;">
+            <div class="class-selector-row">
+                <div class="class-pills-group" id="classPillsGroup">
+                    <!-- Populated dynamically -->
+                </div>
+                <div style="font-size: 0.88rem; color: #64748b; font-weight: 600;" id="classEnrolledCount">
+                    Showing class members
+                </div>
+            </div>
+
+            <div class="table-square-wrap">
+                <table class="points-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 30%;">Student Name</th>
+                            <th style="width: 18%;">Student ID</th>
+                            <th style="width: 16%;">Class / Form</th>
+                            <th style="width: 14%;">Points Balance</th>
+                            <th style="width: 12%;">Achievement</th>
+                            <th style="width: 10%; text-align: right;">Award Points</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pointsTableBody">
+                        <tr>
+                            <td colspan="6" style="text-align: center; padding: 2.5rem; color: #717682;">
+                                Loading class participation roster…
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Toast Notification -->
+    <div class="toast-popup" id="toastNotification">✓ Points awarded</div>
+
+    <!-- Scripts -->
+    <script src="data/seed.js"></script>
+    <script src="auth.js"></script>
+
+    <script>
+        let currentUser = null;
+        let myClasses = [];
+        let allStudents = [];
+        let activeClassId = null;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            currentUser = (typeof getLoggedInUserData === 'function') ? getLoggedInUserData() : null;
+            if (!currentUser) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            const role = (currentUser.role || '').toLowerCase();
+            if (!role.includes('teacher')) {
+                if (typeof redirectByRole === 'function') redirectByRole(currentUser);
+                else window.location.href = 'dashboard.html';
+                return;
+            }
+
+            const banner = document.getElementById('bannerSchoolName');
+            if (banner) {
+                banner.textContent = `${currentUser.schoolName || 'Port of Spain North Secondary'} • Participation & Engagement`;
+            }
+
+            loadParticipationData();
+        });
+
+        function loadParticipationData() {
+            const teacherId = currentUser.id || 'usr_teacher_01';
+            const schId = currentUser.schoolId || 'sch_001';
+            const schName = currentUser.schoolName || '';
+
+            if (window.SENTINEL_SEED_DATA) {
+                if (Array.isArray(window.SENTINEL_SEED_DATA.classes)) {
+                    myClasses = window.SENTINEL_SEED_DATA.classes.filter(c =>
+                        c.teacherId === teacherId ||
+                        (Array.isArray(currentUser.assignedClassIds) && currentUser.assignedClassIds.includes(c.id))
+                    );
+                }
+
+                if (myClasses.length === 0) {
+                    const fallbackLabels = Array.isArray(currentUser.assignedClassIds) && currentUser.assignedClassIds.length > 0
+                        ? currentUser.assignedClassIds
+                        : ['Form 1A', 'Form 2A'];
+
+                    myClasses = fallbackLabels.map((lbl, idx) => ({
+                        id: `cls_${idx + 1}`,
+                        label: lbl,
+                        form: lbl.includes('Form') ? lbl : `Form ${lbl}`
+                    }));
+                }
+
+                if (Array.isArray(window.SENTINEL_SEED_DATA.students)) {
+                    allStudents = window.SENTINEL_SEED_DATA.students.filter(s =>
+                        (s.schoolId || s.school_id) === schId ||
+                        (schName && (s.school || '').toLowerCase().includes(schName.toLowerCase()))
+                    );
+                }
+            }
+
+            renderClassTabs();
+
+            if (myClasses.length > 0) {
+                selectClass(myClasses[0].id);
+            }
+        }
+
+        function renderClassTabs() {
+            const container = document.getElementById('classPillsGroup');
+            if (!container) return;
+
+            container.innerHTML = myClasses.map(c => `
+                <button type="button" class="class-pill-btn ${c.id === activeClassId ? 'active' : ''}" onclick="selectClass('${c.id}')">
+                    ${c.label || c.id}
+                </button>
+            `).join('');
+        }
+
+        function selectClass(classId) {
+            activeClassId = classId;
+            const cls = myClasses.find(c => c.id === classId);
+            if (!cls) return;
+
+            document.querySelectorAll('.class-pill-btn').forEach(b => {
+                b.classList.toggle('active', b.textContent.trim() === (cls.label || cls.id).trim());
+            });
+
+            renderPointsTable();
+        }
+
+        function getStudentPoints(studentId) {
+            try {
+                const val = localStorage.getItem(`sentinel_points_${studentId}`);
+                if (val !== null) return parseInt(val);
+            } catch (_) {}
+
+            // Stable default based on studentId hash
+            let hash = 0;
+            for (let i = 0; i < studentId.length; i++) {
+                hash = (hash << 5) - hash + studentId.charCodeAt(i);
+            }
+            return Math.abs(hash % 20) + 5;
+        }
+
+        function setStudentPoints(studentId, pts) {
+            try {
+                localStorage.setItem(`sentinel_points_${studentId}`, String(pts));
+            } catch (_) {}
+        }
+
+        function awardPoints(studentId, amount, reason) {
+            const current = getStudentPoints(studentId);
+            const updated = current + amount;
+            setStudentPoints(studentId, updated);
+
+            const student = allStudents.find(s => s.id === studentId);
+            const sName = student ? (student.name || 'Student') : 'Student';
+
+            showToast(`✓ +${amount} points awarded to ${sName} for ${reason}!`);
+            renderPointsTable();
+        }
+
+        function renderPointsTable() {
+            const tbody = document.getElementById('pointsTableBody');
+            const enrolledEl = document.getElementById('classEnrolledCount');
+            if (!tbody) return;
+
+            const cls = myClasses.find(c => c.id === activeClassId);
+
+            let students = allStudents.filter(s => {
+                if (!cls) return true;
+                const matchClassId = s.classId && s.classId.toLowerCase() === cls.id.toLowerCase();
+                const matchForm = cls.form && s.form && s.form.toLowerCase().includes(cls.form.toLowerCase());
+                const matchLabel = cls.label && s.form && s.form.toLowerCase().includes(cls.label.toLowerCase());
+                return matchClassId || matchForm || matchLabel;
+            });
+
+            if (students.length === 0) {
+                students = allStudents.slice(0, 10);
+            }
+
+            if (enrolledEl) {
+                enrolledEl.textContent = `${students.length} students enrolled in ${cls ? cls.label : 'Class'}`;
+            }
+
+            // Calculate overall stats
+            let totalPoints = 0;
+            let topStudent = null;
+            let topScore = -1;
+
+            students.forEach(s => {
+                const pts = getStudentPoints(s.id);
+                totalPoints += pts;
+                if (pts > topScore) {
+                    topScore = pts;
+                    topStudent = s.name || `${s.firstName || ''} ${s.lastName || ''}`.trim();
+                }
+            });
+
+            const statTotalEl = document.getElementById('statTotalPoints');
+            const statTopEl = document.getElementById('statTopStudent');
+            const statScoreEl = document.getElementById('statTopScore');
+            if (statTotalEl) statTotalEl.textContent = totalPoints;
+            if (statTopEl) statTopEl.textContent = topStudent || '—';
+            if (statScoreEl) statScoreEl.textContent = topScore > 0 ? `${topScore} points leader` : 'Leading classroom engagement';
+
+            tbody.innerHTML = students.map(s => {
+                const sName = s.name || `${s.firstName || ''} ${s.lastName || ''}`.trim() || 'Student Record';
+                const sId = s.studentId || s.studentNumber || s.id || 'STU-2026';
+                const sForm = s.form || (cls ? cls.form : 'Form 1');
+                const pts = getStudentPoints(s.id);
+
+                let badgeHtml = '<span class="badge-achievement badge-starter">Emerging</span>';
+                if (pts >= 25) badgeHtml = '<span class="badge-achievement badge-gold">🥇 Honor Role</span>';
+                else if (pts >= 18) badgeHtml = '<span class="badge-achievement badge-silver">🥈 Contributor</span>';
+                else if (pts >= 10) badgeHtml = '<span class="badge-achievement badge-bronze">🥉 Active</span>';
+
+                return `
+                    <tr>
+                        <td>
+                            <div class="student-name-text">${sName}</div>
+                        </td>
+                        <td>
+                            <span class="student-id-sub">${sId}</span>
+                        </td>
+                        <td>
+                            <span style="font-weight: 600; color: #111;">${sForm}</span>
+                        </td>
+                        <td>
+                            <div class="points-counter-badge">
+                                ${pts} <small>pts</small>
+                            </div>
+                        </td>
+                        <td>
+                            ${badgeHtml}
+                        </td>
+                        <td style="text-align: right;">
+                            <div style="display: flex; gap: 0.35rem; justify-content: flex-end;">
+                                <button type="button" class="btn-award-pill" onclick="awardPoints('${s.id}', 1, 'Active Class Discussion')" title="Award +1 for class discussion">+1</button>
+                                <button type="button" class="btn-award-pill" onclick="awardPoints('${s.id}', 2, 'Helpful Teamwork & Preparation')" title="Award +2 for teamwork">+2</button>
+                                <button type="button" class="btn-award-pill btn-award-gold" onclick="awardPoints('${s.id}', 5, 'Exemplary Leadership & Focus')" title="Award +5 for leadership">+5</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toastNotification');
+            if (!toast) return;
+            toast.textContent = msg;
+            toast.classList.add('is-visible');
+            setTimeout(() => toast.classList.remove('is-visible'), 3200);
+        }
+    </script>
+
+</body>
+
+</html>

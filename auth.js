@@ -8,10 +8,15 @@ try {
     localStorage.removeItem('sentinel_local_incidents');
 } catch (_) {}
 
-document.addEventListener('DOMContentLoaded', () => {
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+        updateHeaderAuthState();
+        initDropdownListeners();
+    });
+} else {
     updateHeaderAuthState();
     initDropdownListeners();
-});
+}
 
 function getLoggedInUser() {
     const raw = localStorage.getItem('sentinel_user');
@@ -28,12 +33,23 @@ function getLoggedInUserData() {
     const raw = localStorage.getItem('sentinel_user');
     if (!raw) return null;
     try {
-        const parsed = JSON.parse(raw);
+        let parsed = JSON.parse(raw);
         if (typeof parsed === 'string') {
-            return { name: parsed, role: inferRole(parsed), email: generateEmail(parsed) };
+            parsed = { name: parsed, role: inferRole(parsed), email: generateEmail(parsed) };
         }
         if (!parsed.role) parsed.role = inferRole(parsed.name);
         if (!parsed.email) parsed.email = generateEmail(parsed.name);
+        if (!parsed.schoolId && !parsed.school_id) {
+            const match = findLocalUser(parsed.email || parsed.name || parsed.id);
+            if (match && (match.schoolId || match.school_id)) {
+                parsed.schoolId = match.schoolId || match.school_id;
+                parsed.schoolName = match.schoolName || parsed.schoolName;
+            }
+        }
+        if (parsed.schoolId && !parsed.schoolName && window.SENTINEL_SEED_DATA && Array.isArray(window.SENTINEL_SEED_DATA.schools)) {
+            const sch = window.SENTINEL_SEED_DATA.schools.find(s => s.id === parsed.schoolId);
+            if (sch) parsed.schoolName = sch.name;
+        }
         return parsed;
     } catch {
         return { name: raw, role: inferRole(raw), email: generateEmail(raw) };
@@ -83,16 +99,15 @@ function buildNavLinks(user) {
     if (role.includes('teacher')) {
         return `
             <li><a href="${dashUrl}">My Dashboard</a></li>
-            <li><a href="${dashUrl}#classes">My Classes</a></li>
-            <li><a href="${dashUrl}#class-roll">Students</a></li>
-            <li><a href="${dashUrl}#incidents">My Incidents</a></li>
-            <li><a href="engine.html">Engine</a></li>`;
+            <li><a href="classes.html">Classes</a></li>
+            <li><a href="participation-points.html">Participation Points</a></li>`;
     }
     if (role.includes('dean')) {
         return `
             <li><a href="${dashUrl}">My Dashboard</a></li>
-            <li><a href="${dashUrl}#students">Form Students</a></li>
             <li><a href="${dashUrl}#incidents">Incident Reports</a></li>
+            <li><a href="${dashUrl}#attendance">Attendance</a></li>
+            <li><a href="${dashUrl}#students">Students</a></li>
             <li><a href="engine.html">Engine</a></li>`;
     }
     if (role.includes('counsel') || role.includes('guidance')) {
@@ -105,15 +120,17 @@ function buildNavLinks(user) {
     if (role.includes('principal')) {
         return `
             <li><a href="${dashUrl}">My Dashboard</a></li>
-            <li><a href="${dashUrl}#staff">Staff & Classes</a></li>
-            <li><a href="${dashUrl}#students">Students</a></li>
-            <li><a href="${dashUrl}#incidents">Incident Reports</a></li>
+            <li><a href="teachers.html">Teachers</a></li>
+            <li><a href="students.html">Students</a></li>
+            <li><a href="incidents.html">Incident Reports</a></li>
             <li><a href="engine.html">Engine</a></li>`;
     }
     // Ministry / default
     return `
         <li><a href="${dashUrl}">Dashboard</a></li>
         <li><a href="students.html">Students</a></li>
+        <li><a href="schools.html">Schools</a></li>
+        <li><a href="teachers.html">Teachers</a></li>
         <li><a href="incidents.html">Incidents</a></li>
         <li><a href="engine.html">Engine</a></li>`;
 }
@@ -133,6 +150,17 @@ function handleLogIncidentClick(event) {
             return;
         }
     }
+    if (currentPath === 'dean-dashboard.html' || currentPath === 'dean.html') {
+        if (typeof toggleDeanLogForm === 'function') {
+            toggleDeanLogForm(true);
+            return;
+        }
+    }
+    const userData = (typeof getLoggedInUserData === 'function') ? getLoggedInUserData() : null;
+    if (userData && (userData.role || '').toLowerCase().includes('dean')) {
+        window.location.href = 'dean-dashboard.html?action=new#incidents';
+        return;
+    }
     window.location.href = 'incidents.html?action=new';
 }
 
@@ -147,6 +175,19 @@ function updateHeaderAuthState() {
     const userData = getLoggedInUserData();
     const navLinks = document.querySelector('.nav-links');
     const headerActions = document.querySelector('.header-actions');
+    const brandLogos = document.querySelectorAll('.brand-logo');
+
+    // Shrink logo to "SE." when logged in to preserve header space
+    if (brandLogos.length > 0) {
+        brandLogos.forEach(logo => {
+            if (userData && userData.name) {
+                logo.innerHTML = 'SE<span class="brand-dot"></span>';
+                logo.setAttribute('title', 'Sentinel Edu');
+            } else {
+                logo.innerHTML = 'Sentinel Edu<span class="brand-dot"></span>';
+            }
+        });
+    }
 
     if (!navLinks || !headerActions) return;
 
@@ -311,6 +352,28 @@ const LOCAL_DATABASE_USERS = [
         subjects: []
     },
     {
+        id: "usr_principal_02",
+        name: "Mrs. Carol Hosein",
+        email: "c.hosein@sfet.edu.tt",
+        role: "Principal",
+        schoolId: "sch_002",
+        schoolName: "San Fernando East Technical",
+        assignedClassIds: [],
+        coversForms: [],
+        subjects: []
+    },
+    {
+        id: "usr_principal_03",
+        name: "Ms. Anita Paul",
+        email: "a.paul@aapc.edu.tt",
+        role: "Principal",
+        schoolId: "sch_003",
+        schoolName: "Arima Anglican Primary",
+        assignedClassIds: [],
+        coversForms: [],
+        subjects: []
+    },
+    {
         id: "usr_dean_01",
         name: "Mr. Roland Mohammed",
         email: "r.mohammed@posns.edu.tt",
@@ -358,17 +421,44 @@ const LOCAL_DATABASE_USERS = [
     }
 ];
 
+function getCustomUsers() {
+    try {
+        const raw = localStorage.getItem('sentinel_custom_users');
+        return raw ? JSON.parse(raw) : [];
+    } catch {
+        return [];
+    }
+}
+
+function saveCustomUser(user) {
+    const list = getCustomUsers();
+    const existingIdx = list.findIndex(u => u.id === user.id || (u.email && user.email && u.email.toLowerCase() === user.email.toLowerCase()));
+    if (existingIdx !== -1) {
+        list[existingIdx] = { ...list[existingIdx], ...user };
+    } else {
+        list.unshift(user);
+    }
+    localStorage.setItem('sentinel_custom_users', JSON.stringify(list));
+}
+
 function findLocalUser(identifier) {
     if (!identifier) return null;
     const clean = identifier.toLowerCase().trim();
-    return LOCAL_DATABASE_USERS.find(u =>
-        u.email.toLowerCase() === clean ||
-        u.name.toLowerCase() === clean ||
-        u.name.toLowerCase().includes(clean) ||
-        u.role.toLowerCase() === clean ||
-        u.role.toLowerCase().includes(clean) ||
+    const customUsers = getCustomUsers();
+    const seedUsers = (typeof window !== 'undefined' && window.SENTINEL_SEED_DATA && Array.isArray(window.SENTINEL_SEED_DATA.users)) ? window.SENTINEL_SEED_DATA.users : [];
+    const allUsers = [...LOCAL_DATABASE_USERS, ...customUsers, ...seedUsers];
+
+    return allUsers.find(u =>
+        (u.email && u.email.toLowerCase() === clean) ||
+        (u.id && u.id.toLowerCase() === clean) ||
+        (u.name && u.name.toLowerCase() === clean) ||
+        (u.name && u.name.toLowerCase().includes(clean)) ||
+        (u.role && u.role.toLowerCase() === clean) ||
+        (u.role && u.role.toLowerCase().includes(clean)) ||
         (clean.includes('ramjattan') && u.id === 'usr_ministry_01') ||
         (clean.includes('fitzwilliam') && u.id === 'usr_principal_01') ||
+        (clean.includes('hosein') && u.id === 'usr_principal_02') ||
+        (clean.includes('paul') && u.id === 'usr_principal_03') ||
         (clean.includes('mohammed') && u.id === 'usr_dean_01') ||
         (clean.includes('alleyne') && u.id === 'usr_dean_02') ||
         (clean.includes('boodoo') && u.id === 'usr_counselor_01') ||

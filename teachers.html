@@ -1,0 +1,1628 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Directory - Sentinel Edu</title>
+    <meta name="description" content="Instructional staff directory, school assignments, class allocations, and verified login management across Trinidad and Tobago.">
+
+    <!-- Google Fonts: Google Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Product+Sans:wght@400;700&display=swap" rel="stylesheet">
+
+    <!-- Shared Stylesheet -->
+    <link rel="stylesheet" href="style/style.css">
+
+    <style>
+        body {
+            background-color: #ffffff;
+            color: #121316;
+            font-family: var(--font-family);
+        }
+
+        .page-wrapper {
+            max-width: 1400px;
+            margin: 2.5rem auto 4rem;
+            padding: 0 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        /* ===== PAGE TITLE BANNER ===== */
+        .page-title-banner {
+            background: transparent;
+            border: none;
+            padding: 2.5rem 0 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .page-banner-left .page-subtitle {
+            font-size: 0.88rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #5e6472;
+            margin-bottom: 0.5rem;
+        }
+
+        .page-banner-left h1 {
+            font-size: clamp(1.8rem, 2.8vw, 2.6rem);
+            font-weight: 800;
+            color: #111111;
+            letter-spacing: -0.025em;
+            line-height: 1.1;
+        }
+
+        .page-banner-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .btn-create-teacher {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: #111111;
+            color: #ffffff;
+            font-size: 0.92rem;
+            font-weight: 700;
+            padding: 0.75rem 1.4rem;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-create-teacher:hover {
+            background: #333333;
+        }
+
+        /* ===== METRICS ROW ===== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 2rem;
+        }
+
+        .stat-card {
+            background: transparent;
+            border: none;
+            padding: 0.25rem 0;
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+
+        .stat-card-label {
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: #5e6472;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .stat-card-value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #111111;
+            line-height: 1.1;
+        }
+
+        .stat-card-sub {
+            font-size: 0.8rem;
+            color: #71717a;
+        }
+
+        /* ===== CONTROLS ROW ===== */
+        .controls-card {
+            background: #ffffff;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            border-radius: 6px;
+            padding: 1.25rem 1.5rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
+        .controls-left {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.85rem;
+            flex: 1;
+        }
+
+        .search-box {
+            position: relative;
+            min-width: 260px;
+            flex: 1;
+            max-width: 380px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 0.65rem 1rem 0.65rem 2.4rem;
+            border: 1px solid #d4d4d8;
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 0.9rem;
+            outline: none;
+            background: #ffffff;
+            transition: border-color 0.2s ease;
+        }
+
+        .search-box input:focus {
+            border-color: #111111;
+        }
+
+        .search-box svg {
+            position: absolute;
+            left: 0.8rem;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 16px;
+            height: 16px;
+            fill: #71717a;
+        }
+
+        .filter-select {
+            padding: 0.65rem 1rem;
+            border: 1px solid #d4d4d8;
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 0.88rem;
+            color: #111111;
+            background: #ffffff;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .filter-select:focus {
+            border-color: #111111;
+        }
+
+        .btn-reset-filters {
+            background: transparent;
+            border: 1px solid #d4d4d8;
+            padding: 0.65rem 1rem;
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #555555;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-reset-filters:hover {
+            background: #f4f4f5;
+            color: #111111;
+        }
+
+        .record-counter {
+            font-size: 0.88rem;
+            color: #5e6472;
+            font-weight: 600;
+        }
+
+        /* ===== TABLE ===== */
+        .table-card {
+            background: #ffffff;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            border-radius: 0;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+        }
+
+        .directory-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.92rem;
+        }
+
+        .directory-table th {
+            background: #fafafa;
+            color: #5e6472;
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+            white-space: nowrap;
+        }
+
+        .directory-table td {
+            padding: 1.1rem 1.25rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            vertical-align: middle;
+            color: #111111;
+        }
+
+        .directory-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .directory-table tr:hover {
+            background: #fafafa;
+        }
+
+        .teacher-cell {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .teacher-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #ede9fe;
+            color: #5b21b6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.95rem;
+            flex-shrink: 0;
+        }
+
+        .teacher-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.15rem;
+        }
+
+        .teacher-name {
+            font-weight: 700;
+            color: #111111;
+        }
+
+        .teacher-role-tag {
+            font-size: 0.74rem;
+            font-weight: 600;
+            color: #71717a;
+        }
+
+        .school-badge {
+            display: inline-block;
+            padding: 0.25rem 0.6rem;
+            background: #f4f4f5;
+            color: #27272a;
+            border-radius: 4px;
+            font-size: 0.82rem;
+            font-weight: 600;
+        }
+
+        .school-badge-unassigned {
+            background: #dc2626;
+            color: #ffffff;
+            border: none;
+        }
+
+        .subject-tag {
+            display: inline-block;
+            padding: 0.25rem 0.6rem;
+            background: #2563eb;
+            color: #ffffff;
+            border-radius: 4px;
+            font-size: 0.76rem;
+            font-weight: 600;
+            margin: 2px 2px 2px 0;
+            white-space: nowrap;
+            letter-spacing: 0.01em;
+        }
+
+        /* ===== ROLE BADGES (SOLID BACKGROUND, WHITE TEXT) ===== */
+        .role-badge {
+            display: inline-block;
+            padding: 0.25rem 0.55rem;
+            border-radius: 4px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            color: #ffffff;
+            white-space: normal;
+            word-break: normal;
+            overflow-wrap: normal;
+            line-height: 1.35;
+            text-align: center;
+        }
+
+        .role-principal {
+            background: #581c87;
+            color: #ffffff;
+        }
+
+        .role-dean {
+            background: #9a3412;
+            color: #ffffff;
+        }
+
+        .role-teacher {
+            background: #2563eb;
+            color: #ffffff;
+        }
+
+        .role-counselor {
+            background: #0f766e;
+            color: #ffffff;
+        }
+
+        .role-default {
+            background: #475569;
+            color: #ffffff;
+        }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.2rem 0.55rem;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            background: #ecfdf5;
+            color: #047857;
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #10b981;
+        }
+
+        .actions-cell {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 0.5rem;
+        }
+
+        .btn-action-edit {
+            background: #f4f4f5;
+            color: #18181b;
+            border: 1px solid #d4d4d8;
+            padding: 0.45rem 0.8rem;
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .btn-action-edit:hover {
+            background: #e4e4e7;
+        }
+
+        .btn-action-login-info {
+            background: #111111;
+            color: #ffffff;
+            border: none;
+            padding: 0.45rem 0.85rem;
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 0.8rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.15s ease;
+            white-space: nowrap;
+        }
+
+        .btn-action-login-info:hover {
+            background: #333333;
+        }
+
+        /* ===== MODAL ===== */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+        }
+
+        .modal-overlay.is-active {
+            display: flex;
+        }
+
+        .modal-card {
+            background: #ffffff;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 620px;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 24px 48px rgba(0, 0, 0, 0.25);
+            animation: modalSlide 0.2s ease-out;
+        }
+
+        @keyframes modalSlide {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .modal-header {
+            padding: 1.5rem 1.75rem;
+            border-bottom: 1px solid #e4e4e7;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            background: #fafafa;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            font-size: 1.35rem;
+            font-weight: 800;
+            color: #111111;
+            letter-spacing: -0.01em;
+        }
+
+        .modal-header p {
+            margin: 0.35rem 0 0;
+            font-size: 0.85rem;
+            color: #71717a;
+        }
+
+        .btn-close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: #71717a;
+            cursor: pointer;
+            line-height: 1;
+            padding: 0.2rem;
+        }
+
+        .btn-close-modal:hover {
+            color: #111111;
+        }
+
+        .modal-body {
+            padding: 1.5rem 1.75rem;
+            overflow-y: auto;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .form-group-modal {
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+
+        .form-group-modal label {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #18181b;
+        }
+
+        .form-group-modal input,
+        .form-group-modal select {
+            padding: 0.65rem 0.85rem;
+            border: 1px solid #d4d4d8;
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 0.9rem;
+            outline: none;
+            background: #ffffff;
+        }
+
+        .form-group-modal input:focus,
+        .form-group-modal select:focus {
+            border-color: #111111;
+        }
+
+        .subjects-picker-box {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+            margin-top: 0.25rem;
+            max-height: 120px;
+            overflow-y: auto;
+            padding: 0.5rem;
+            border: 1px solid #e4e4e7;
+            border-radius: 4px;
+            background: #fafafa;
+        }
+
+        .subject-check-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            font-size: 0.8rem;
+            background: #ffffff;
+            border: 1px solid #d4d4d8;
+            padding: 0.25rem 0.55rem;
+            border-radius: 3px;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.15s ease;
+        }
+
+        .subject-check-label:hover {
+            border-color: #111111;
+        }
+
+        .subject-check-label input:checked + span {
+            font-weight: 700;
+            color: #1d4ed8;
+        }
+
+        .modal-footer {
+            padding: 1.25rem 1.75rem;
+            border-top: 1px solid #e4e4e7;
+            background: #fafafa;
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+        }
+
+        .btn-modal-cancel {
+            background: #f4f4f5;
+            color: #3f3f46;
+            border: 1px solid #d4d4d8;
+            padding: 0.6rem 1.2rem;
+            border-radius: 4px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-modal-submit {
+            background: #111111;
+            color: #ffffff;
+            border: none;
+            padding: 0.6rem 1.4rem;
+            border-radius: 4px;
+            font-size: 0.88rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .btn-modal-submit:hover {
+            background: #333333;
+        }
+
+        .toast-popup {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: #111111;
+            color: #ffffff;
+            padding: 0.85rem 1.4rem;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            z-index: 99999;
+            opacity: 0;
+            transform: translateY(12px);
+            transition: all 0.2s ease;
+            pointer-events: none;
+        }
+
+        .toast-popup.is-show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Header Navigation -->
+    <header class="site-header">
+        <a href="index.html" class="brand-logo">
+            Sentinel Edu<span class="brand-dot"></span>
+        </a>
+
+        <nav>
+            <ul class="nav-links">
+                <li><a href="dashboard.html">Dashboard</a></li>
+                <li><a href="students.html">Students</a></li>
+                <li><a href="schools.html">Schools</a></li>
+                <li><a href="teachers.html" style="font-weight: 700; color: #000;">Teachers</a></li>
+                <li><a href="incidents.html">Incidents</a></li>
+                <li><a href="engine.html">Engine</a></li>
+            </ul>
+        </nav>
+
+        <div class="header-actions">
+            <a href="login.html" class="login-btn">
+                <span class="login-avatar">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                    </svg>
+                </span>
+                Staff Login
+            </a>
+        </div>
+    </header>
+
+    <div class="page-wrapper">
+
+        <!-- Page Header Banner -->
+        <section class="page-title-banner">
+            <div class="page-banner-left">
+                <div class="page-subtitle">Ministry of Education • Faculty Registry</div>
+                <h1>Instructional Staff &amp; Teacher Accounts</h1>
+            </div>
+            <div class="page-banner-right">
+                <button type="button" class="btn-create-teacher" onclick="openCreateTeacherModal()">
+                    <span>+ Add New Teacher Account</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- Stats Overview Cards -->
+        <section class="stats-grid">
+            <div class="stat-card">
+                <span class="stat-card-label">Total Teachers</span>
+                <span class="stat-card-value" id="statTotalTeachers">—</span>
+                <span class="stat-card-sub">Registered accounts</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-card-label">Assigned to School</span>
+                <span class="stat-card-value" id="statAssignedTeachers">—</span>
+                <span class="stat-card-sub">Active faculty placements</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-card-label">Unassigned Teachers</span>
+                <span class="stat-card-value" id="statUnassignedTeachers">—</span>
+                <span class="stat-card-sub">Available for school assignment</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-card-label">Secondary Schools Covered</span>
+                <span class="stat-card-value" id="statSchoolsCovered">—</span>
+                <span class="stat-card-sub">Institutional coverage</span>
+            </div>
+        </section>
+
+        <!-- Search and Filter Bar -->
+        <section class="controls-card">
+            <div class="controls-left">
+                <div class="search-box">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" />
+                    </svg>
+                    <input type="text" id="teacherSearchInput" placeholder="Search teacher name, email, or subject…" oninput="filterTeachers()">
+                </div>
+
+                <select id="schoolFilter" class="filter-select" onchange="filterTeachers()">
+                    <option value="">All Schools</option>
+                </select>
+
+                <select id="subjectFilter" class="filter-select" onchange="filterTeachers()">
+                    <option value="">All Subjects</option>
+                    <option value="Mathematics">Mathematics</option>
+                    <option value="English Language">English Language</option>
+                    <option value="English Literature">English Literature</option>
+                    <option value="Integrated Science">Integrated Science</option>
+                    <option value="Physics">Physics</option>
+                    <option value="Chemistry">Chemistry</option>
+                    <option value="Biology">Biology</option>
+                    <option value="Social Studies">Social Studies</option>
+                    <option value="Information Technology">Information Technology</option>
+                    <option value="Visual Arts">Visual Arts</option>
+                    <option value="Spanish">Spanish</option>
+                </select>
+
+                <button type="button" class="btn-reset-filters" onclick="resetFilters()">Reset</button>
+            </div>
+
+            <div class="record-counter" id="recordCounterText">
+                Showing all teachers
+            </div>
+        </section>
+
+        <!-- Teachers Directory Table -->
+        <div class="table-card">
+            <table class="directory-table">
+                <thead>
+                    <tr>
+                        <th style="width: 20%;">Teacher Profile</th>
+                        <th style="width: 9%;">Role</th>
+                        <th style="width: 17%;">Login Email / Username</th>
+                        <th style="width: 19%;">Assigned School Facility</th>
+                        <th style="width: 15%;">Instructional Subjects</th>
+                        <th style="width: 20%; text-align: right;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="teachersTableBody">
+                    <tr>
+                        <td colspan="6" style="text-align: center; padding: 2.5rem; color: #71717a;">Loading teachers directory…</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div><!-- end .page-wrapper -->
+
+    <!-- ===== CREATE NEW TEACHER ACCOUNT MODAL ===== -->
+    <div class="modal-overlay" id="createTeacherModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <div>
+                    <h2>Create New Teacher Account</h2>
+                    <p>Creates a verified teacher profile with immediate login credentials</p>
+                </div>
+                <button type="button" class="btn-close-modal" onclick="closeCreateTeacherModal()">&times;</button>
+            </div>
+
+            <form id="createTeacherForm" onsubmit="handleCreateTeacher(event)">
+                <div class="modal-body">
+                    <div id="teacherFormError" style="display: none; padding: 0.65rem 0.85rem; background: #fee2e2; border: 1px solid #f87171; border-radius: 4px; color: #991b1b; font-size: 0.85rem; font-weight: 600;"></div>
+
+                    <div class="form-row">
+                        <div class="form-group-modal">
+                            <label for="newTeacherName">Teacher Full Name *</label>
+                            <input type="text" id="newTeacherName" placeholder="e.g. Ms. Kavita Maharaj" required minlength="3" oninput="autoSuggestEmail(this.value)">
+                        </div>
+
+                        <div class="form-group-modal">
+                            <label for="newTeacherEmail">Official Login Email *</label>
+                            <input type="email" id="newTeacherEmail" placeholder="k.maharaj@posns.edu.tt" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group-modal">
+                            <label for="newTeacherPassword">Initial Password * <small style="font-weight:400; color:#71717a;">(min 6 chars)</small></label>
+                            <input type="text" id="newTeacherPassword" value="demo1234" required minlength="6">
+                        </div>
+
+                        <div class="form-group-modal">
+                            <label for="newTeacherSchool">Assigned School Facility</label>
+                            <select id="newTeacherSchool">
+                                <option value="">Select school (or keep Unassigned)…</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group-modal">
+                            <label for="newTeacherRole">Staff Role *</label>
+                            <select id="newTeacherRole" required>
+                                <option value="Teacher">Teacher</option>
+                                <option value="Dean of Discipline">Dean of Discipline</option>
+                                <option value="Guidance Counselor">Guidance Counselor</option>
+                                <option value="Principal">Principal</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group-modal">
+                            <label for="newTeacherClass">Assigned Classroom / Form <small style="font-weight:400; color:#71717a;">(e.g. Form 3-A, Form 4-B)</small></label>
+                            <input type="text" id="newTeacherClass" placeholder="e.g. Form 3-A">
+                        </div>
+                    </div>
+
+                    <div class="form-group-modal">
+                        <label>Instructional Subjects (Select all that apply)</label>
+                        <div class="subjects-picker-box">
+                            <label class="subject-check-label"><input type="checkbox" name="subjectCheck" value="Mathematics"> <span>Mathematics</span></label>
+                            <label class="subject-check-label"><input type="checkbox" name="subjectCheck" value="English Language"> <span>English Language</span></label>
+                            <label class="subject-check-label"><input type="checkbox" name="subjectCheck" value="English Literature"> <span>English Literature</span></label>
+                            <label class="subject-check-label"><input type="checkbox" name="subjectCheck" value="Integrated Science"> <span>Integrated Science</span></label>
+                            <label class="subject-check-label"><input type="checkbox" name="subjectCheck" value="Physics"> <span>Physics</span></label>
+                            <label class="subject-check-label"><input type="checkbox" name="subjectCheck" value="Chemistry"> <span>Chemistry</span></label>
+                            <label class="subject-check-label"><input type="checkbox" name="subjectCheck" value="Biology"> <span>Biology</span></label>
+                            <label class="subject-check-label"><input type="checkbox" name="subjectCheck" value="Social Studies"> <span>Social Studies</span></label>
+                            <label class="subject-check-label"><input type="checkbox" name="subjectCheck" value="Information Technology"> <span>Information Technology</span></label>
+                            <label class="subject-check-label"><input type="checkbox" name="subjectCheck" value="Visual Arts"> <span>Visual Arts</span></label>
+                            <label class="subject-check-label"><input type="checkbox" name="subjectCheck" value="Spanish"> <span>Spanish</span></label>
+                            <label class="subject-check-label"><input type="checkbox" name="subjectCheck" value="Physical Education"> <span>Physical Education</span></label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn-modal-cancel" onclick="closeCreateTeacherModal()">Cancel</button>
+                    <button type="submit" class="btn-modal-submit" id="btnSubmitTeacher">Create Teacher Account</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ===== EDIT TEACHER MODAL ===== -->
+    <div class="modal-overlay" id="editTeacherModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <div>
+                    <h2>Edit Teacher Profile</h2>
+                    <p id="editTeacherSubtitle">Update school facility assignment and subjects</p>
+                </div>
+                <button type="button" class="btn-close-modal" onclick="closeEditTeacherModal()">&times;</button>
+            </div>
+
+            <form id="editTeacherForm" onsubmit="handleSaveTeacherEdit(event)">
+                <input type="hidden" id="editTeacherId">
+                <div class="modal-body">
+                    <div id="editTeacherError" style="display: none; padding: 0.65rem 0.85rem; background: #fee2e2; border: 1px solid #f87171; border-radius: 4px; color: #991b1b; font-size: 0.85rem; font-weight: 600;"></div>
+
+                    <div class="form-row">
+                        <div class="form-group-modal">
+                            <label for="editTeacherName">Teacher Full Name *</label>
+                            <input type="text" id="editTeacherName" required minlength="3">
+                        </div>
+
+                        <div class="form-group-modal">
+                            <label for="editTeacherEmail">Email / Username *</label>
+                            <input type="email" id="editTeacherEmail" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group-modal">
+                        <label for="editTeacherSchool">Assigned School Facility</label>
+                        <select id="editTeacherSchool">
+                            <option value="">Unassigned (Floating Teacher)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group-modal">
+                        <label for="editTeacherRole">Staff Role</label>
+                        <select id="editTeacherRole">
+                            <option value="Teacher">Teacher</option>
+                            <option value="Dean of Discipline">Dean of Discipline</option>
+                            <option value="Guidance Counselor">Guidance Counselor</option>
+                            <option value="Principal">Principal</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group-modal">
+                        <label for="editTeacherClass">Assigned Class / Form</label>
+                        <input type="text" id="editTeacherClass" placeholder="e.g. Form 2-A">
+                    </div>
+
+                    <div class="form-group-modal">
+                        <label>Subjects (Comma-separated)</label>
+                        <input type="text" id="editTeacherSubjects" placeholder="e.g. Mathematics, Physics">
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn-modal-cancel" onclick="closeEditTeacherModal()">Cancel</button>
+                    <button type="submit" class="btn-modal-submit">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ===== VIEW LOGIN INFORMATION MODAL ===== -->
+    <div class="modal-overlay" id="viewLoginInfoModal">
+        <div class="modal-card" style="max-width: 520px;">
+            <div class="modal-header">
+                <div>
+                    <h2>Teacher Login Information</h2>
+                    <p id="infoTeacherSubtitle">Authentication credentials for staff portal login</p>
+                </div>
+                <button type="button" class="btn-close-modal" onclick="closeLoginInfoModal()">&times;</button>
+            </div>
+
+            <div class="modal-body" style="gap: 1.25rem;">
+                <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 4px; padding: 1rem 1.25rem; display: flex; align-items: center; gap: 0.85rem;">
+                    <div class="teacher-avatar" id="infoAvatar" style="width: 44px; height: 44px; font-size: 1.1rem;">TA</div>
+                    <div>
+                        <div style="font-weight: 800; font-size: 1.05rem; color: #111111;" id="infoTeacherName">Teacher Name</div>
+                        <div style="font-size: 0.82rem; color: #64748b;" id="infoTeacherSchool">Assigned School</div>
+                    </div>
+                </div>
+
+                <!-- Username / Email Box -->
+                <div class="form-group-modal">
+                    <label>Login Email / Username</label>
+                    <div style="display: flex; gap: 0.5rem; align-items: center;">
+                        <input type="text" id="infoEmailVal" readonly style="flex: 1; background: #fafafa; font-family: monospace; font-size: 0.9rem; font-weight: 600; color: #111111; cursor: text;">
+                        <button type="button" class="btn-action-edit" onclick="copyLoginField('infoEmailVal', 'Email copied!')" style="padding: 0.65rem 0.9rem;">Copy</button>
+                    </div>
+                </div>
+
+                <!-- Password Box -->
+                <div class="form-group-modal">
+                    <label>Account Password</label>
+                    <div style="display: flex; gap: 0.5rem; align-items: center;">
+                        <input type="password" id="infoPasswordVal" readonly style="flex: 1; background: #fafafa; font-family: monospace; font-size: 0.9rem; font-weight: 600; color: #111111; cursor: text;">
+                        <button type="button" class="btn-action-edit" id="btnToggleInfoPass" onclick="toggleInfoPasswordVisibility()" style="padding: 0.65rem 0.9rem;">Show</button>
+                        <button type="button" class="btn-action-edit" onclick="copyLoginField('infoPasswordVal', 'Password copied!')" style="padding: 0.65rem 0.9rem;">Copy</button>
+                    </div>
+                    <small style="color: #64748b; font-size: 0.78rem;">Default initial password for verified teacher accounts is <code>demo1234</code>.</small>
+                </div>
+
+                <!-- Access Portal Link -->
+                <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 4px; padding: 0.85rem 1rem; font-size: 0.84rem; color: #1e40af; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <strong>Staff Portal:</strong> <span style="font-family: monospace;">login.html</span>
+                    </div>
+                    <a href="login.html" target="_blank" style="color: #1d4ed8; font-weight: 700; text-decoration: underline; font-size: 0.82rem;">Open Login Page &nearr;</a>
+                </div>
+            </div>
+
+            <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center;">
+                <button type="button" class="btn-action-edit" id="btnDirectLoginFromModal" onclick="directLoginFromModal()" style="color: #111111; font-weight: 700;">
+                    Sign in as this Teacher &rarr;
+                </button>
+                <button type="button" class="btn-modal-cancel" onclick="closeLoginInfoModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification Popup -->
+    <div class="toast-popup" id="toastNotification">✓ Action completed</div>
+
+    <!-- Scripts -->
+    <script src="data/seed.js"></script>
+    <script src="auth.js"></script>
+
+    <script>
+        const SUPABASE_REST_URL = "https://wrumedevccqkopguaxdi.supabase.co/rest/v1";
+        const SUPABASE_ANON_KEY = "sb_publishable_zpd_lzgRqghcN-0X7qw7SA_I2hAZHXH";
+
+        let allTeachers = [];
+        let allSchools = [];
+        let currentUser = null;
+        let isPrincipal = false;
+        let userSchoolId = null;
+        let userSchoolName = null;
+
+        document.addEventListener('DOMContentLoaded', initTeachersPage);
+
+        async function initTeachersPage() {
+            // Check logged in user for Principal view scoping
+            currentUser = (typeof getLoggedInUserData === 'function') ? getLoggedInUserData() : null;
+            if (currentUser && (currentUser.role || '').toLowerCase().includes('principal')) {
+                isPrincipal = true;
+                userSchoolId = currentUser.schoolId || currentUser.school_id;
+                if (!userSchoolId && window.SENTINEL_SEED_DATA && Array.isArray(window.SENTINEL_SEED_DATA.schools)) {
+                    const sch = window.SENTINEL_SEED_DATA.schools.find(s => s.principal === currentUser.id);
+                    if (sch) userSchoolId = sch.id;
+                }
+                if (!userSchoolId) userSchoolId = 'sch_001';
+                userSchoolName = currentUser.schoolName;
+                if (!userSchoolName && window.SENTINEL_SEED_DATA && Array.isArray(window.SENTINEL_SEED_DATA.schools)) {
+                    const sch = window.SENTINEL_SEED_DATA.schools.find(s => s.id === userSchoolId);
+                    if (sch) userSchoolName = sch.name;
+                }
+                if (!userSchoolName) userSchoolName = 'Port of Spain North Secondary';
+
+                const h1 = document.querySelector('.page-title-banner h1');
+                if (h1) h1.textContent = `${userSchoolName} – Faculty & Staff`;
+                const sub = document.querySelector('.page-title-banner .page-subtitle');
+                if (sub) sub.textContent = `Principal View · ${userSchoolName}`;
+            }
+
+            // 1. Initial synchronous load from local seed database
+            if (window.SENTINEL_SEED_DATA) {
+                allSchools = Array.isArray(window.SENTINEL_SEED_DATA.schools) ? [...window.SENTINEL_SEED_DATA.schools] : [];
+                allTeachers = Array.isArray(window.SENTINEL_SEED_DATA.users)
+                    ? window.SENTINEL_SEED_DATA.users.filter(u => {
+                        const r = (u.role || '').toLowerCase();
+                        return r.includes('teacher') || r.includes('dean') || r.includes('principal') || r.includes('counsel');
+                    })
+                    : [];
+            }
+
+            // Also merge any custom-created accounts from localStorage
+            const customUsers = (typeof getCustomUsers === 'function') ? getCustomUsers() : [];
+            customUsers.filter(u => {
+                const r = (u.role || '').toLowerCase();
+                return r.includes('teacher') || r.includes('dean') || r.includes('principal') || r.includes('counsel');
+            }).forEach(t => {
+                if (!allTeachers.some(x => x.id === t.id)) {
+                    allTeachers.unshift(t);
+                }
+            });
+
+            if (isPrincipal && userSchoolId) {
+                allTeachers = allTeachers.filter(t => (t.schoolId || t.school_id) === userSchoolId);
+            }
+
+            populateSchoolDropdowns();
+            renderTeachersTable(allTeachers);
+            updateOverviewStats();
+
+            // 2. Sync live data from Express backend or Supabase
+            await syncLiveData();
+        }
+
+        async function syncLiveData() {
+            try {
+                const apiBase = (typeof API_BASE !== 'undefined' ? API_BASE : 'http://localhost:5000');
+                const [schRes, tchRes] = await Promise.all([
+                    fetch(`${apiBase}/api/schools`).catch(() => null),
+                    fetch(`${apiBase}/api/teachers`).catch(() => null)
+                ]);
+
+                if (schRes && schRes.ok) {
+                    const data = await schRes.json();
+                    if (Array.isArray(data) && data.length > 0) allSchools = data;
+                }
+                if (tchRes && tchRes.ok) {
+                    const data = await tchRes.json();
+                    if (Array.isArray(data) && data.length > 0) allTeachers = data;
+                }
+            } catch (_) {
+                // Fallback direct to Supabase
+                try {
+                    const [sbSch, sbUsr] = await Promise.all([
+                        fetch(`${SUPABASE_REST_URL}/schools?select=*`, { headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` } }).catch(() => null),
+                        fetch(`${SUPABASE_REST_URL}/users?select=*&role=neq.Ministry%20Education%20Officer`, { headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` } }).catch(() => null)
+                    ]);
+
+                    if (sbSch && sbSch.ok) {
+                        const d = await sbSch.json();
+                        if (Array.isArray(d) && d.length > 0) allSchools = d;
+                    }
+                    if (sbUsr && sbUsr.ok) {
+                        const d = await sbUsr.json();
+                        if (Array.isArray(d) && d.length > 0) {
+                            allTeachers = d.map(u => ({
+                                id: u.id,
+                                name: u.name,
+                                email: u.email,
+                                role: u.role,
+                                schoolId: u.school_id || u.schoolId,
+                                subjects: u.subjects || [],
+                                assignedClassIds: u.assigned_class_ids || []
+                            }));
+                        }
+                    }
+                } catch (_) {}
+            }
+
+            if (isPrincipal && userSchoolId) {
+                allTeachers = allTeachers.filter(t => (t.schoolId || t.school_id) === userSchoolId);
+            }
+
+            populateSchoolDropdowns();
+            renderTeachersTable(allTeachers);
+            updateOverviewStats();
+        }
+
+        function populateSchoolDropdowns() {
+            const filterSel = document.getElementById('schoolFilter');
+            const newSchSel = document.getElementById('newTeacherSchool');
+            const editSchSel = document.getElementById('editTeacherSchool');
+
+            const currentFilter = filterSel ? filterSel.value : '';
+
+            if (isPrincipal && userSchoolId) {
+                if (filterSel) {
+                    filterSel.innerHTML = `<option value="${userSchoolId}">${userSchoolName}</option>`;
+                    filterSel.value = userSchoolId;
+                    filterSel.disabled = true;
+                }
+                if (newSchSel) {
+                    newSchSel.innerHTML = `<option value="${userSchoolId}" selected>${userSchoolName}</option>`;
+                    newSchSel.value = userSchoolId;
+                }
+                if (editSchSel) {
+                    editSchSel.innerHTML = `<option value="${userSchoolId}" selected>${userSchoolName}</option>` +
+                        allSchools.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+                }
+                return;
+            }
+
+            if (filterSel) {
+                filterSel.innerHTML = '<option value="">All Schools</option><option value="UNASSIGNED">Unassigned Only</option>' +
+                    allSchools.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+                filterSel.value = currentFilter;
+            }
+
+            const schoolOptions = allSchools.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+
+            if (newSchSel) {
+                newSchSel.innerHTML = '<option value="">Unassigned (Floating Teacher)</option>' + schoolOptions;
+            }
+            if (editSchSel) {
+                editSchSel.innerHTML = '<option value="">Unassigned (Floating Teacher)</option>' + schoolOptions;
+            }
+        }
+
+        function updateOverviewStats() {
+            const totalEl = document.getElementById('statTotalTeachers');
+            const assignedEl = document.getElementById('statAssignedTeachers');
+            const unassignedEl = document.getElementById('statUnassignedTeachers');
+            const schoolsCoveredEl = document.getElementById('statSchoolsCovered');
+
+            if (isPrincipal) {
+                const total = allTeachers.length;
+                const teachersCount = allTeachers.filter(t => (t.role || '').toLowerCase().includes('teacher')).length;
+                const deansCount = allTeachers.filter(t => (t.role || '').toLowerCase().includes('dean') || (t.role || '').toLowerCase().includes('counsel')).length;
+
+                if (totalEl) totalEl.textContent = total;
+                if (assignedEl) assignedEl.textContent = teachersCount;
+                if (unassignedEl) unassignedEl.textContent = deansCount;
+                if (schoolsCoveredEl) schoolsCoveredEl.textContent = '1';
+
+                const cardLabels = document.querySelectorAll('.stat-card-label');
+                const cardSubs = document.querySelectorAll('.stat-card-sub');
+                if (cardLabels[0]) cardLabels[0].textContent = 'School Faculty';
+                if (cardLabels[1]) cardLabels[1].textContent = 'Active Teachers';
+                if (cardLabels[2]) cardLabels[2].textContent = 'Deans & Counselors';
+                if (cardLabels[3]) cardLabels[3].textContent = 'School Facility';
+                if (cardSubs[3]) cardSubs[3].textContent = userSchoolName || 'Institutional placement';
+                return;
+            }
+
+            const total = allTeachers.length;
+            const assigned = allTeachers.filter(t => t.schoolId || t.school_id).length;
+            const unassigned = total - assigned;
+
+            const coveredSchoolIds = new Set(allTeachers.map(t => t.schoolId || t.school_id).filter(Boolean));
+
+            if (totalEl) totalEl.textContent = total;
+            if (assignedEl) assignedEl.textContent = assigned;
+            if (unassignedEl) unassignedEl.textContent = unassigned;
+            if (schoolsCoveredEl) schoolsCoveredEl.textContent = coveredSchoolIds.size;
+        }
+
+        function getRoleBadgeClass(role) {
+            const r = (role || '').toLowerCase();
+            if (r.includes('principal')) return 'role-principal';
+            if (r.includes('dean')) return 'role-dean';
+            if (r.includes('counsel') || r.includes('guidance')) return 'role-counselor';
+            if (r.includes('teacher')) return 'role-teacher';
+            return 'role-default';
+        }
+
+        function renderTeachersTable(teachers) {
+            const tbody = document.getElementById('teachersTableBody');
+            const counter = document.getElementById('recordCounterText');
+            if (!tbody) return;
+
+            if (teachers.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 2.5rem; color: #71717a;">No staff found matching your filters.</td></tr>`;
+                if (counter) counter.textContent = 'Showing 0 staff';
+                return;
+            }
+
+            if (counter) counter.textContent = `Showing ${teachers.length} staff member${teachers.length !== 1 ? 's' : ''}`;
+
+            tbody.innerHTML = teachers.map(t => {
+                const sId = t.schoolId || t.school_id;
+                const sch = allSchools.find(s => s.id === sId);
+                const schoolName = sch ? sch.name : 'Unassigned';
+
+                const subjs = Array.isArray(t.subjects) ? t.subjects : (t.subjects ? [t.subjects] : ['General Studies']);
+                const initials = (t.name || 'T').split(' ').map(p => p[0]).filter(Boolean).slice(-2).join('');
+
+                return `
+                    <tr>
+                        <td>
+                            <div class="teacher-cell">
+                                <div class="teacher-avatar">${initials}</div>
+                                <div class="teacher-info">
+                                    <span class="teacher-name">${t.name}</span>
+                                    <span class="teacher-role-tag">${t.role || 'Teacher'}</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="role-badge ${getRoleBadgeClass(t.role)}">${t.role || 'Teacher'}</span>
+                        </td>
+                        <td style="color: #52525b; font-family: monospace; font-size: 0.88rem;">
+                            ${t.email}
+                        </td>
+                        <td>
+                            <span class="school-badge ${!sId ? 'school-badge-unassigned' : ''}">
+                                ${schoolName}
+                            </span>
+                        </td>
+                        <td>
+                            ${subjs.map(s => `<span class="subject-tag">${s}</span>`).join('')}
+                        </td>
+                        <td style="text-align: right;">
+                            <div class="actions-cell">
+                                <button type="button" class="btn-action-edit" onclick="openEditTeacherModal('${t.id}')">
+                                    Edit
+                                </button>
+                                <button type="button" class="btn-action-login-info" onclick="viewTeacherLoginInfo('${t.id}')">
+                                    View Login Information
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function filterTeachers() {
+            const query = (document.getElementById('teacherSearchInput').value || '').toLowerCase().trim();
+            const schoolId = document.getElementById('schoolFilter').value;
+            const subject = document.getElementById('subjectFilter').value;
+
+            const filtered = allTeachers.filter(t => {
+                const name = (t.name || '').toLowerCase();
+                const email = (t.email || '').toLowerCase();
+                const subjs = Array.isArray(t.subjects) ? t.subjects.join(' ').toLowerCase() : String(t.subjects || '').toLowerCase();
+
+                const matchQuery = !query || name.includes(query) || email.includes(query) || subjs.includes(query);
+
+                let matchSchool = true;
+                const tSchoolId = t.schoolId || t.school_id;
+                if (schoolId === 'UNASSIGNED') {
+                    matchSchool = !tSchoolId;
+                } else if (schoolId) {
+                    matchSchool = tSchoolId === schoolId;
+                }
+
+                let matchSubject = true;
+                if (subject) {
+                    matchSubject = subjs.includes(subject.toLowerCase());
+                }
+
+                return matchQuery && matchSchool && matchSubject;
+            });
+
+            renderTeachersTable(filtered);
+        }
+
+        function resetFilters() {
+            document.getElementById('teacherSearchInput').value = '';
+            document.getElementById('schoolFilter').value = isPrincipal ? (userSchoolId || '') : '';
+            document.getElementById('subjectFilter').value = '';
+            renderTeachersTable(allTeachers);
+        }
+
+        // ===== CREATE NEW TEACHER MODAL LOGIC =====
+        function openCreateTeacherModal() {
+            document.getElementById('teacherFormError').style.display = 'none';
+            document.getElementById('createTeacherForm').reset();
+            document.getElementById('newTeacherPassword').value = 'demo1234';
+            if (isPrincipal && userSchoolId) {
+                const schEl = document.getElementById('newTeacherSchool');
+                if (schEl) schEl.value = userSchoolId;
+            }
+            document.getElementById('createTeacherModal').classList.add('is-active');
+            setTimeout(() => document.getElementById('newTeacherName').focus(), 100);
+        }
+
+        function closeCreateTeacherModal() {
+            document.getElementById('createTeacherModal').classList.remove('is-active');
+        }
+
+        function autoSuggestEmail(nameVal) {
+            const emailInput = document.getElementById('newTeacherEmail');
+            if (!emailInput || !nameVal) return;
+
+            const parts = nameVal.trim().split(' ').filter(Boolean);
+            if (parts.length >= 2) {
+                const first = parts[0].replace(/[^a-zA-Z]/g, '').toLowerCase();
+                const last = parts[parts.length - 1].replace(/[^a-zA-Z]/g, '').toLowerCase();
+                emailInput.value = `${first[0]}.${last}@posns.edu.tt`;
+            }
+        }
+
+        async function handleCreateTeacher(e) {
+            e.preventDefault();
+            const errBox = document.getElementById('teacherFormError');
+            errBox.style.display = 'none';
+
+            const name = document.getElementById('newTeacherName').value.trim();
+            const email = document.getElementById('newTeacherEmail').value.trim().toLowerCase();
+            const password = document.getElementById('newTeacherPassword').value.trim();
+            const schoolId = document.getElementById('newTeacherSchool').value || null;
+            const role = document.getElementById('newTeacherRole').value || 'Teacher';
+            const assignedClass = document.getElementById('newTeacherClass').value.trim();
+
+            const checkedBoxes = document.querySelectorAll('input[name="subjectCheck"]:checked');
+            const subjects = Array.from(checkedBoxes).map(cb => cb.value);
+            if (subjects.length === 0) subjects.push('General Studies');
+
+            // ── VALIDATIONS ──
+            if (!name || name.length < 3) {
+                errBox.textContent = 'Please enter teacher full name (minimum 3 characters).';
+                errBox.style.display = 'block';
+                return;
+            }
+
+            if (!email || !email.includes('@') || !email.includes('.')) {
+                errBox.textContent = 'Please enter a valid educational email address.';
+                errBox.style.display = 'block';
+                return;
+            }
+
+            const dup = allTeachers.find(t => t.email && t.email.toLowerCase() === email);
+            if (dup) {
+                errBox.textContent = `A teacher account with email "${email}" already exists.`;
+                errBox.style.display = 'block';
+                return;
+            }
+
+            if (!password || password.length < 6) {
+                errBox.textContent = 'Initial password must be at least 6 characters.';
+                errBox.style.display = 'block';
+                return;
+            }
+
+            const submitBtn = document.getElementById('btnSubmitTeacher');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Creating account…';
+
+            const newTeacherObj = {
+                id: 'usr_teacher_' + Date.now(),
+                name: name,
+                email: email,
+                password: password,
+                role: role,
+                schoolId: schoolId,
+                school_id: schoolId,
+                subjects: subjects,
+                assignedClassIds: assignedClass ? [assignedClass] : [],
+                createdAt: new Date().toISOString()
+            };
+
+            // 1. Sync via Express API
+            try {
+                const apiBase = (typeof API_BASE !== 'undefined' ? API_BASE : 'http://localhost:5000');
+                await fetch(`${apiBase}/api/teachers`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name,
+                        email,
+                        password,
+                        role: newTeacherObj.role,
+                        schoolId,
+                        subjects,
+                        assignedClassIds: newTeacherObj.assignedClassIds
+                    })
+                });
+            } catch (_) {}
+
+            // 2. Direct online Supabase insert
+            try {
+                await fetch(`${SUPABASE_REST_URL}/users`, {
+                    method: 'POST',
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        id: newTeacherObj.id,
+                        name: newTeacherObj.name,
+                        email: newTeacherObj.email,
+                        role: newTeacherObj.role,
+                        school_id: newTeacherObj.schoolId,
+                        subjects: newTeacherObj.subjects,
+                        assigned_class_ids: newTeacherObj.assignedClassIds
+                    })
+                });
+            } catch (_) {}
+
+            // 3. Save to localStorage custom users so teacher can immediately log in
+            if (typeof saveCustomUser === 'function') {
+                saveCustomUser(newTeacherObj);
+            }
+
+            // Update local memory and view
+            allTeachers.unshift(newTeacherObj);
+            renderTeachersTable(allTeachers);
+            updateOverviewStats();
+
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Create Teacher Account';
+            closeCreateTeacherModal();
+
+            showToast(`✓ Teacher account created for ${name}! Password: ${password}`);
+        }
+
+        // ===== EDIT TEACHER MODAL LOGIC =====
+        function openEditTeacherModal(teacherId) {
+            const teacher = allTeachers.find(t => t.id === teacherId);
+            if (!teacher) return;
+
+            document.getElementById('editTeacherId').value = teacher.id;
+            document.getElementById('editTeacherName').value = teacher.name;
+            document.getElementById('editTeacherEmail').value = teacher.email;
+            document.getElementById('editTeacherSchool').value = teacher.schoolId || teacher.school_id || '';
+
+            // Pre-fill Role dropdown
+            const editRoleSel = document.getElementById('editTeacherRole');
+            if (editRoleSel) editRoleSel.value = teacher.role || 'Teacher';
+
+            const subjs = Array.isArray(teacher.subjects) ? teacher.subjects.join(', ') : (teacher.subjects || '');
+            document.getElementById('editTeacherSubjects').value = subjs;
+
+            const classes = Array.isArray(teacher.assignedClassIds) ? teacher.assignedClassIds.join(', ') : '';
+            document.getElementById('editTeacherClass').value = classes;
+
+            document.getElementById('editTeacherError').style.display = 'none';
+            document.getElementById('editTeacherModal').classList.add('is-active');
+        }
+
+        function closeEditTeacherModal() {
+            document.getElementById('editTeacherModal').classList.remove('is-active');
+        }
+
+        async function handleSaveTeacherEdit(e) {
+            e.preventDefault();
+            const id = document.getElementById('editTeacherId').value;
+            const name = document.getElementById('editTeacherName').value.trim();
+            const email = document.getElementById('editTeacherEmail').value.trim().toLowerCase();
+            const schoolId = document.getElementById('editTeacherSchool').value || null;
+            const roleSel = document.getElementById('editTeacherRole');
+            const subjsRaw = document.getElementById('editTeacherSubjects').value;
+            const subjects = subjsRaw.split(',').map(s => s.trim()).filter(Boolean);
+            const classesRaw = document.getElementById('editTeacherClass').value;
+            const assignedClassIds = classesRaw.split(',').map(s => s.trim()).filter(Boolean);
+
+            const teacher = allTeachers.find(t => t.id === id);
+            if (!teacher) return;
+
+            teacher.name = name;
+            teacher.email = email;
+            teacher.role = (roleSel && roleSel.value) ? roleSel.value : (teacher.role || 'Teacher');
+            teacher.schoolId = schoolId;
+            teacher.school_id = schoolId;
+            teacher.subjects = subjects.length > 0 ? subjects : ['General Studies'];
+            teacher.assignedClassIds = assignedClassIds;
+
+            // 1. Sync via Express API
+            try {
+                const apiBase = (typeof API_BASE !== 'undefined' ? API_BASE : 'http://localhost:5000');
+                await fetch(`${apiBase}/api/teachers/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email, role: teacher.role, schoolId, subjects: teacher.subjects, assignedClassIds })
+                });
+            } catch (_) {}
+
+            // 2. Sync to Supabase
+            try {
+                await fetch(`${SUPABASE_REST_URL}/users?id=eq.${id}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        name: teacher.name,
+                        email: teacher.email,
+                        role: teacher.role,
+                        school_id: schoolId,
+                        subjects: teacher.subjects,
+                        assigned_class_ids: teacher.assignedClassIds
+                    })
+                });
+            } catch (_) {}
+
+            if (typeof saveCustomUser === 'function') {
+                saveCustomUser(teacher);
+            }
+
+            renderTeachersTable(allTeachers);
+            updateOverviewStats();
+            closeEditTeacherModal();
+            showToast(`✓ Updated profile for ${teacher.name}`);
+        }
+
+        let _currentInfoTeacher = null;
+
+        function viewTeacherLoginInfo(teacherId) {
+            const teacher = allTeachers.find(t => t.id === teacherId);
+            if (!teacher) return;
+
+            _currentInfoTeacher = teacher;
+
+            const nameEl = document.getElementById('infoTeacherName');
+            const avatarEl = document.getElementById('infoAvatar');
+            const schoolEl = document.getElementById('infoTeacherSchool');
+            const emailInput = document.getElementById('infoEmailVal');
+            const passInput = document.getElementById('infoPasswordVal');
+            const passBtn = document.getElementById('btnToggleInfoPass');
+
+            if (nameEl) nameEl.textContent = teacher.name;
+            if (avatarEl) {
+                const initials = (teacher.name || 'T').split(' ').map(p => p[0]).filter(Boolean).slice(-2).join('');
+                avatarEl.textContent = initials;
+            }
+
+            const sId = teacher.schoolId || teacher.school_id;
+            const sch = allSchools.find(s => s.id === sId);
+            if (schoolEl) schoolEl.textContent = sch ? `${sch.name} • ${sch.district || ''}` : 'Unassigned (No school assigned)';
+
+            if (emailInput) emailInput.value = teacher.email;
+            if (passInput) {
+                passInput.value = teacher.password || 'demo1234';
+                passInput.type = 'password';
+            }
+            if (passBtn) passBtn.textContent = 'Show';
+
+            const modal = document.getElementById('viewLoginInfoModal');
+            if (modal) modal.classList.add('is-active');
+        }
+
+        function closeLoginInfoModal() {
+            const modal = document.getElementById('viewLoginInfoModal');
+            if (modal) modal.classList.remove('is-active');
+            _currentInfoTeacher = null;
+        }
+
+        function toggleInfoPasswordVisibility() {
+            const passInput = document.getElementById('infoPasswordVal');
+            const passBtn = document.getElementById('btnToggleInfoPass');
+            if (!passInput) return;
+
+            if (passInput.type === 'password') {
+                passInput.type = 'text';
+                if (passBtn) passBtn.textContent = 'Hide';
+            } else {
+                passInput.type = 'password';
+                if (passBtn) passBtn.textContent = 'Show';
+            }
+        }
+
+        function copyLoginField(fieldId, msg) {
+            const el = document.getElementById(fieldId);
+            if (!el) return;
+
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(el.value).then(() => {
+                    showToast('✓ ' + msg);
+                }).catch(() => {
+                    fallbackCopy(el, msg);
+                });
+            } else {
+                fallbackCopy(el, msg);
+            }
+        }
+
+        function fallbackCopy(el, msg) {
+            el.select();
+            document.execCommand('copy');
+            showToast('✓ ' + msg);
+        }
+
+        function directLoginFromModal() {
+            if (!_currentInfoTeacher) return;
+            localStorage.setItem('sentinel_user', JSON.stringify(_currentInfoTeacher));
+            window.location.href = 'teacher-dashboard.html';
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toastNotification');
+            if (!toast) return;
+            toast.textContent = msg;
+            toast.classList.add('is-show');
+            setTimeout(() => toast.classList.remove('is-show'), 3500);
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+        }
+    </script>
+</body>
+
+</html>
+

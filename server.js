@@ -49,11 +49,12 @@ function loadDb() {
 
     // Minimal scaffold – the real seed data lives in database.json
     const scaffold = {
-        schools:   [],
-        classes:   [],
-        students:  [],
-        users:     [],
-        incidents: []
+        schools:        [],
+        classes:        [],
+        students:       [],
+        users:          [],
+        incidents:      [],
+        attendanceLogs: []
     };
     fs.writeFileSync(DB_FILE, JSON.stringify(scaffold, null, 2), 'utf8');
     return scaffold;
@@ -267,6 +268,7 @@ app.get('/api/engine/students-evaluation', (req, res) => {
                 district: st.district || 'St. George East District',
                 status: st.status || 'Active',
                 currentTriageLevel: st.triageLevel || 0,
+                attendance: (st.attendance !== undefined && st.attendance !== null) ? Number(st.attendance) : 95,
                 incidentCount: studentIncs.length,
                 evaluation: evalResult
             };
@@ -854,6 +856,64 @@ app.get('/api/students/by-school/:schoolId', (req, res) => {
     res.json(students);
 });
 
+// CREATE or RESTORE a student file (POST /api/students)
+app.post('/api/students', async (req, res) => {
+    try {
+        const student = req.body;
+        if (!student || !student.name) {
+            return res.status(400).json({ error: 'Student name is required' });
+        }
+        const newStu = {
+            id: student.id || ('stu_' + Date.now()),
+            studentNumber: student.studentNumber || student.studentId || null,
+            name: student.name,
+            firstName: student.firstName || student.name.split(' ')[0],
+            lastName: student.lastName || student.name.split(' ').slice(1).join(' '),
+            classId: student.classId || 'cls_1A',
+            schoolId: student.schoolId || 'sch_001',
+            form: student.form || 'General',
+            incidentCount: student.incidentCount || 0,
+            triageLevel: student.triageLevel !== undefined ? student.triageLevel : 0,
+            attendance: student.attendance !== undefined ? student.attendance : 95,
+            status: student.status || 'Active'
+        };
+
+        const existingIdx = db.students.findIndex(s => s.id === newStu.id);
+        if (existingIdx !== -1) {
+            db.students[existingIdx] = newStu;
+        } else {
+            db.students.unshift(newStu);
+        }
+        saveDb();
+
+        if (supabase) {
+            try {
+                await supabase.from('students').upsert({
+                    id: newStu.id,
+                    student_number: newStu.studentNumber,
+                    name: newStu.name,
+                    first_name: newStu.firstName,
+                    last_name: newStu.lastName,
+                    class_id: newStu.classId,
+                    school_id: newStu.schoolId,
+                    form: newStu.form,
+                    incident_count: newStu.incidentCount,
+                    triage_level: newStu.triageLevel,
+                    attendance: newStu.attendance,
+                    status: newStu.status
+                });
+            } catch (sErr) {
+                console.warn('[Supabase Student Restore/Create] Notice:', sErr.message);
+            }
+        }
+
+        res.status(201).json({ success: true, student: newStu });
+    } catch (err) {
+        console.error('Create student error:', err);
+        res.status(500).json({ error: 'Failed to create/restore student: ' + err.message });
+    }
+});
+
 // UPDATE a student file (PUT /api/students/:id)
 app.put('/api/students/:id', async (req, res) => {
     try {
@@ -871,6 +931,7 @@ app.put('/api/students/:id', async (req, res) => {
         if (updates.district !== undefined) student.district = updates.district;
         if (updates.triageLevel !== undefined) student.triageLevel = parseInt(updates.triageLevel);
         if (updates.incidentCount !== undefined) student.incidentCount = parseInt(updates.incidentCount);
+        if (updates.attendance !== undefined) student.attendance = parseInt(updates.attendance);
         if (updates.lastReview !== undefined) student.lastReview = updates.lastReview;
         student.updatedAt = new Date().toISOString();
 
@@ -933,6 +994,52 @@ app.delete('/api/students/:id', async (req, res) => {
     }
 });
 
+// GET attendance logs with optional filter by ?studentId=... and ?form=...
+app.get('/api/attendance', (req, res) => {
+    let logs = db.attendanceLogs || [];
+    if (req.query.studentId) {
+        const sid = req.query.studentId.toLowerCase();
+        logs = logs.filter(l => (l.studentId && l.studentId.toLowerCase() === sid) || (l.studentNumber && l.studentNumber.toLowerCase() === sid));
+    }
+    if (req.query.form) {
+        const f = req.query.form.toLowerCase();
+        logs = logs.filter(l => (l.form && l.form.toLowerCase() === f));
+    }
+    res.json(logs);
+});
+
+// GET attendance summary and rate for a specific student
+app.get('/api/attendance/:studentId', (req, res) => {
+    const sid = req.params.studentId.toLowerCase();
+    const logs = (db.attendanceLogs || []).filter(l => 
+        (l.studentId && l.studentId.toLowerCase() === sid) || 
+        (l.studentNumber && l.studentNumber.toLowerCase() === sid)
+    );
+    const student = (db.students || []).find(s => 
+        (s.id && s.id.toLowerCase() === sid) || 
+        (s.studentNumber && s.studentNumber.toLowerCase() === sid)
+    );
+    const totalDays = logs.length;
+    const presentCount = logs.filter(l => l.status === 'Present').length;
+    const lateCount = logs.filter(l => l.status === 'Late').length;
+    const absentCount = logs.filter(l => l.status === 'Absent').length;
+    const excusedCount = logs.filter(l => l.status === 'Excused').length;
+    const rate = totalDays > 0 ? Math.round(((presentCount + lateCount) / totalDays) * 100) : (student?.attendance || 95);
+
+    res.json({
+        studentId: req.params.studentId,
+        studentName: student?.name || logs[0]?.studentName || 'Unknown',
+        form: student?.form || logs[0]?.form || 'Unknown',
+        attendanceRate: rate,
+        totalDays,
+        presentCount,
+        lateCount,
+        absentCount,
+        excusedCount,
+        logs
+    });
+});
+
 // ─────────────────────────────────────────────────────────────────────────────
 // 10. STAFF ROUTE
 // ─────────────────────────────────────────────────────────────────────────────
@@ -947,6 +1054,219 @@ app.get('/api/staff/by-school/:schoolId', (req, res) => {
         .map(({ passwordHash, ...safe }) => safe);  // omit password hash
 
     res.json(staff);
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 10b. TEACHER DIRECTORY & SCHOOL ASSIGNMENT ROUTES
+// ─────────────────────────────────────────────────────────────────────────────
+
+// GET all teachers & school faculty (Teachers, Deans, Principals, Counselors)
+app.get('/api/teachers', (req, res) => {
+    const facultyRoles = ['teacher', 'dean', 'principal', 'counselor', 'guidance'];
+    const teachers = (db.users || [])
+        .filter(u => {
+            const r = (u.role || '').toLowerCase();
+            return facultyRoles.some(role => r.includes(role)) || !r.includes('ministry');
+        })
+        .map(({ passwordHash, ...safe }) => {
+            const sch = (db.schools || []).find(s => s.id === safe.schoolId);
+            return {
+                ...safe,
+                schoolName: sch ? sch.name : 'Unassigned',
+                district: sch ? sch.district : 'Unassigned'
+            };
+        });
+    res.json(teachers);
+});
+
+// POST – Create a new teacher / faculty account (login-ready with password hash)
+app.post('/api/teachers', async (req, res) => {
+    try {
+        const { name, email, password, role, schoolId, subjects, assignedClassIds } = req.body;
+
+        if (!name || !email) {
+            return res.status(400).json({ error: 'Full name and email are required to create a staff account.' });
+        }
+
+        const cleanEmail = email.toLowerCase().trim();
+        const existing = db.users.find(u => u.email.toLowerCase() === cleanEmail);
+        if (existing) {
+            return res.status(409).json({ error: `An account with email "${cleanEmail}" already exists.` });
+        }
+
+        const plainPass = (password && password.trim().length >= 6) ? password.trim() : 'demo1234';
+        const passwordHash = await bcrypt.hash(plainPass, 10);
+
+        const newTeacher = {
+            id: 'usr_' + (role || 'teacher').toLowerCase().replace(/[^a-z0-9]/g, '_') + '_' + Date.now(),
+            name: name.trim(),
+            email: cleanEmail,
+            role: role || 'Teacher',
+            schoolId: schoolId || null,
+            assignedClassIds: Array.isArray(assignedClassIds) ? assignedClassIds : [],
+            coversForms: [],
+            deanCoverage: null,
+            subjects: Array.isArray(subjects) ? subjects : (subjects ? [subjects] : ['General Studies']),
+            passwordHash,
+            createdAt: new Date().toISOString()
+        };
+
+        db.users.push(newTeacher);
+        saveDb();
+
+        // Sync to Supabase online database
+        if (supabase) {
+            try {
+                await supabase.from('users').upsert({
+                    id: newTeacher.id,
+                    name: newTeacher.name,
+                    email: newTeacher.email,
+                    role: newTeacher.role,
+                    school_id: newTeacher.schoolId,
+                    subjects: newTeacher.subjects,
+                    assigned_class_ids: newTeacher.assignedClassIds,
+                    password_hash: passwordHash,
+                    created_at: newTeacher.createdAt
+                });
+                console.log(`[Supabase Sync] Staff account created for ${newTeacher.name} (${newTeacher.role}) ✓`);
+            } catch (err) {
+                console.warn('[Supabase Sync] Teacher create warning:', err.message);
+            }
+        }
+
+        const sch = (db.schools || []).find(s => s.id === newTeacher.schoolId);
+        const { passwordHash: _, ...safeTeacher } = newTeacher;
+        safeTeacher.schoolName = sch ? sch.name : 'Unassigned';
+
+        res.status(201).json({
+            success: true,
+            teacher: safeTeacher,
+            message: `Account created successfully for ${newTeacher.name} (${newTeacher.role}). They can now sign in using ${newTeacher.email} and password.`
+        });
+    } catch (err) {
+        console.error('Create teacher error:', err);
+        res.status(500).json({ error: 'Failed to create staff account: ' + err.message });
+    }
+});
+
+// PUT – Update an existing staff member (reassign school, update role, subjects, etc.)
+app.put('/api/teachers/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const updates = req.body;
+
+        const teacher = db.users.find(u => u.id === id);
+        if (!teacher) {
+            return res.status(404).json({ error: 'Staff member not found.' });
+        }
+
+        if (updates.name !== undefined) teacher.name = updates.name.trim();
+        if (updates.email !== undefined) teacher.email = updates.email.toLowerCase().trim();
+        if (updates.role !== undefined) teacher.role = updates.role.trim();
+        if (updates.schoolId !== undefined) teacher.schoolId = updates.schoolId || null;
+        if (updates.subjects !== undefined) teacher.subjects = Array.isArray(updates.subjects) ? updates.subjects : [updates.subjects];
+        if (updates.assignedClassIds !== undefined) teacher.assignedClassIds = updates.assignedClassIds;
+
+        saveDb();
+
+        if (supabase) {
+            try {
+                await supabase.from('users').update({
+                    name: teacher.name,
+                    email: teacher.email,
+                    role: teacher.role,
+                    school_id: teacher.schoolId,
+                    subjects: teacher.subjects,
+                    assigned_class_ids: teacher.assignedClassIds
+                }).eq('id', teacher.id);
+            } catch (err) {
+                console.warn('[Supabase Sync] Teacher update warning:', err.message);
+            }
+        }
+
+        const sch = (db.schools || []).find(s => s.id === teacher.schoolId);
+        const { passwordHash: _, ...safeTeacher } = teacher;
+        safeTeacher.schoolName = sch ? sch.name : 'Unassigned';
+
+        res.json({ success: true, teacher: safeTeacher });
+    } catch (err) {
+        console.error('Update teacher error:', err);
+        res.status(500).json({ error: 'Failed to update teacher: ' + err.message });
+    }
+});
+
+// POST – Assign an existing teacher to a school
+app.post('/api/schools/:schoolId/teachers', async (req, res) => {
+    try {
+        const { schoolId } = req.params;
+        const { teacherId } = req.body;
+
+        if (!teacherId) {
+            return res.status(400).json({ error: 'teacherId is required.' });
+        }
+
+        const school = db.schools.find(s => s.id === schoolId);
+        if (!school) {
+            return res.status(404).json({ error: 'School not found.' });
+        }
+
+        const teacher = db.users.find(u => u.id === teacherId);
+        if (!teacher) {
+            return res.status(404).json({ error: 'Teacher not found.' });
+        }
+
+        teacher.schoolId = schoolId;
+        saveDb();
+
+        if (supabase) {
+            try {
+                await supabase.from('users').update({ school_id: schoolId }).eq('id', teacherId);
+            } catch (err) {
+                console.warn('[Supabase Sync] Assign teacher warning:', err.message);
+            }
+        }
+
+        const { passwordHash: _, ...safeTeacher } = teacher;
+        safeTeacher.schoolName = school.name;
+
+        res.json({
+            success: true,
+            message: `Successfully assigned ${teacher.name} to ${school.name}.`,
+            teacher: safeTeacher
+        });
+    } catch (err) {
+        res.status(500).json({ error: 'Failed to assign teacher: ' + err.message });
+    }
+});
+
+// DELETE – Remove/Unassign a teacher from a school
+app.delete('/api/schools/:schoolId/teachers/:teacherId', async (req, res) => {
+    try {
+        const { schoolId, teacherId } = req.params;
+
+        const teacher = db.users.find(u => u.id === teacherId);
+        if (!teacher) {
+            return res.status(404).json({ error: 'Teacher not found.' });
+        }
+
+        teacher.schoolId = null;
+        saveDb();
+
+        if (supabase) {
+            try {
+                await supabase.from('users').update({ school_id: null }).eq('id', teacherId);
+            } catch (err) {
+                console.warn('[Supabase Sync] Unassign teacher warning:', err.message);
+            }
+        }
+
+        res.json({
+            success: true,
+            message: `Successfully removed ${teacher.name} from school staff.`
+        });
+    } catch (err) {
+        res.status(500).json({ error: 'Failed to unassign teacher: ' + err.message });
+    }
 });
 
 // ─────────────────────────────────────────────────────────────────────────────

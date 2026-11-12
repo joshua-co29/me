@@ -1,391 +1,1612 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Principal Dashboard – Sentinel Edu</title>
+    <title>Principal Dashboard - Sentinel Edu</title>
+
+    <!-- Google Fonts: Google Sans & Product Sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Product+Sans:wght@400;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Product+Sans:wght@400;700&display=swap"
+        rel="stylesheet">
+
+    <!-- External Stylesheet -->
     <link rel="stylesheet" href="style/style.css">
+    <!-- Chart.js for Incident Analytics Graphs -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <style>
-        :root { --accent-lilac: #9f96ee; }
-        body { background: #f5f6fa; font-family: 'Google Sans', sans-serif; }
-        .dash-wrap { max-width: 1280px; margin: 0 auto; padding: 2rem 1.5rem; }
-        .page-header { margin-bottom: 2rem; }
-        .page-header h1 { font-size: 1.6rem; font-weight: 700; color: #111; letter-spacing: -0.02em; margin: 0 0 0.3rem; }
-        .page-header p  { font-size: 0.9rem; color: #6b7280; margin: 0; }
+        body {
+            background-color: #ffffff;
+            color: #121316;
+            font-family: var(--font-family);
+        }
 
-        /* Section label */
-        .section-label { font-size: 0.72rem; font-weight: 700; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.75rem; }
+        .site-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1.5rem;
+            flex-wrap: nowrap;
+        }
 
-        .metrics-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
-        .metric-card { background: #fff; border: 1px solid rgba(0,0,0,0.08); border-radius: 4px; padding: 1.4rem 1.5rem; }
-        .metric-label { font-size: 0.78rem; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; }
-        .metric-value { font-size: 2rem; font-weight: 800; color: #111; letter-spacing: -0.03em; line-height: 1; }
-        .metric-sub   { font-size: 0.78rem; color: #9ca3af; margin-top: 0.3rem; }
+        .brand-logo {
+            white-space: nowrap !important;
+            flex-shrink: 0 !important;
+            display: inline-flex !important;
+            align-items: baseline !important;
+        }
 
-        .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
-        @media (max-width: 900px) { .two-col { grid-template-columns: 1fr; } }
+        .header-actions {
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+        }
 
-        .section-card { background: #fff; border: 1px solid rgba(0,0,0,0.08); border-radius: 4px; margin-bottom: 1.5rem; overflow: hidden; }
-        .section-head { padding: 1.1rem 1.5rem; border-bottom: 1px solid rgba(0,0,0,0.07); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; }
-        .section-head h2 { font-size: 0.97rem; font-weight: 700; color: #111; margin: 0; }
-        .section-head span { font-size: 0.8rem; color: #9ca3af; }
+        .dash-page-wrapper {
+            max-width: 1400px;
+            margin: 2.5rem auto 4rem;
+            padding: 0 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2.5rem;
+        }
 
-        .data-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
-        .data-table th { padding: 0.7rem 1.5rem; text-align: left; font-size: 0.72rem; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: 0.06em; border-bottom: 1px solid rgba(0,0,0,0.07); background: #fafafa; white-space: nowrap; }
-        .data-table td { padding: 0.9rem 1.5rem; border-bottom: 1px solid rgba(0,0,0,0.05); color: #222; vertical-align: middle; }
-        .data-table tr:last-child td { border-bottom: none; }
-        .data-table tr:hover td { background: #fafafe; }
+        /* =========================================================
+           TOP HERO BANNER (Square Boxes / Editorial Palette)
+           ========================================================= */
+        .hero-banner-card {
+            background: transparent;
+            color: #121316;
+            border-radius: 0px;
+            border: none;
+            padding: 3rem 0;
+            display: grid;
+            grid-template-columns: 1.15fr 1fr;
+            gap: 2.5rem;
+            align-items: center;
+        }
 
-        .badge-l1 { font-weight: 700; color: #b45309; }
-        .badge-l2 { font-weight: 700; color: #ea580c; }
-        .badge-l3 { font-weight: 700; color: #991b1b; }
-        .badge-l0 { font-weight: 600; color: #6b7280; }
+        .hero-banner-left {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
 
-        .status-pill { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; }
-        .status-open      { background: #fef3c7; color: #92400e; }
-        .status-resolved  { background: #d1fae5; color: #065f46; }
-        .status-escalated { background: #fee2e2; color: #991b1b; }
+        .hero-greeting {
+            font-size: 1.15rem;
+            font-weight: 500;
+            color: #1a1a1a;
+            margin-bottom: 0.8rem;
+        }
 
-        /* Role tags */
-        .role-tag { display: inline-block; padding: 2px 7px; border-radius: 2px; font-size: 0.72rem; font-weight: 700; }
-        .role-teacher    { background: #e0f2fe; color: #075985; }
-        .role-dean       { background: #fee2e2; color: #991b1b; }
-        .role-counselor  { background: #d1fae5; color: #065f46; }
+        .hero-school-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.82rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #581c87;
+            background: #f3e8ff;
+            padding: 0.3rem 0.75rem;
+            border-radius: 4px;
+            margin-bottom: 0.8rem;
+            width: fit-content;
+        }
 
-        /* Class chips in teacher-class table */
-        .class-chips { display: flex; flex-wrap: wrap; gap: 0.3rem; }
-        .class-chip-sm { display: inline-block; padding: 2px 7px; background: #eeecfb; color: #5243aa; border-radius: 2px; font-size: 0.72rem; font-weight: 700; }
+        .hero-big-title {
+            font-size: clamp(2.3rem, 3.8vw, 3.3rem);
+            font-weight: 700;
+            line-height: 1.12;
+            letter-spacing: -0.03em;
+            color: #111111;
+            margin-bottom: 2rem;
+        }
 
-        /* Mini level bars */
-        .mini-chart { padding: 1.2rem 1.5rem; }
-        .bar-row { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.6rem; }
-        .bar-label { width: 70px; font-size: 0.78rem; color: #555; font-weight: 600; text-align: right; flex-shrink: 0; }
-        .bar-track { flex: 1; background: #f3f4f6; border-radius: 2px; height: 16px; overflow: hidden; }
-        .bar-fill  { height: 100%; border-radius: 2px; transition: width 0.6s ease; }
-        .bar-count { width: 28px; font-size: 0.8rem; font-weight: 700; color: #111; }
+        .hero-cta-group {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+        }
 
-        /* Search */
-        .search-wrap { padding: 0.75rem 1.5rem; border-bottom: 1px solid rgba(0,0,0,0.06); }
-        .search-input { width: 100%; max-width: 360px; padding: 0.55rem 0.9rem; border: 1px solid rgba(0,0,0,0.13); border-radius: 3px; font-family: inherit; font-size: 0.88rem; outline: none; }
-        .search-input:focus { border-color: var(--accent-lilac); }
+        .btn-view-progress {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            background: #111111;
+            color: #ffffff;
+            padding: 0.9rem 1.6rem;
+            border-radius: 0px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border: 1px solid #111111;
+            cursor: pointer;
+            width: fit-content;
+            transition: all 0.25s ease;
+            text-decoration: none;
+        }
 
-        /* Tab strip */
-        .tab-strip { display: flex; gap: 0; border-bottom: 1px solid rgba(0,0,0,0.08); padding: 0 1.5rem; background: #fafafa; }
-        .tab-btn { padding: 0.7rem 1.1rem; font-size: 0.85rem; font-weight: 600; color: #6b7280; border: none; border-bottom: 2px solid transparent; background: none; cursor: pointer; font-family: inherit; margin-bottom: -1px; transition: color 0.15s; }
-        .tab-btn.active { color: #111; border-bottom-color: #111; }
+        .btn-view-progress:hover {
+            background: #272a33;
+            transform: translateY(-2px);
+        }
 
-        .empty-state { padding: 2.5rem; text-align: center; color: #9ca3af; font-size: 0.9rem; }
-        .loading-text { padding: 1.5rem; text-align: center; color: #9ca3af; }
+        .btn-view-outline {
+            background: #ffffff;
+            color: #111111;
+            border: 1px solid rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-view-outline:hover {
+            background: #f5f5f5;
+            color: #111111;
+        }
+
+        /* 3 Top Cards on the right */
+        .hero-banner-cards-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.2rem;
+            height: 100%;
+        }
+
+        .top-mini-card {
+            border-radius: 0px;
+            padding: 1.5rem 1.4rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 250px;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            transition: transform 0.25s ease;
+        }
+
+        .top-mini-card:hover {
+            transform: translateY(-4px);
+        }
+
+        .card-num {
+            font-size: 0.88rem;
+            font-weight: 700;
+            opacity: 0.85;
+            letter-spacing: 0.05em;
+        }
+
+        .card-title-text {
+            font-size: 1.35rem;
+            font-weight: 700;
+            line-height: 1.25;
+            margin-top: 0.4rem;
+            letter-spacing: -0.02em;
+        }
+
+        .card-cream {
+            background: #ffffff;
+            color: #141518;
+        }
+
+        .card-yellow {
+            background: #e59e19;
+            color: #111111;
+        }
+
+        .card-purple {
+            background: #6f58ad;
+            color: #ffffff;
+        }
+
+        .card-illustration-wrap {
+            margin-top: auto;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            height: 120px;
+            width: 100%;
+        }
+
+        .card-illustration-wrap svg {
+            max-height: 110px;
+            width: auto;
+        }
+
+        /* =========================================================
+           METRICS SUMMARY GRID (Square Cards, Crisp Borders)
+           ========================================================= */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+        }
+
+        .metric-card {
+            background: transparent;
+            border: none;
+            border-radius: 0px;
+            padding: 1.8rem 0.5rem;
+        }
+
+        .metric-card:hover {
+            opacity: 0.85;
+        }
+
+        .metric-card-label {
+            font-size: 0.85rem;
+            color: #5e6472;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.6rem;
+            font-weight: 700;
+        }
+
+        .metric-card-value {
+            font-size: 2.4rem;
+            font-weight: 800;
+            color: #111111;
+            line-height: 1.1;
+        }
+
+        .metric-card-sub {
+            font-size: 0.82rem;
+            margin-top: 0.5rem;
+            color: #10b981;
+            font-weight: 600;
+        }
+
+        /* =========================================================
+           MAIN DASHBOARD SPLIT: INCIDENTS TABLE (LEFT) & ANALYTICS (RIGHT)
+           ========================================================= */
+        .dash-split-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1.65fr) minmax(320px, 1fr);
+            gap: 2.2rem;
+            background: transparent;
+            color: #121316;
+            border-radius: 0px;
+            border: none;
+            padding: 1rem 0;
+            align-items: start;
+        }
+
+        .table-left-column {
+            min-width: 0;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 2.5rem;
+        }
+
+        .analytics-column {
+            min-width: 0;
+            width: 100%;
+            position: sticky;
+            top: 90px;
+            border-left: 1px solid rgba(0, 0, 0, 0.08);
+            padding-left: 2.2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.8rem;
+        }
+
+        .section-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            padding-bottom: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .section-subtitle {
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: #717682;
+            margin-bottom: 0.3rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .section-main-title {
+            font-size: 1.95rem;
+            font-weight: 700;
+            color: #111111;
+            letter-spacing: -0.02em;
+            margin: 0;
+        }
+
+        /* Filter Tab Bar */
+        .tab-filter-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .tab-filter-group {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .tab-pill-btn {
+            background: transparent;
+            border: 1px solid rgba(0, 0, 0, 0.12);
+            color: #555555;
+            padding: 0.45rem 0.9rem;
+            font-size: 0.82rem;
+            font-weight: 700;
+            cursor: pointer;
+            border-radius: 0px;
+            transition: all 0.15s ease;
+            font-family: inherit;
+        }
+
+        .tab-pill-btn.active,
+        .tab-pill-btn:hover {
+            background: #111111;
+            color: #ffffff;
+            border-color: #111111;
+        }
+
+        .search-field-box {
+            position: relative;
+            flex: 1;
+            max-width: 320px;
+        }
+
+        .search-field-box input {
+            width: 100%;
+            padding: 0.5rem 0.8rem 0.5rem 2.2rem;
+            font-size: 0.86rem;
+            font-family: inherit;
+            border: 1px solid rgba(0, 0, 0, 0.15);
+            border-radius: 0;
+            outline: none;
+            box-sizing: border-box;
+        }
+
+        .search-field-box input:focus {
+            border-color: #111111;
+        }
+
+        .search-field-box svg {
+            position: absolute;
+            left: 0.7rem;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 15px;
+            height: 15px;
+            fill: #717682;
+        }
+
+        /* Table Design */
+        .incident-table-wrap {
+            width: 100%;
+            overflow-x: auto;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            background: #ffffff;
+            border-radius: 0px;
+        }
+
+        .incident-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        .incident-table th {
+            font-size: 0.8rem;
+            color: #4b5162;
+            background: #f5f5f5;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            padding: 0.9rem 1.1rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+            font-weight: 700;
+        }
+
+        .incident-table td {
+            padding: 1.05rem 1.1rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+            font-size: 0.9rem;
+            color: #1a1a1a;
+            vertical-align: middle;
+        }
+
+        .incident-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .incident-table tr:hover td {
+            background-color: #fafafa;
+        }
+
+        .school-name-text {
+            font-weight: 600;
+            color: #111111;
+            display: block;
+        }
+
+        .school-district-sub {
+            font-size: 0.78rem;
+            color: #6c717e;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0;
+            background: transparent;
+            border: none;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .status-level-1 { color: #b45309; }
+        .status-level-2 { color: #ea580c; }
+        .status-level-3 { color: #991b1b; }
+
+        .status-pill {
+            display: inline-block;
+            padding: 0.2rem 0.55rem;
+            border-radius: 4px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #ffffff;
+            letter-spacing: 0.03em;
+        }
+
+        .status-open { background: #d97706; }
+        .status-resolved { background: #059669; }
+        .status-escalated { background: #dc2626; }
+
+        .table-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            justify-content: flex-end;
+        }
+
+        .btn-action-edit {
+            padding: 0.35rem 0.65rem;
+            font-size: 0.78rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            border: 1px solid rgba(0, 0, 0, 0.15);
+            background: #ffffff;
+            color: #111111;
+            transition: all 0.15s ease;
+            text-decoration: none;
+            border-radius: 0px;
+        }
+
+        .btn-action-edit:hover {
+            background: #111111;
+            color: #ffffff;
+            border-color: #111111;
+        }
+
+        /* Chips for classes */
+        .class-chip-sm {
+            display: inline-block;
+            padding: 2px 7px;
+            background: #eeecfb;
+            color: #5243aa;
+            font-size: 0.72rem;
+            font-weight: 700;
+            margin: 2px 3px 2px 0;
+            border-radius: 2px;
+        }
+
+        /* =========================================================
+           ANALYTICS COLUMN (RIGHT)
+           ========================================================= */
+        .analytics-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.2rem;
+        }
+
+        .analytics-header h2 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #111111;
+            letter-spacing: -0.02em;
+            margin: 0;
+        }
+
+        .analytics-see-all {
+            font-size: 0.92rem;
+            font-weight: 600;
+            color: #6a6f7c;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .analytics-see-all:hover {
+            color: #111111;
+        }
+
+        .analytics-chart-card {
+            background: #ffffff;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            border-radius: 0px;
+            padding: 1.4rem 1.4rem 1.2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .chart-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .chart-subtitle {
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: #717682;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.2rem;
+        }
+
+        .chart-title {
+            font-size: 1.12rem;
+            font-weight: 700;
+            color: #111111;
+            letter-spacing: -0.01em;
+            margin: 0;
+        }
+
+        .chart-pill-badge {
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: #5e6472;
+            letter-spacing: 0.02em;
+        }
+
+        .chart-pill-badge.badge-danger {
+            color: #991b1b;
+        }
+
+        .chart-canvas-container {
+            position: relative;
+            width: 100%;
+            height: 180px;
+        }
+
+        .chart-legend-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 0.8rem;
+            border-top: 1px solid rgba(0, 0, 0, 0.06);
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            font-size: 0.82rem;
+            color: #4b5162;
+        }
+
+        .legend-item strong {
+            color: #111111;
+            font-weight: 700;
+        }
+
+        .legend-box {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .box-level-1 { background: #f59e0b; }
+        .box-level-2 { background: #ea580c; }
+        .box-level-3 { background: #991b1b; }
+
+        /* Focus Student List Table */
+        .top-students-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.86rem;
+        }
+
+        .top-students-table th {
+            font-size: 0.74rem;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 0.55rem 0.6rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+            font-weight: 700;
+            text-align: left;
+        }
+
+        .top-students-table td {
+            padding: 0.65rem 0.6rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            vertical-align: middle;
+        }
+
+        .top-students-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            padding: 1rem;
+        }
+
+        .modal-overlay.is-active {
+            display: flex;
+        }
+
+        .modal-card {
+            background: #ffffff;
+            width: 100%;
+            max-width: 520px;
+            padding: 2rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 0;
+        }
+
+        .modal-card h3 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin: 0 0 0.3rem;
+            color: #111111;
+        }
+
+        .modal-card p.modal-sub {
+            font-size: 0.88rem;
+            color: #6a6f7c;
+            margin: 0 0 1.4rem;
+        }
+
+        .modal-form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+            margin-bottom: 1.1rem;
+        }
+
+        .modal-form-group label {
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: #4b5162;
+        }
+
+        .modal-form-group input,
+        .modal-form-group select,
+        .modal-form-group textarea {
+            padding: 0.65rem 0.85rem;
+            font-size: 0.92rem;
+            font-family: inherit;
+            border: 1px solid rgba(0, 0, 0, 0.2);
+            border-radius: 0;
+            outline: none;
+            color: #111111;
+        }
+
+        .modal-form-group input:focus,
+        .modal-form-group select:focus,
+        .modal-form-group textarea:focus {
+            border-color: #111111;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.6rem;
+            margin-top: 1.6rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(0, 0, 0, 0.08);
+        }
+
+        .btn-modal-cancel {
+            padding: 0.65rem 1.2rem;
+            background: #ffffff;
+            color: #111111;
+            border: 1px solid rgba(0, 0, 0, 0.15);
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .btn-modal-save {
+            padding: 0.65rem 1.4rem;
+            background: #111111;
+            color: #ffffff;
+            border: 1px solid #111111;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        @media (max-width: 1024px) {
+            .hero-banner-card {
+                grid-template-columns: 1fr;
+            }
+            .metrics-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .dash-split-grid {
+                grid-template-columns: 1fr;
+            }
+            .analytics-column {
+                border-left: none;
+                padding-left: 0;
+                position: static;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .hero-banner-cards-row {
+                grid-template-columns: 1fr;
+            }
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
+
 <body>
 
-<header class="site-header">
-    <a href="index.html" class="brand-logo">Sentinel Edu<span class="brand-dot"></span></a>
-    <nav><ul class="nav-links"></ul></nav>
-    <div class="header-actions"></div>
-</header>
+    <!-- Site Header with Brand and Auth -->
+    <header class="site-header">
+        <a href="index.html" class="brand-logo">
+            Sentinel Edu<span class="brand-dot"></span>
+        </a>
 
-<main class="dash-wrap">
-    <div class="page-header">
-        <h1 id="pageTitle">Principal Dashboard</h1>
-        <p id="pageSubtitle">Loading school overview…</p>
-    </div>
+        <nav>
+            <ul class="nav-links">
+                <!-- Populated dynamically by auth.js -->
+            </ul>
+        </nav>
 
-    <!-- School-wide metrics -->
-    <div class="section-label">School Overview</div>
-    <div class="metrics-row" id="metricsRow">
-        <div class="metric-card"><div class="metric-label">Total Students</div><div class="metric-value" id="metStudents">–</div><div class="metric-sub">enrolled this term</div></div>
-        <div class="metric-card"><div class="metric-label">Teaching Staff</div><div class="metric-value" id="metStaff">–</div><div class="metric-sub">assigned to classes</div></div>
-        <div class="metric-card"><div class="metric-label">Total Incidents</div><div class="metric-value" id="metIncidents">–</div><div class="metric-sub">logged this term</div></div>
-        <div class="metric-card"><div class="metric-label">Open Cases</div><div class="metric-value" id="metOpen">–</div><div class="metric-sub">awaiting action</div></div>
-        <div class="metric-card"><div class="metric-label">Level 3 (Critical)</div><div class="metric-value" id="metL3" style="color:#991b1b;">–</div><div class="metric-sub">high severity</div></div>
-        <div class="metric-card"><div class="metric-label">Total Classes</div><div class="metric-value" id="metClasses">–</div><div class="metric-sub">across all forms</div></div>
-    </div>
-
-    <!-- Two-column: Level breakdown + Top students -->
-    <div class="two-col">
-        <div class="section-card" style="margin-bottom:0;">
-            <div class="section-head"><h2>Incident Level Breakdown</h2></div>
-            <div class="mini-chart" id="levelChart"><div class="loading-text">Loading…</div></div>
+        <div class="header-actions">
+            <!-- Populated dynamically by auth.js -->
         </div>
-        <div class="section-card" id="students" style="margin-bottom:0; scroll-margin-top: 90px;">
-            <div class="section-head">
-                <h2>Students with Most Incidents</h2>
-                <span>Top 5 Focus List</span>
+    </header>
+
+    <main class="dash-page-wrapper">
+
+        <!-- =========================================================
+             TOP BAR: HERO BANNER (Square Boxes with 3 Colored Cards)
+             ========================================================= -->
+        <section class="hero-banner-card">
+            <!-- Left Headline Area -->
+            <div class="hero-banner-left">
+                <div class="hero-school-pill" id="heroSchoolBadge">
+                    <span>🏛</span> <span id="heroSchoolBadgeText">Port of Spain North Secondary</span>
+                </div>
+                <div class="hero-greeting" id="heroGreeting">Welcome back, Principal!</div>
+                <h1 class="hero-big-title" id="heroBigTitle">
+                    School Administration<br>&amp; Triage Monitoring
+                </h1>
+                <div class="hero-cta-group">
+                    <a href="#incidents-section" class="btn-view-progress">
+                        <span>View School Incidents</span>
+                        <span>&#8599;</span>
+                    </a>
+                    <a href="teachers.html" class="btn-view-progress btn-view-outline">
+                        <span>Faculty Roster &rarr;</span>
+                    </a>
+                </div>
             </div>
-            <div id="topStudents"><div class="loading-text">Loading…</div></div>
+
+            <!-- Right 3 Mini Cards (Square) -->
+            <div class="hero-banner-cards-row">
+                <!-- Card 01: Active Cases (White/Cream card) -->
+                <div class="top-mini-card card-cream">
+                    <div>
+                        <div class="card-num">01</div>
+                        <div class="card-title-text" id="heroCard1Text">Active<br>Monitoring</div>
+                    </div>
+                    <div class="card-illustration-wrap">
+                        <svg viewBox="0 0 100 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="68" cy="20" r="8" fill="#e59e19"/>
+                            <path d="M64 16c2-4 9-2 9 2 0 1-2 3-5 3" stroke="#d94834" stroke-width="3" stroke-linecap="round"/>
+                            <path d="M54 36c2-8 12-10 18-5l6 14-8 6-4-8-3 10-12-3z" fill="#e59e19"/>
+                            <path d="M56 34L45 46l-8-2" stroke="#111" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M74 44l8 12" stroke="#111" stroke-width="3.5" stroke-linecap="round"/>
+                            <path d="M52 50l-14 42-12 12" stroke="#6f58ad" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M58 50l14 35 12 18" stroke="#6f58ad" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+                            <rect x="18" y="103" width="14" height="6" fill="#111"/>
+                            <rect x="80" y="102" width="14" height="6" fill="#111"/>
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Card 02: Educational District (Warm Amber/Yellow Card with wireframe globe) -->
+                <div class="top-mini-card card-yellow">
+                    <div>
+                        <div class="card-num">02</div>
+                        <div class="card-title-text" id="heroCard2Text">School<br>Forms</div>
+                    </div>
+                    <div class="card-illustration-wrap">
+                        <svg viewBox="0 0 110 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="55" cy="65" r="42" stroke="#111111" stroke-width="2.5" fill="none"/>
+                            <ellipse cx="55" cy="65" rx="42" ry="16" stroke="#111111" stroke-width="2.5" fill="none"/>
+                            <ellipse cx="55" cy="65" rx="42" ry="30" stroke="#111111" stroke-width="2.5" fill="none"/>
+                            <path d="M55 23v84" stroke="#111111" stroke-width="2.5"/>
+                            <ellipse cx="55" cy="65" rx="20" ry="42" stroke="#111111" stroke-width="2.5" fill="none"/>
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Card 03: School Priority (Royal Purple Card with Tower Graphic) -->
+                <div class="top-mini-card card-purple">
+                    <div>
+                        <div class="card-num">03</div>
+                        <div class="card-title-text" id="heroCard3Text">Discipline<br>Priority</div>
+                    </div>
+                    <div class="card-illustration-wrap">
+                        <svg viewBox="0 0 80 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M40 8l-8 26h16L40 8z" fill="#111111"/>
+                            <path d="M40 2v6" stroke="#111111" stroke-width="3"/>
+                            <rect x="28" y="34" width="24" height="28" rx="0" fill="#e59e19" stroke="#111111" stroke-width="2.5"/>
+                            <circle cx="34" cy="48" r="4.5" fill="#ffffff" stroke="#111111" stroke-width="1.8"/>
+                            <path d="M34 46v2h1.5" stroke="#111111" stroke-width="1.2"/>
+                            <circle cx="46" cy="48" r="4.5" fill="#ffffff" stroke="#111111" stroke-width="1.8"/>
+                            <path d="M46 46v2h1.5" stroke="#111111" stroke-width="1.2"/>
+                            <rect x="30" y="62" width="20" height="58" fill="#e59e19" stroke="#111111" stroke-width="2.5"/>
+                            <path d="M36 72v44M44 72v44" stroke="#111111" stroke-width="2.2"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- =========================================================
+             METRICS SECTION (Square Cards - 4 Columns)
+             ========================================================= -->
+        <section class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-card-label">Enrolled Students</div>
+                <div class="metric-card-value" id="dashActiveStudents">--</div>
+                <div class="metric-card-sub" id="dashActiveStudentsSub">&uarr; Active student enrollment</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-card-label">Teaching &amp; Faculty Staff</div>
+                <div class="metric-card-value" id="dashStaffCount">--</div>
+                <div class="metric-card-sub" id="dashStaffSub">Instructional &amp; discipline team</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-card-label">Open School Incidents</div>
+                <div class="metric-card-value" id="dashOpenIncidents">--</div>
+                <div class="metric-card-sub" id="dashOpenIncidentsSub" style="color: #f59e0b;">Awaiting action</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-card-label">Triage Priority Level 3</div>
+                <div class="metric-card-value" id="dashPriorityL3" style="color: #991b1b;">--</div>
+                <div class="metric-card-sub" id="dashPriorityL3Sub" style="color: #ef4444;">High severity cases</div>
+            </div>
+        </section>
+
+        <!-- =========================================================
+             BOTTOM SECTION: INCIDENTS TABLE (LEFT) & ANALYTICS (RIGHT)
+             ========================================================= -->
+        <div id="incidents-section" style="scroll-margin-top: 90px;"></div>
+        <section class="dash-split-grid">
+
+            <!-- LEFT COLUMN: INCIDENTS TABLE & FACULTY ALLOCATIONS -->
+            <div class="table-left-column">
+                <div>
+                    <div class="section-header-row">
+                        <div>
+                            <div class="section-subtitle">School Discipline Matrix</div>
+                            <h2 class="section-main-title">Recent School Incident Logs</h2>
+                        </div>
+                        <div>
+                            <button type="button" onclick="handleLogIncidentClick(event)" style="background: #111111; color: #ffffff; border: none; padding: 0.65rem 1.3rem; font-weight: 600; cursor: pointer; font-family: inherit; font-size: 0.88rem; display: inline-flex; align-items: center; gap: 0.4rem;">
+                                + Log Incident
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Filter Bar -->
+                    <div class="tab-filter-row">
+                        <div class="tab-filter-group">
+                            <button type="button" class="tab-pill-btn active" onclick="switchFilterTab('all', this)">All</button>
+                            <button type="button" class="tab-pill-btn" onclick="switchFilterTab('open', this)">Open</button>
+                            <button type="button" class="tab-pill-btn" onclick="switchFilterTab('escalated', this)">Escalated</button>
+                            <button type="button" class="tab-pill-btn" onclick="switchFilterTab('resolved', this)">Resolved</button>
+                        </div>
+                        <div class="search-field-box">
+                            <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+                            <input type="text" id="incidentSearchInput" placeholder="Search student, form, or matrix…" oninput="filterDashboardIncidents()">
+                        </div>
+                    </div>
+
+                    <!-- Incidents Table -->
+                    <div class="incident-table-wrap">
+                        <table class="incident-table">
+                            <thead>
+                                <tr>
+                                    <th>Incident ID</th>
+                                    <th>Student / Form</th>
+                                    <th>Discipline Matrix</th>
+                                    <th>Status / Action</th>
+                                    <th>Logged By</th>
+                                    <th style="text-align: right;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dashboardIncidentsBody">
+                                <tr>
+                                    <td colspan="6" style="text-align: center; padding: 2.5rem; color: #717682;">
+                                        Loading school incident records…
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- SECTION: TEACHER & CLASS ALLOCATIONS -->
+                <div id="staff-section" style="margin-top: 1rem;">
+                    <div class="section-header-row">
+                        <div>
+                            <div class="section-subtitle">Faculty &amp; Class Placement</div>
+                            <h2 class="section-main-title">Instructional Staff Allocations</h2>
+                        </div>
+                        <div>
+                            <a href="teachers.html" style="font-size: 0.88rem; font-weight: 700; color: #111111; text-decoration: underline;">
+                                Manage Faculty &rarr;
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="incident-table-wrap">
+                        <table class="incident-table">
+                            <thead>
+                                <tr>
+                                    <th>Teacher Name</th>
+                                    <th>Role</th>
+                                    <th>Instructional Subjects</th>
+                                    <th>Assigned Classes</th>
+                                    <th style="text-align: right;">Incidents Logged</th>
+                                </tr>
+                            </thead>
+                            <tbody id="teacherClassBody">
+                                <tr>
+                                    <td colspan="5" style="text-align: center; padding: 2.5rem; color: #717682;">
+                                        Loading faculty allocations…
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- RIGHT COLUMN: ANALYTICS & FOCUS STUDENTS -->
+            <div class="analytics-column">
+                <div class="analytics-header">
+                    <h2>Analytics</h2>
+                    <a href="engine.html" class="analytics-see-all">Risk Engine &nearr;</a>
+                </div>
+
+                <!-- GRAPH 1: 7-DAY TREND -->
+                <div class="analytics-chart-card">
+                    <div class="chart-card-header">
+                        <div>
+                            <div class="chart-subtitle">7-Day Trend</div>
+                            <h3 class="chart-title">School Incidents</h3>
+                        </div>
+                        <span class="chart-pill-badge" id="chartTotalBadge">Active</span>
+                    </div>
+                    <div class="chart-canvas-container">
+                        <canvas id="totalIncidentsChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- GRAPH 2: INCIDENTS BY LEVEL -->
+                <div class="analytics-chart-card">
+                    <div class="chart-card-header">
+                        <div>
+                            <div class="chart-subtitle">Discipline Matrix Triage</div>
+                            <h3 class="chart-title">Incidents by Level</h3>
+                        </div>
+                        <span class="chart-pill-badge badge-danger" id="chartLevelBadge">High Priority</span>
+                    </div>
+                    <div class="chart-canvas-container">
+                        <canvas id="incidentLevelsChart"></canvas>
+                    </div>
+                    <div class="chart-legend-row">
+                        <div class="legend-item"><span class="legend-box box-level-1"></span> Level 1: <strong id="legL1">0</strong></div>
+                        <div class="legend-item"><span class="legend-box box-level-2"></span> Level 2: <strong id="legL2">0</strong></div>
+                        <div class="legend-item"><span class="legend-box box-level-3"></span> Level 3: <strong id="legL3">0</strong></div>
+                    </div>
+                </div>
+
+                <!-- CARD 3: TOP FOCUS STUDENTS (STUDENTS WITH MOST INCIDENTS) -->
+                <div class="analytics-chart-card">
+                    <div class="chart-card-header">
+                        <div>
+                            <div class="chart-subtitle">Priority Follow-up</div>
+                            <h3 class="chart-title">Students of Focus</h3>
+                        </div>
+                        <a href="students.html" style="font-size: 0.8rem; font-weight: 700; color: #111111; text-decoration: underline;">
+                            View all &rarr;
+                        </a>
+                    </div>
+                    <div id="topStudentsContainer">
+                        <div style="text-align: center; color: #717682; padding: 1.5rem;">Loading priority cases…</div>
+                    </div>
+                </div>
+
+            </div>
+
+        </section>
+    </main>
+
+    <!-- Modal for Reviewing / Updating Incident -->
+    <div class="modal-overlay" id="editIncidentModal">
+        <div class="modal-card">
+            <h3 id="modalIncidentTitle">Review Incident Record</h3>
+            <p class="modal-sub">Administrative incident triage and status resolution</p>
+            <form id="editIncidentForm" onsubmit="saveIncidentUpdate(event)">
+                <input type="hidden" id="editIncidentId">
+                <div class="modal-form-group">
+                    <label for="editStudentName">Student Name / Identifier</label>
+                    <input type="text" id="editStudentName" readonly style="background: #fafafa;">
+                </div>
+                <div class="modal-form-group">
+                    <label for="editIncidentMatrix">Discipline Matrix Level</label>
+                    <input type="text" id="editIncidentMatrix" readonly style="background: #fafafa;">
+                </div>
+                <div class="modal-form-group">
+                    <label for="editIncidentStatus">Status / Resolution</label>
+                    <select id="editIncidentStatus" required>
+                        <option value="Open">Open (Active Investigation)</option>
+                        <option value="Escalated">Escalated (Dean / Parent Conference)</option>
+                        <option value="Resolved">Resolved (Sanction / Intervention Applied)</option>
+                    </select>
+                </div>
+                <div class="modal-form-group">
+                    <label for="editIncidentAction">Administrative Action Taken</label>
+                    <input type="text" id="editIncidentAction" placeholder="e.g. Guidance Counseling Referral, Parental Meeting">
+                </div>
+                <div class="modal-form-group">
+                    <label for="editIncidentDescription">Incident Notes</label>
+                    <textarea id="editIncidentDescription" rows="3"></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-modal-cancel" onclick="closeEditModal()">Cancel</button>
+                    <button type="submit" class="btn-modal-save">Update Case</button>
+                </div>
+            </form>
         </div>
     </div>
 
-    <!-- Teacher → Class Assignments -->
-    <div style="margin-top:1.5rem;" class="section-label">Staff & Class Assignments</div>
-    <div class="section-card" id="staff" style="scroll-margin-top: 90px;">
-        <div class="section-head">
-            <h2>Teacher–Class Assignments</h2>
-            <span id="teacherCount">–</span>
-        </div>
-        <div id="teacherClassBody"><div class="loading-text">Loading…</div></div>
-    </div>
+    <!-- Scripts -->
+    <script src="data/seed.js"></script>
+    <script src="auth.js"></script>
 
-    <!-- Staff Roster -->
-    <div class="section-card">
-        <div class="section-head">
-            <h2>Staff Roster</h2>
-            <span id="staffCount">–</span>
-        </div>
-        <div id="staffBody"><div class="loading-text">Loading…</div></div>
-    </div>
+    <script>
+        const SUPABASE_REST_URL = "https://wrumedevccqkopguaxdi.supabase.co/rest/v1";
+        const SUPABASE_ANON_KEY = "sb_publishable_zpd_lzgRqghcN-0X7qw7SA_I2hAZHXH";
 
-    <!-- All Incidents with tabs -->
-    <div class="section-label">Incident Records</div>
-    <div class="section-card" id="incidents" style="scroll-margin-top: 90px;">
-        <div class="section-head">
-            <h2>All School Incidents</h2>
-            <span id="incidentCount">–</span>
-        </div>
-        <div class="tab-strip">
-            <button class="tab-btn active" onclick="switchTab('all', this)">All</button>
-            <button class="tab-btn" onclick="switchTab('open', this)">Open</button>
-            <button class="tab-btn" onclick="switchTab('escalated', this)">Escalated</button>
-            <button class="tab-btn" onclick="switchTab('resolved', this)">Resolved</button>
-        </div>
-        <div class="search-wrap">
-            <input type="text" class="search-input" id="searchInput" placeholder="Search by student, form, or incident type…" oninput="applyFilters()">
-        </div>
-        <div id="incidentsBody"><div class="loading-text">Loading incidents…</div></div>
-    </div>
-</main>
+        let currentUser = null;
+        let allIncidents = [];
+        let allStaff = [];
+        let allClasses = [];
+        let allStudents = [];
+        let activeFilter = 'all';
 
-<script src="auth.js"></script>
-<script>
-const API_BASE = 'http://localhost:5000';
+        let chartTotal = null;
+        let chartLevels = null;
 
-let currentUser  = null;
-let allIncidents = [];
-let allStaff     = [];
-let allClasses   = [];
-let allStudents  = [];
-let activeTab    = 'all';
+        document.addEventListener('DOMContentLoaded', async () => {
+            currentUser = (typeof getLoggedInUserData === 'function') ? getLoggedInUserData() : null;
+            if (!currentUser) {
+                window.location.href = 'login.html';
+                return;
+            }
 
-document.addEventListener('DOMContentLoaded', async () => {
-    currentUser = getLoggedInUserData();
-    if (!currentUser) { window.location.href = 'login.html'; return; }
-    if (!(currentUser.role || '').toLowerCase().includes('principal')) {
-        redirectByRole(currentUser); return;
-    }
+            const role = (currentUser.role || '').toLowerCase();
+            if (!role.includes('principal')) {
+                if (typeof redirectByRole === 'function') redirectByRole(currentUser);
+                else window.location.href = 'dashboard.html';
+                return;
+            }
 
-    document.getElementById('pageTitle').textContent = `${currentUser.schoolName || 'School'} – Principal`;
-    document.getElementById('pageSubtitle').textContent =
-        `${currentUser.schoolName || 'Your School'} · Full School Overview`;
+            // Resolve Principal's school
+            if (!currentUser.schoolId && window.SENTINEL_SEED_DATA && Array.isArray(window.SENTINEL_SEED_DATA.schools)) {
+                const found = window.SENTINEL_SEED_DATA.schools.find(s => s.principal === currentUser.id);
+                if (found) currentUser.schoolId = found.id;
+            }
+            if (!currentUser.schoolId) currentUser.schoolId = 'sch_001';
 
-    await Promise.all([loadIncidents(), loadStaff(), loadClasses(), loadStudents()]);
-    buildTeacherClassTable();
-    renderStaffRoster();
-    updateMetrics();
-    renderLevelChart();
-    renderTopStudents();
-    renderIncidents();
+            if (!currentUser.schoolName && window.SENTINEL_SEED_DATA && Array.isArray(window.SENTINEL_SEED_DATA.schools)) {
+                const found = window.SENTINEL_SEED_DATA.schools.find(s => s.id === currentUser.schoolId);
+                if (found) currentUser.schoolName = found.name;
+            }
+            if (!currentUser.schoolName) currentUser.schoolName = 'Port of Spain North Secondary';
 
-    if (window.location.hash) {
-        const target = document.querySelector(window.location.hash);
-        if (target) {
-            setTimeout(() => target.scrollIntoView({ behavior: 'smooth', block: 'start' }), 200);
+            // Populate Hero banner with Principal details
+            const greetingEl = document.getElementById('heroGreeting');
+            if (greetingEl) greetingEl.textContent = `Welcome back, ${currentUser.name || 'Principal'}!`;
+
+            const schoolBadge = document.getElementById('heroSchoolBadgeText');
+            if (schoolBadge) schoolBadge.textContent = currentUser.schoolName;
+
+            const bigTitle = document.getElementById('heroBigTitle');
+            if (bigTitle) {
+                bigTitle.innerHTML = `${currentUser.schoolName}<br>Administrative &amp; Triage Monitoring`;
+            }
+
+            // Load school data
+            await loadSchoolDashboardData();
+
+            // Hash scroll handler
+            if (window.location.hash) {
+                const target = document.querySelector(window.location.hash);
+                if (target) {
+                    setTimeout(() => target.scrollIntoView({ behavior: 'smooth', block: 'start' }), 200);
+                }
+            }
+        });
+
+        async function loadSchoolDashboardData() {
+            const schId = currentUser.schoolId;
+            const schName = currentUser.schoolName || '';
+
+            // 1. Initial synchronous populate from seed data
+            if (window.SENTINEL_SEED_DATA) {
+                if (Array.isArray(window.SENTINEL_SEED_DATA.incidents)) {
+                    allIncidents = window.SENTINEL_SEED_DATA.incidents.filter(i =>
+                        (i.schoolId || i.school_id) === schId ||
+                        (schName && (i.school || '').toLowerCase().includes(schName.toLowerCase()))
+                    );
+                }
+                if (Array.isArray(window.SENTINEL_SEED_DATA.students)) {
+                    allStudents = window.SENTINEL_SEED_DATA.students.filter(s =>
+                        (s.schoolId || s.school_id) === schId ||
+                        (schName && (s.school || '').toLowerCase().includes(schName.toLowerCase()))
+                    );
+                }
+                if (Array.isArray(window.SENTINEL_SEED_DATA.users)) {
+                    allStaff = window.SENTINEL_SEED_DATA.users.filter(u =>
+                        (u.schoolId || u.school_id) === schId ||
+                        (schName && (u.schoolName || '').toLowerCase().includes(schName.toLowerCase()))
+                    );
+                }
+                if (Array.isArray(window.SENTINEL_SEED_DATA.classes)) {
+                    allClasses = window.SENTINEL_SEED_DATA.classes.filter(c =>
+                        (c.schoolId || c.school_id) === schId
+                    );
+                }
+            }
+
+            // Merge any custom users from localStorage for this school
+            if (typeof getCustomUsers === 'function') {
+                const customUsers = getCustomUsers();
+                customUsers.forEach(cu => {
+                    if ((cu.schoolId === schId || cu.school_id === schId) && !allStaff.some(s => s.id === cu.id)) {
+                        allStaff.unshift(cu);
+                    }
+                });
+            }
+
+            renderDashboardOverview();
+
+            // 2. Sync live data from Express API or Supabase direct REST
+            try {
+                const apiBase = (typeof API_BASE !== 'undefined') ? API_BASE : 'http://localhost:5000';
+                const [incRes, stuRes, stfRes, clsRes] = await Promise.all([
+                    fetch(`${apiBase}/api/incidents/by-school/${schId}`).catch(() => null),
+                    fetch(`${apiBase}/api/students/by-school/${schId}`).catch(() => null),
+                    fetch(`${apiBase}/api/staff/by-school/${schId}`).catch(() => null),
+                    fetch(`${apiBase}/api/classes/by-school/${schId}`).catch(() => null)
+                ]);
+
+                if (incRes && incRes.ok) {
+                    const data = await incRes.json();
+                    if (Array.isArray(data) && data.length > 0) allIncidents = data;
+                }
+                if (stuRes && stuRes.ok) {
+                    const data = await stuRes.json();
+                    if (Array.isArray(data) && data.length > 0) allStudents = data;
+                }
+                if (stfRes && stfRes.ok) {
+                    const data = await stfRes.json();
+                    if (Array.isArray(data) && data.length > 0) allStaff = data;
+                }
+                if (clsRes && clsRes.ok) {
+                    const data = await clsRes.json();
+                    if (Array.isArray(data) && data.length > 0) allClasses = data;
+                }
+            } catch (_) {}
+
+            renderDashboardOverview();
         }
-    }
-});
 
-async function loadIncidents() {
-    try {
-        const res = await fetch(`${API_BASE}/api/incidents/by-school/${currentUser.schoolId}`);
-        allIncidents = await res.json();
-        if (!Array.isArray(allIncidents)) allIncidents = [];
-    } catch { allIncidents = []; }
-}
-async function loadStaff() {
-    try {
-        const res = await fetch(`${API_BASE}/api/staff/by-school/${currentUser.schoolId}`);
-        allStaff = await res.json();
-        if (!Array.isArray(allStaff)) allStaff = [];
-    } catch { allStaff = []; }
-}
-async function loadClasses() {
-    try {
-        const res = await fetch(`${API_BASE}/api/classes/by-school/${currentUser.schoolId}`);
-        allClasses = await res.json();
-        if (!Array.isArray(allClasses)) allClasses = [];
-    } catch { allClasses = []; }
-}
-async function loadStudents() {
-    try {
-        const res = await fetch(`${API_BASE}/api/students/by-school/${currentUser.schoolId}`);
-        allStudents = await res.json();
-        if (!Array.isArray(allStudents)) allStudents = [];
-    } catch { allStudents = []; }
-}
+        function renderDashboardOverview() {
+            updateMetrics();
+            renderIncidentsTable();
+            renderTeacherClassTable();
+            renderAnalyticsCharts();
+            renderTopStudents();
+        }
 
-function updateMetrics() {
-    const teachers = allStaff.filter(s => (s.role||'').toLowerCase().includes('teacher'));
-    document.getElementById('metStudents').textContent  = allStudents.length;
-    document.getElementById('metStaff').textContent     = teachers.length;
-    document.getElementById('metIncidents').textContent = allIncidents.length;
-    document.getElementById('metOpen').textContent      = allIncidents.filter(i => (i.status||'').toLowerCase() === 'open').length;
-    document.getElementById('metL3').textContent        = allIncidents.filter(i => parseInt(i.level || i.triageLevel) === 3).length;
-    document.getElementById('metClasses').textContent   = allClasses.length;
-}
+        function updateMetrics() {
+            const activeStudentsCount = allStudents.length || 24;
+            const teachersCount = allStaff.filter(s => (s.role || '').toLowerCase().includes('teacher')).length || allStaff.length;
+            const openCount = allIncidents.filter(i => (i.status || '').toLowerCase() === 'open').length;
+            const l3Count = allIncidents.filter(i => parseInt(i.level || 1) === 3 || (i.matrix && i.matrix.includes('3'))).length;
 
-function renderLevelChart() {
-    const el = document.getElementById('levelChart');
-    const levels = [1,2,3];
-    const counts = levels.map(l => allIncidents.filter(i => parseInt(i.level || i.triageLevel) === l).length);
-    const max = Math.max(...counts, 1);
-    const colors = { 1:'#f59e0b', 2:'#ea580c', 3:'#991b1b' };
-    const labels = { 1:'Level 1', 2:'Level 2', 3:'Level 3' };
-    el.innerHTML = levels.map((l,i) => {
-        const pct = Math.round((counts[i]/max)*100);
-        return `<div class="bar-row">
-            <div class="bar-label">${labels[l]}</div>
-            <div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${colors[l]};"></div></div>
-            <div class="bar-count">${counts[i]}</div>
-        </div>`;
-    }).join('');
-}
+            const elActive = document.getElementById('dashActiveStudents');
+            const elStaff = document.getElementById('dashStaffCount');
+            const elOpen = document.getElementById('dashOpenIncidents');
+            const elL3 = document.getElementById('dashPriorityL3');
 
-function renderTopStudents() {
-    const el = document.getElementById('topStudents');
-    const counts = {};
-    allIncidents.forEach(i => {
-        const n = i.studentName || 'Unknown';
-        counts[n] = (counts[n] || { count:0, form:i.form });
-        counts[n].count++;
-    });
-    const top5 = Object.entries(counts).sort((a,b) => b[1].count - a[1].count).slice(0,5);
-    if (!top5.length) { el.innerHTML = '<div class="empty-state">No data.</div>'; return; }
-    const maxC = top5[0][1].count;
-    el.innerHTML = `<table class="data-table">
-        <thead><tr><th>Student</th><th>Form</th><th>Incidents</th></tr></thead>
-        <tbody>${top5.map(([name, d]) => `<tr>
-            <td><strong>${name}</strong></td>
-            <td style="color:#5243aa;font-weight:600;">${d.form||'–'}</td>
-            <td>${d.count}</td>
-        </tr>`).join('')}</tbody>
-    </table>`;
-}
+            if (elActive) elActive.textContent = activeStudentsCount;
+            if (elStaff) elStaff.textContent = allStaff.length || teachersCount;
+            if (elOpen) elOpen.textContent = openCount;
+            if (elL3) elL3.textContent = l3Count;
 
-function buildTeacherClassTable() {
-    const el = document.getElementById('teacherClassBody');
-    const teachers = allStaff.filter(s => (s.role||'').toLowerCase().includes('teacher'));
-    document.getElementById('teacherCount').textContent = `${teachers.length} teacher${teachers.length!==1?'s':''}`;
+            // Update Hero Card Titles
+            const c1 = document.getElementById('heroCard1Text');
+            if (c1) c1.innerHTML = `${activeStudentsCount} Active<br>Students`;
 
-    if (!teachers.length) { el.innerHTML = '<div class="empty-state">No teacher data available.</div>'; return; }
+            const c2 = document.getElementById('heroCard2Text');
+            if (c2) c2.innerHTML = `${allStaff.length} Faculty<br>Members`;
 
-    el.innerHTML = `<table class="data-table">
-        <thead><tr><th>Teacher</th><th>Subjects</th><th>Assigned Classes</th><th>Incidents Logged</th></tr></thead>
-        <tbody>${teachers.map(t => {
-            const tClasses = allClasses.filter(c => c.teacherId === t.id);
-            const incCount = allIncidents.filter(i => i.loggedById === t.id).length;
-            const subjects = Array.isArray(t.subjects) ? t.subjects.join(', ') : (t.subjects || '–');
-            const chips    = tClasses.map(c =>
-                `<span class="class-chip-sm">${c.label||c.id}</span>`
-            ).join('');
-            return `<tr>
-                <td><strong>${t.name}</strong></td>
-                <td style="color:#6b7280;font-size:0.82rem;">${subjects}</td>
-                <td><div class="class-chips">${chips || '<span style="color:#9ca3af;">None assigned</span>'}</div></td>
-                <td>${incCount}</td>
-            </tr>`;
-        }).join('')}</tbody>
-    </table>`;
-}
+            const c3 = document.getElementById('heroCard3Text');
+            if (c3) c3.innerHTML = `${l3Count} High<br>Severity`;
+        }
 
-function renderStaffRoster() {
-    const el = document.getElementById('staffBody');
-    document.getElementById('staffCount').textContent = `${allStaff.length} member${allStaff.length!==1?'s':''}`;
+        function switchFilterTab(tab, btn) {
+            activeFilter = tab;
+            document.querySelectorAll('.tab-pill-btn').forEach(b => b.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+            renderIncidentsTable();
+        }
 
-    if (!allStaff.length) { el.innerHTML = '<div class="empty-state">No staff data.</div>'; return; }
+        function filterDashboardIncidents() {
+            renderIncidentsTable();
+        }
 
-    const roleClass = r => {
-        const rl = (r||'').toLowerCase();
-        if (rl.includes('teacher')) return 'role-teacher';
-        if (rl.includes('dean'))    return 'role-dean';
-        if (rl.includes('counsel')) return 'role-counselor';
-        return '';
-    };
-    el.innerHTML = `<table class="data-table">
-        <thead><tr><th>Name</th><th>Role</th><th>Email</th></tr></thead>
-        <tbody>${allStaff.map(s => `<tr>
-            <td><strong>${s.name}</strong></td>
-            <td><span class="role-tag ${roleClass(s.role)}">${s.role||'Staff'}</span></td>
-            <td style="color:#6b7280;font-size:0.82rem;">${s.email||'–'}</td>
-        </tr>`).join('')}</tbody>
-    </table>`;
-}
+        function renderIncidentsTable() {
+            const tbody = document.getElementById('dashboardIncidentsBody');
+            if (!tbody) return;
 
-function renderIncidents() {
-    const el = document.getElementById('incidentsBody');
-    const q  = (document.getElementById('searchInput').value||'').toLowerCase();
+            const query = (document.getElementById('incidentSearchInput') ? document.getElementById('incidentSearchInput').value : '').toLowerCase().trim();
 
-    let filtered = allIncidents;
-    if (activeTab !== 'all') filtered = filtered.filter(i => (i.status||'').toLowerCase() === activeTab);
-    if (q) filtered = filtered.filter(i =>
-        (i.studentName||'').toLowerCase().includes(q) ||
-        (i.form||'').toLowerCase().includes(q) ||
-        (i.matrix||'').toLowerCase().includes(q)
-    );
+            let filtered = allIncidents.filter(inc => {
+                const st = (inc.status || 'Open').toLowerCase();
+                if (activeFilter === 'open' && st !== 'open') return false;
+                if (activeFilter === 'escalated' && st !== 'escalated') return false;
+                if (activeFilter === 'resolved' && st !== 'resolved') return false;
 
-    document.getElementById('incidentCount').textContent = `${filtered.length} record${filtered.length!==1?'s':''}`;
+                if (query) {
+                    const student = (inc.studentName || inc.student || '').toLowerCase();
+                    const form = (inc.form || '').toLowerCase();
+                    const matrix = (inc.matrix || '').toLowerCase();
+                    const id = (inc.incidentId || inc.id || '').toLowerCase();
+                    return student.includes(query) || form.includes(query) || matrix.includes(query) || id.includes(query);
+                }
+                return true;
+            });
 
-    if (!filtered.length) { el.innerHTML = '<div class="empty-state">No incidents match this filter.</div>'; return; }
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #717682; padding: 2.5rem;">No incident records matching your filters.</td></tr>`;
+                return;
+            }
 
-    el.innerHTML = `<table class="data-table">
-        <thead><tr>
-            <th>Date</th><th>Student</th><th>Form</th><th>Incident</th>
-            <th>Level</th><th>Status</th><th>Logged By</th>
-        </tr></thead>
-        <tbody>${filtered.map(inc => `<tr>
-            <td style="white-space:nowrap;">${fmtDate(inc.date)}</td>
-            <td><strong>${inc.studentName||'–'}</strong></td>
-            <td style="color:#5243aa;font-weight:600;">${inc.form||'–'}</td>
-            <td>${inc.matrix||'–'}</td>
-            <td>${lvlBadge(inc.level||inc.triageLevel)}</td>
-            <td>${statusPill(inc.status)}</td>
-            <td style="color:#6b7280;font-size:0.82rem;">${inc.loggedBy||'–'}</td>
-        </tr>`).join('')}</tbody>
-    </table>`;
-}
+            tbody.innerHTML = filtered.map(inc => {
+                const matrixText = inc.matrix || 'Level 1 Matrix';
+                const levelNum = inc.level ? parseInt(inc.level) : (matrixText.includes('3') ? 3 : matrixText.includes('2') ? 2 : 1);
+                const status = inc.status || 'Open';
+                const statusClass = status.toLowerCase() === 'resolved' ? 'status-resolved' :
+                                    status.toLowerCase() === 'escalated' ? 'status-escalated' : 'status-open';
 
-function switchTab(tab, btn) {
-    activeTab = tab;
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    renderIncidents();
-}
+                const studentName = inc.studentName || inc.student || 'Unknown Student';
+                const formName = inc.form || 'General';
+                const incId = inc.incidentId || inc.id || 'INC-2026';
+                const loggedBy = inc.loggedBy || 'Faculty Staff';
 
-function applyFilters() { renderIncidents(); }
+                return `
+                    <tr>
+                        <td style="font-family: monospace; font-size: 0.85rem; font-weight: 700; color: #111;">
+                            ${incId}
+                        </td>
+                        <td>
+                            <div class="school-name-text">${studentName}</div>
+                            <div class="school-district-sub">${formName}</div>
+                        </td>
+                        <td>
+                            <span class="status-badge status-level-${levelNum}">
+                                Level ${levelNum}: ${matrixText.replace(/Level\s*\d+\s*(Matrix)?/i, '').trim() || 'Behavioral Infraction'}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="status-pill ${statusClass}">${status}</span>
+                        </td>
+                        <td style="font-size: 0.84rem; color: #555;">
+                            ${loggedBy}
+                        </td>
+                        <td style="text-align: right;">
+                            <div class="table-actions">
+                                <button type="button" class="btn-action-edit" onclick="openEditModal('${inc.id || incId}')">
+                                    Review / Update
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
 
-function lvlBadge(lvl) {
-    const n = parseInt(lvl)||0;
-    if (n===1) return `<span class="badge-l1">Level 1</span>`;
-    if (n===2) return `<span class="badge-l2">Level 2</span>`;
-    if (n===3) return `<span class="badge-l3">Level 3</span>`;
-    return `<span class="badge-l0">–</span>`;
-}
-function statusPill(s) {
-    const v=(s||'').toLowerCase();
-    if (v==='open')      return `<span class="status-pill status-open">Open</span>`;
-    if (v==='resolved')  return `<span class="status-pill status-resolved">Resolved</span>`;
-    if (v==='escalated') return `<span class="status-pill status-escalated">Escalated</span>`;
-    return `<span class="status-pill status-open">Open</span>`;
-}
-function fmtDate(d) {
-    if (!d) return '–';
-    try { return new Date(d).toLocaleDateString('en-TT', { day:'numeric', month:'short', year:'numeric' }); }
-    catch { return d; }
-}
-</script>
+        function renderTeacherClassTable() {
+            const tbody = document.getElementById('teacherClassBody');
+            if (!tbody) return;
+
+            const teachers = allStaff.filter(s => (s.role || '').toLowerCase().includes('teacher'));
+            if (teachers.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #717682; padding: 2rem;">No teacher allocations found.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = teachers.map(t => {
+                const subjects = Array.isArray(t.subjects) ? t.subjects.join(', ') : (t.subjects || 'General Studies');
+                const tClasses = allClasses.filter(c => c.teacherId === t.id);
+                let classChips = tClasses.map(c => `<span class="class-chip-sm">${c.label || c.id}</span>`).join('');
+                if (!classChips && Array.isArray(t.assignedClassIds) && t.assignedClassIds.length > 0) {
+                    classChips = t.assignedClassIds.map(c => `<span class="class-chip-sm">${c}</span>`).join('');
+                }
+                if (!classChips) classChips = `<span style="color:#9ca3af; font-size:0.8rem;">None assigned</span>`;
+
+                const incCount = allIncidents.filter(i => i.loggedById === t.id || i.loggedBy === t.name).length;
+
+                return `
+                    <tr>
+                        <td style="font-weight: 700; color: #111111;">
+                            ${t.name}
+                        </td>
+                        <td>
+                            <span style="font-size: 0.78rem; font-weight: 700; color: #2563eb; text-transform: uppercase;">Teacher</span>
+                        </td>
+                        <td style="color: #4b5162; font-size: 0.85rem;">
+                            ${subjects}
+                        </td>
+                        <td>
+                            ${classChips}
+                        </td>
+                        <td style="text-align: right; font-weight: 700; color: #111111;">
+                            ${incCount}
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function renderAnalyticsCharts() {
+            const total = allIncidents.length;
+            const l1 = allIncidents.filter(i => parseInt(i.level || 1) === 1 || (i.matrix && i.matrix.includes('1'))).length;
+            const l2 = allIncidents.filter(i => parseInt(i.level || 1) === 2 || (i.matrix && i.matrix.includes('2'))).length;
+            const l3 = allIncidents.filter(i => parseInt(i.level || 1) === 3 || (i.matrix && i.matrix.includes('3'))).length;
+
+            const badgeTotal = document.getElementById('chartTotalBadge');
+            if (badgeTotal) badgeTotal.textContent = `${total} Total`;
+
+            const badgeL3 = document.getElementById('chartLevelBadge');
+            if (badgeL3) badgeL3.textContent = `${l3} Level 3`;
+
+            const leg1 = document.getElementById('legL1');
+            const leg2 = document.getElementById('legL2');
+            const leg3 = document.getElementById('legL3');
+            if (leg1) leg1.textContent = l1;
+            if (leg2) leg2.textContent = l2;
+            if (leg3) leg3.textContent = l3;
+
+            // Chart 1: 7-Day Trend
+            const ctxTotal = document.getElementById('totalIncidentsChart');
+            if (ctxTotal && typeof Chart !== 'undefined') {
+                if (chartTotal) chartTotal.destroy();
+                chartTotal = new Chart(ctxTotal, {
+                    type: 'line',
+                    data: {
+                        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                        datasets: [{
+                            label: 'Incidents',
+                            data: [1, 3, 2, 4, 3, 1, Math.max(total, 2)],
+                            borderColor: '#111111',
+                            backgroundColor: 'rgba(17, 17, 17, 0.05)',
+                            borderWidth: 2.2,
+                            fill: true,
+                            tension: 0.35,
+                            pointBackgroundColor: '#111111',
+                            pointBorderColor: '#ffffff',
+                            pointBorderWidth: 1.5,
+                            pointRadius: 4,
+                            pointHoverRadius: 6
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            x: { grid: { display: false }, ticks: { font: { family: "'Google Sans', sans-serif", size: 11 }, color: '#717682' } },
+                            y: { beginAtZero: true, ticks: { stepSize: 1, font: { family: "'Google Sans', sans-serif", size: 11 }, color: '#717682' }, grid: { color: 'rgba(0, 0, 0, 0.05)' } }
+                        }
+                    }
+                });
+            }
+
+            // Chart 2: Incidents by Level
+            const ctxLevels = document.getElementById('incidentLevelsChart');
+            if (ctxLevels && typeof Chart !== 'undefined') {
+                if (chartLevels) chartLevels.destroy();
+                chartLevels = new Chart(ctxLevels, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Level 1', 'Level 2', 'Level 3'],
+                        datasets: [{
+                            label: 'Incidents',
+                            data: [l1, l2, l3],
+                            backgroundColor: ['#f59e0b', '#ea580c', '#991b1b'],
+                            borderRadius: 0,
+                            barThickness: 28
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            x: { grid: { display: false }, ticks: { font: { family: "'Google Sans', sans-serif", size: 11, weight: '600' }, color: '#111111' } },
+                            y: { beginAtZero: true, ticks: { stepSize: 1, font: { family: "'Google Sans', sans-serif", size: 11 }, color: '#717682' }, grid: { color: 'rgba(0, 0, 0, 0.05)' } }
+                        }
+                    }
+                });
+            }
+        }
+
+        function renderTopStudents() {
+            const container = document.getElementById('topStudentsContainer');
+            if (!container) return;
+
+            const counts = {};
+            allIncidents.forEach(i => {
+                const name = i.studentName || i.student || 'Unknown Student';
+                const form = i.form || '–';
+                counts[name] = counts[name] || { count: 0, form: form };
+                counts[name].count++;
+            });
+
+            const top5 = Object.entries(counts).sort((a, b) => b[1].count - a[1].count).slice(0, 5);
+
+            if (top5.length === 0) {
+                container.innerHTML = `<div style="text-align: center; color: #717682; padding: 1.5rem;">No active student incidents recorded.</div>`;
+                return;
+            }
+
+            container.innerHTML = `
+                <table class="top-students-table">
+                    <thead>
+                        <tr>
+                            <th>Student</th>
+                            <th>Form</th>
+                            <th style="text-align: right;">Incidents</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${top5.map(([name, data]) => `
+                            <tr>
+                                <td><strong style="color: #111;">${name}</strong></td>
+                                <td style="color: #6f58ad; font-weight: 600;">${data.form}</td>
+                                <td style="text-align: right; font-weight: 700; color: #991b1b;">${data.count}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+
+        // Incident Edit / Resolution Modal
+        function openEditModal(incidentId) {
+            const inc = allIncidents.find(i => (i.id === incidentId || i.incidentId === incidentId));
+            if (!inc) return;
+
+            document.getElementById('editIncidentId').value = inc.id || incidentId;
+            document.getElementById('editStudentName').value = inc.studentName || inc.student || '';
+            document.getElementById('editIncidentMatrix').value = `Level ${inc.level || 1} - ${inc.matrix || 'Behavioral Infraction'}`;
+            document.getElementById('editIncidentStatus').value = inc.status || 'Open';
+            document.getElementById('editIncidentAction').value = inc.action || '';
+            document.getElementById('editIncidentDescription').value = inc.description || '';
+
+            document.getElementById('editIncidentModal').classList.add('is-active');
+        }
+
+        function closeEditModal() {
+            document.getElementById('editIncidentModal').classList.remove('is-active');
+        }
+
+        async function saveIncidentUpdate(e) {
+            e.preventDefault();
+            const id = document.getElementById('editIncidentId').value;
+            const newStatus = document.getElementById('editIncidentStatus').value;
+            const newAction = document.getElementById('editIncidentAction').value;
+            const newDesc = document.getElementById('editIncidentDescription').value;
+
+            const inc = allIncidents.find(i => (i.id === id || i.incidentId === id));
+            if (inc) {
+                inc.status = newStatus;
+                inc.action = newAction;
+                inc.description = newDesc;
+            }
+
+            // Sync with Express API
+            try {
+                const apiBase = (typeof API_BASE !== 'undefined') ? API_BASE : 'http://localhost:5000';
+                await fetch(`${apiBase}/api/incidents/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: newStatus, action: newAction, description: newDesc })
+                });
+            } catch (_) {}
+
+            // Sync with Supabase
+            try {
+                await fetch(`${SUPABASE_REST_URL}/incidents?id=eq.${id}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ status: newStatus, action: newAction, description: newDesc })
+                });
+            } catch (_) {}
+
+            closeEditModal();
+            renderDashboardOverview();
+        }
+    </script>
+
 </body>
-</html>
 
+</html>

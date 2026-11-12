@@ -552,6 +552,8 @@
             <ul class="nav-links">
                 <li><a href="dashboard.html">Dashboard</a></li>
                 <li><a href="students.html">Students</a></li>
+                <li><a href="schools.html">Schools</a></li>
+                <li><a href="teachers.html">Teachers</a></li>
                 <li><a href="incidents.html" style="font-weight: 700; color: #000;">Incidents</a></li>
                 <li><a href="engine.html">Engine</a></li>
             </ul>
@@ -588,14 +590,38 @@
         <section class="log-form-section" id="logFormSection">
             <div class="log-form-title">Log New Incident</div>
             <form onsubmit="submitIncident(event)">
+                <div id="incFormError" style="display:none; color:#991b1b; background:#fee2e2; border:1px solid #f87171; padding:0.65rem 0.85rem; border-radius:4px; font-size:0.85rem; margin-bottom:1rem; font-weight:600; grid-column:1 / -1;"></div>
+
                 <div class="form-grid">
                     <div class="form-group">
                         <label for="incStudentId">Student Name or ID</label>
-                        <input type="text" id="incStudentId" class="form-control" placeholder="e.g. Marcus Aurelius or STU-2026-001" required>
+                        <input type="text" id="incStudentId" list="registeredStudentsDatalist" class="form-control" placeholder="Type or select student…" required autocomplete="off" oninput="handleStudentAutocomplete(this.value)">
+                        <datalist id="registeredStudentsDatalist"></datalist>
+                        <small id="stuVerifiedBadge" style="display:none; color:#15803d; font-size:0.75rem; font-weight:700; margin-top:0.25rem;">✓ Verified Enrolled Student</small>
                     </div>
                     <div class="form-group">
                         <label for="incStudentForm">Student Form / Class</label>
                         <input type="text" id="incStudentForm" class="form-control" placeholder="e.g. Form 4-B" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="incDate">Incident Date</label>
+                        <input type="date" id="incDate" class="form-control" required onchange="clearIncFormError()">
+                    </div>
+                    <div class="form-group">
+                        <label for="incLocation">Location on Compound</label>
+                        <select id="incLocation" class="form-control" required onchange="clearIncFormError()">
+                            <option value="">Select location…</option>
+                            <option value="Classroom">Classroom</option>
+                            <option value="Corridor / Hallway">Corridor / Hallway</option>
+                            <option value="Cafeteria / Canteen">Cafeteria / Canteen</option>
+                            <option value="Playfield / Sports Court">Playfield / Sports Court</option>
+                            <option value="School Compound Gate / Perimeter">School Compound Gate / Perimeter</option>
+                            <option value="Restroom">Restroom</option>
+                            <option value="Science / Computer Lab">Science / Computer Lab</option>
+                            <option value="Staff Room / Administrative Area">Staff Room / Administrative Area</option>
+                            <option value="Off Compound / Commute">Off Compound / Commute</option>
+                            <option value="Online / Cyberbullying">Online / Cyberbullying</option>
+                        </select>
                     </div>
                     <div class="form-group">
                         <label for="incSchool">School / Institution</label>
@@ -603,19 +629,20 @@
                     </div>
                     <div class="form-group">
                         <label for="incDistrict">Educational District</label>
-                        <select id="incDistrict" class="form-control" required>
+                        <select id="incDistrict" class="form-control" required onchange="clearIncFormError()">
                             <option value="">Select district…</option>
-                            <option>St. George East District</option>
-                            <option>Victoria Educational District</option>
-                            <option>Caroni Educational District</option>
-                            <option>Tobago Educational District</option>
-                            <option>St. Patrick Educational District</option>
-                            <option>Nariva/Mayaro District</option>
+                            <option value="St. George East District">St. George East District</option>
+                            <option value="Victoria Educational District">Victoria Educational District</option>
+                            <option value="Caroni Educational District">Caroni Educational District</option>
+                            <option value="Tobago Educational District">Tobago Educational District</option>
+                            <option value="St. Patrick Educational District">St. Patrick Educational District</option>
+                            <option value="Port of Spain & Environs District">Port of Spain & Environs District</option>
+                            <option value="North Eastern Educational District">North Eastern Educational District</option>
                         </select>
                     </div>
                     <div class="form-group">
                         <label for="incMatrix">Discipline Matrix Level</label>
-                        <select id="incMatrix" class="form-control" required>
+                        <select id="incMatrix" class="form-control" required onchange="handleMatrixLevelChange(this.value)">
                             <option value="">Select level…</option>
                             <option value="Level 1 Matrix">Level 1 — Minor Infraction</option>
                             <option value="Level 2 Matrix">Level 2 — Moderate Infraction</option>
@@ -624,19 +651,26 @@
                     </div>
                     <div class="form-group">
                         <label for="incAction">Initial Action Taken</label>
-                        <select id="incAction" class="form-control" required>
+                        <select id="incAction" class="form-control" required onchange="clearIncFormError()">
                             <option value="">Select action…</option>
-                            <option>Guidance Counseling Referral</option>
-                            <option>Peer Mediation Protocol</option>
-                            <option>Parent Conference Logged</option>
-                            <option>Dean Formal Review</option>
-                            <option>Ministry Escalated Review</option>
-                            <option>External Support Assigned</option>
+                            <option value="Classroom Privileges Review / Reflection Log">Classroom Privileges Review / Reflection Log</option>
+                            <option value="Teacher Warning & Conference">Teacher Warning & Conference</option>
+                            <option value="Guidance Counseling Referral">Guidance Counseling Referral</option>
+                            <option value="Peer Mediation Protocol">Peer Mediation Protocol</option>
+                            <option value="Parent Conference Logged">Parent Conference Logged</option>
+                            <option value="Dean Formal Review">Dean Formal Review</option>
+                            <option value="Administrative Suspension">Administrative Suspension</option>
+                            <option value="Ministry Escalated Review">Ministry Escalated Review</option>
+                            <option value="External Support Assigned">External Support Assigned</option>
                         </select>
                     </div>
                     <div class="form-group full-width">
-                        <label for="incDescription">Incident Description</label>
-                        <textarea id="incDescription" class="form-control" placeholder="Briefly describe the incident circumstances…" required></textarea>
+                        <label for="incDescription">Incident Description <span style="font-weight:400; text-transform:none; color:#64748b;">(Detailed factual summary)</span></label>
+                        <textarea id="incDescription" class="form-control" placeholder="Describe the incident circumstances, involved parties, and immediate response in detail (minimum 25 characters)…" required minlength="25" oninput="updateDescCharCount()"></textarea>
+                        <div style="display:flex; justify-content:space-between; margin-top:0.25rem;">
+                            <small id="descCharCount" style="color:#64748b; font-size:0.75rem;">Minimum 25 characters (0 / 25)</small>
+                            <small id="descMinHint" style="color:#dc2626; font-size:0.75rem; display:none;">Requires at least 25 characters</small>
+                        </div>
                     </div>
                 </div>
                 <div class="form-actions">
@@ -696,20 +730,33 @@
     <div class="modal-overlay" id="editIncidentModal">
         <div class="modal-card">
             <h3 id="modalIncidentTitle">Update Incident Record</h3>
-            <p class="modal-sub">Administrative Incident Review & Matrix Classification</p>
+            <p class="modal-sub" id="modalIncidentSub">Administrative Incident Review & Matrix Classification</p>
+            <div id="deanEditNotice" style="display:none; color:#92400e; background:#fef3c7; border:1px solid #fcd34d; padding:0.6rem 0.85rem; border-radius:4px; font-size:0.82rem; margin-bottom:1rem; font-weight:600;">
+                ⚠ Dean Permission: You are authorized to update the incident status only. Other fields are locked.
+            </div>
             <form id="editIncidentForm" onsubmit="saveIncidentUpdate(event)">
                 <input type="hidden" id="editIncidentId">
+                <div id="editIncFormError" style="display:none; color:#991b1b; background:#fee2e2; border:1px solid #f87171; padding:0.65rem 0.85rem; border-radius:4px; font-size:0.85rem; margin-bottom:1rem; font-weight:600;"></div>
+
                 <div class="modal-form-group">
                     <label for="editStudentName">Student / Class</label>
-                    <input type="text" id="editStudentName" required>
+                    <input type="text" id="editStudentName" required minlength="3">
                 </div>
                 <div class="modal-form-group">
                     <label for="editSchool">Institution / School</label>
-                    <input type="text" id="editSchool" required>
+                    <input type="text" id="editSchool" required minlength="3">
                 </div>
                 <div class="modal-form-group">
                     <label for="editDistrict">District</label>
-                    <input type="text" id="editDistrict" required>
+                    <select id="editDistrict" required>
+                        <option value="St. George East District">St. George East District</option>
+                        <option value="Victoria Educational District">Victoria Educational District</option>
+                        <option value="Caroni Educational District">Caroni Educational District</option>
+                        <option value="Tobago Educational District">Tobago Educational District</option>
+                        <option value="St. Patrick Educational District">St. Patrick Educational District</option>
+                        <option value="Port of Spain & Environs District">Port of Spain & Environs District</option>
+                        <option value="North Eastern Educational District">North Eastern Educational District</option>
+                    </select>
                 </div>
                 <div class="modal-form-group">
                     <label for="editMatrix">Discipline Matrix</label>
@@ -721,7 +768,7 @@
                 </div>
                 <div class="modal-form-group">
                     <label for="editAction">Status / Action Taken</label>
-                    <input type="text" id="editAction" required placeholder="e.g. Dean Formal Review">
+                    <input type="text" id="editAction" required placeholder="e.g. Dean Formal Review" minlength="3">
                 </div>
                 <div class="modal-form-group">
                     <label for="editStatus">Case Status</label>
@@ -732,61 +779,8 @@
                     </select>
                 </div>
                 <div class="modal-form-group">
-                    <label for="editDescription">Incident Description</label>
-                    <textarea id="editDescription" rows="3" placeholder="Brief circumstances..."></textarea>
-                </div>
-                <div class="modal-actions">
-                    <button type="button" class="btn-modal-cancel" onclick="closeEditModal()">Cancel</button>
-                    <button type="submit" class="btn-modal-save">Save Changes</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    </main>
-
-    <!-- Modal for Editing Incident (Ministry Officer Only) -->
-    <div class="modal-overlay" id="editIncidentModal">
-        <div class="modal-card">
-            <h3 id="modalIncidentTitle">Update Incident Record</h3>
-            <p class="modal-sub">Administrative Incident Review &amp; Matrix Classification</p>
-            <form id="editIncidentForm" onsubmit="saveIncidentUpdate(event)">
-                <input type="hidden" id="editIncidentId">
-                <div class="modal-form-group">
-                    <label for="editStudentName">Student / Class</label>
-                    <input type="text" id="editStudentName" required>
-                </div>
-                <div class="modal-form-group">
-                    <label for="editSchool">Institution / School</label>
-                    <input type="text" id="editSchool" required>
-                </div>
-                <div class="modal-form-group">
-                    <label for="editDistrict">District</label>
-                    <input type="text" id="editDistrict" required>
-                </div>
-                <div class="modal-form-group">
-                    <label for="editMatrix">Discipline Matrix</label>
-                    <select id="editMatrix">
-                        <option value="Level 1 Matrix">Level 1 Matrix (Minor Infraction)</option>
-                        <option value="Level 2 Matrix">Level 2 Matrix (Moderate Violation)</option>
-                        <option value="Level 3 Matrix">Level 3 Matrix (Severe / Criminal)</option>
-                    </select>
-                </div>
-                <div class="modal-form-group">
-                    <label for="editAction">Action Taken</label>
-                    <input type="text" id="editAction" required placeholder="e.g. Dean Formal Review">
-                </div>
-                <div class="modal-form-group">
-                    <label for="editStatus">Case Status</label>
-                    <select id="editStatus">
-                        <option value="Open">Open</option>
-                        <option value="Resolved">Resolved</option>
-                        <option value="Escalated">Escalated</option>
-                    </select>
-                </div>
-                <div class="modal-form-group">
-                    <label for="editDescription">Incident Description</label>
-                    <textarea id="editDescription" rows="3" placeholder="Brief circumstances..."></textarea>
+                    <label for="editDescription">Incident Description <span style="font-weight:400; text-transform:none; color:#64748b;">(min 25 characters)</span></label>
+                    <textarea id="editDescription" rows="3" placeholder="Brief circumstances..." required minlength="25"></textarea>
                 </div>
                 <div class="modal-actions">
                     <button type="button" class="btn-modal-cancel" onclick="closeEditModal()">Cancel</button>
@@ -821,6 +815,10 @@
             ? [...window.SENTINEL_SEED_DATA.incidents]
             : [];
         let isMinistryUser = false;
+        let isDeanUser = false;
+        let isPrincipalUser = false;
+        let principalSchoolId = null;
+        let principalSchoolName = null;
 
         function getApiUrl(path) {
             const base = (typeof API_BASE !== 'undefined' && API_BASE) ? API_BASE : 'http://localhost:5000';
@@ -838,6 +836,7 @@
             if (userData) {
                 const r = (userData.role || '').toLowerCase();
                 isMinistryUser = r.includes('ministry') || r.includes('officer');
+                isDeanUser = r.includes('dean');
             }
         })();
 
@@ -863,10 +862,40 @@
             if (userData) {
                 const r = (userData.role || '').toLowerCase();
                 isMinistryUser = r.includes('ministry') || r.includes('officer');
+                isDeanUser = r.includes('dean');
+                if (r.includes('principal')) {
+                    isPrincipalUser = true;
+                    principalSchoolId = userData.schoolId || userData.school_id;
+                    if (!principalSchoolId && typeof window !== 'undefined' && window.SENTINEL_SEED_DATA && Array.isArray(window.SENTINEL_SEED_DATA.schools)) {
+                        const sch = window.SENTINEL_SEED_DATA.schools.find(s => s.principal === userData.id);
+                        if (sch) principalSchoolId = sch.id;
+                    }
+                    if (!principalSchoolId) principalSchoolId = 'sch_001';
+                    principalSchoolName = userData.schoolName;
+                    if (!principalSchoolName && typeof window !== 'undefined' && window.SENTINEL_SEED_DATA && Array.isArray(window.SENTINEL_SEED_DATA.schools)) {
+                        const sch = window.SENTINEL_SEED_DATA.schools.find(s => s.id === principalSchoolId);
+                        if (sch) principalSchoolName = sch.name;
+                    }
+                    if (!principalSchoolName) principalSchoolName = 'Port of Spain North Secondary';
+
+                    const h1 = document.querySelector('.page-header h1');
+                    if (h1) h1.textContent = `${principalSchoolName} – Incident Reports`;
+                    const p = document.querySelector('.page-header p');
+                    if (p) p.textContent = `Behavioral & discipline incidents recorded at ${principalSchoolName}`;
+
+                    allIncidents = allIncidents.filter(inc => {
+                        const incSchId = inc.schoolId || inc.school_id;
+                        const incSchName = inc.school || '';
+                        return (incSchId && incSchId === principalSchoolId) ||
+                               (principalSchoolName && incSchName.toLowerCase().includes(principalSchoolName.toLowerCase())) ||
+                               (principalSchoolName && principalSchoolName.toLowerCase().includes(incSchName.toLowerCase()));
+                    });
+                }
 
                 const schoolInput = document.getElementById('incSchool');
-                if (schoolInput && !schoolInput.value && userData.schoolName) {
-                    schoolInput.value = userData.schoolName;
+                if (schoolInput && (userData.schoolName || principalSchoolName)) {
+                    schoolInput.value = principalSchoolName || userData.schoolName;
+                    if (isPrincipalUser) schoolInput.readOnly = true;
                 }
                 const districtSelect = document.getElementById('incDistrict');
                 if (districtSelect && !districtSelect.value) {
@@ -874,13 +903,27 @@
                 }
             }
 
+            // Set default date to today and prevent future dates
+            const dateInput = document.getElementById('incDate');
+            if (dateInput) {
+                const todayStr = new Date().toISOString().split('T')[0];
+                dateInput.value = todayStr;
+                dateInput.max = todayStr;
+            }
+
+            // Populate student directory autocomplete
+            populateStudentDirectory();
+
             const urlParams = new URLSearchParams(window.location.search);
             const studentParam = urlParams.get('student');
             const formParam = urlParams.get('form') || urlParams.get('class');
 
             if (studentParam) {
                 const sEl = document.getElementById('incStudentId');
-                if (sEl) sEl.value = studentParam;
+                if (sEl) {
+                    sEl.value = studentParam;
+                    handleStudentAutocomplete(studentParam);
+                }
             }
             if (formParam) {
                 const fEl = document.getElementById('incStudentForm');
@@ -900,6 +943,100 @@
                 loadIncidents();
             });
         });
+
+        // ── AUTOCOMPLETE & REAL-TIME VALIDATION HELPERS ───────────────────────
+        function populateStudentDirectory() {
+            const dl = document.getElementById('registeredStudentsDatalist');
+            if (!dl) return;
+            const students = (window.SENTINEL_SEED_DATA && Array.isArray(window.SENTINEL_SEED_DATA.students))
+                ? window.SENTINEL_SEED_DATA.students
+                : [];
+            dl.innerHTML = students.map(s => `<option value="${s.name}">${s.name} • ${s.form || 'General'} (${s.studentNumber || s.id})</option>`).join('');
+        }
+
+        function handleStudentAutocomplete(val) {
+            clearIncFormError();
+            const badge = document.getElementById('stuVerifiedBadge');
+            const query = (val || '').trim().toLowerCase();
+            if (!query || query.length < 2) {
+                if (badge) badge.style.display = 'none';
+                return;
+            }
+
+            const students = (window.SENTINEL_SEED_DATA && Array.isArray(window.SENTINEL_SEED_DATA.students))
+                ? window.SENTINEL_SEED_DATA.students
+                : [];
+
+            const match = students.find(s =>
+                (s.name && s.name.toLowerCase() === query) ||
+                (s.studentNumber && s.studentNumber.toLowerCase() === query) ||
+                (s.id && s.id.toLowerCase() === query) ||
+                (s.name && s.name.toLowerCase().startsWith(query))
+            );
+
+            if (match) {
+                if (badge) {
+                    badge.textContent = `✓ Verified Enrolled: ${match.name} (${match.studentNumber || match.id})`;
+                    badge.style.display = 'block';
+                }
+                const formInput = document.getElementById('incStudentForm');
+                if (formInput && match.form) formInput.value = match.form;
+
+                const schoolInput = document.getElementById('incSchool');
+                if (schoolInput && match.school) schoolInput.value = match.school;
+
+                const districtSelect = document.getElementById('incDistrict');
+                if (districtSelect && match.district) districtSelect.value = match.district;
+            } else {
+                if (badge) badge.style.display = 'none';
+            }
+        }
+
+        function updateDescCharCount() {
+            clearIncFormError();
+            const descEl = document.getElementById('incDescription');
+            const countEl = document.getElementById('descCharCount');
+            const hintEl = document.getElementById('descMinHint');
+            if (!descEl || !countEl) return;
+
+            const len = descEl.value.trim().length;
+            countEl.textContent = `Minimum 25 characters (${len} / 25)`;
+            if (len >= 25) {
+                countEl.style.color = '#15803d';
+                if (hintEl) hintEl.style.display = 'none';
+            } else {
+                countEl.style.color = '#64748b';
+                if (hintEl && len > 0) hintEl.style.display = 'inline';
+                else if (hintEl) hintEl.style.display = 'none';
+            }
+        }
+
+        function handleMatrixLevelChange(lvl) {
+            clearIncFormError();
+            const actionSelect = document.getElementById('incAction');
+            if (!actionSelect) return;
+
+            // Suggest appropriate protocol when Level 3 is selected
+            if (lvl.toLowerCase().includes('level 3')) {
+                if (!actionSelect.value || actionSelect.value.includes('Teacher') || actionSelect.value.includes('Classroom')) {
+                    actionSelect.value = 'Dean Formal Review';
+                }
+            }
+        }
+
+        function showIncFormError(msg) {
+            const errBox = document.getElementById('incFormError');
+            if (errBox) {
+                errBox.textContent = '⚠ ' + msg;
+                errBox.style.display = 'block';
+                errBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+        }
+
+        function clearIncFormError() {
+            const errBox = document.getElementById('incFormError');
+            if (errBox) errBox.style.display = 'none';
+        }
 
         const FALLBACK_INCIDENTS = [
             { id: "inc_001", incidentId: "#INC-2026-089", date: "28 Oct 2026", studentName: "Marcus J. Williams", form: "Form 4-B", school: "Port of Spain North Secondary", district: "St. George East District", matrix: "Level 2 Matrix", level: 2, action: "Dean Formal Review", status: "Open" },
@@ -992,10 +1129,30 @@
 
             if (loaded.length === 0) loaded = FALLBACK_INCIDENTS;
 
+            if (isPrincipalUser && principalSchoolId) {
+                loaded = loaded.filter(inc => {
+                    const incSchId = inc.schoolId || inc.school_id;
+                    const incSchName = inc.school || '';
+                    return (incSchId && incSchId === principalSchoolId) ||
+                           (principalSchoolName && incSchName.toLowerCase().includes(principalSchoolName.toLowerCase())) ||
+                           (principalSchoolName && principalSchoolName.toLowerCase().includes(incSchName.toLowerCase()));
+                });
+            }
+
+            // Apply any persisted statuses from localStorage
+            try {
+                const saved = JSON.parse(localStorage.getItem('sentinel_inc_statuses') || '{}');
+                loaded.forEach(inc => {
+                    if (saved[inc.id] && saved[inc.id].status) {
+                        inc.status = saved[inc.id].status;
+                    }
+                });
+            } catch (_) {}
+
             allIncidents = loaded;
             renderIncidentsTable(allIncidents);
             const actionsHeader = document.getElementById('incActionsHeader');
-            if (actionsHeader && isMinistryUser) actionsHeader.style.display = '';
+            if (actionsHeader && (isMinistryUser || isDeanUser)) actionsHeader.style.display = '';
         }
 
         function renderIncidentsTable(incidents) {
@@ -1024,6 +1181,11 @@
                             <button class="btn-inc-edit" onclick="openEditModal('${safeId}')">Edit</button>
                             <button class="btn-inc-delete" onclick="deleteIncident('${safeId}', '${safeCode}')">Delete</button>
                         </div>
+                    </td>` : isDeanUser ? `
+                    <td style="text-align: right;">
+                        <div class="inc-actions-cell" style="justify-content: flex-end;">
+                            <button class="btn-inc-edit" onclick="openEditModal('${safeId}')">Edit</button>
+                        </div>
                     </td>` : '';
 
                 return `
@@ -1047,6 +1209,7 @@
         }
 
         function openEditModal(incId) {
+            clearEditIncFormError();
             const inc = allIncidents.find(i => i.id === incId || i.incidentId === incId);
             if (!inc) return;
 
@@ -1064,28 +1227,160 @@
             else if (matrixVal.includes('2')) document.getElementById('editMatrix').value = 'Level 2 Matrix';
             else document.getElementById('editMatrix').value = 'Level 1 Matrix';
 
+            // Dean-only enforcement: Only status is editable
+            const notice = document.getElementById('deanEditNotice');
+            const subTitle = document.getElementById('modalIncidentSub');
+            if (isDeanUser && !isMinistryUser) {
+                if (notice) notice.style.display = 'block';
+                if (subTitle) subTitle.textContent = 'Dean of Discipline — Incident Status Update';
+                document.getElementById('editStudentName').disabled = true;
+                document.getElementById('editSchool').disabled = true;
+                document.getElementById('editDistrict').disabled = true;
+                document.getElementById('editMatrix').disabled = true;
+                document.getElementById('editAction').disabled = true;
+                document.getElementById('editDescription').disabled = true;
+                document.getElementById('editStatus').disabled = false;
+            } else {
+                if (notice) notice.style.display = 'none';
+                if (subTitle) subTitle.textContent = 'Administrative Incident Review & Matrix Classification';
+                document.getElementById('editStudentName').disabled = false;
+                document.getElementById('editSchool').disabled = false;
+                document.getElementById('editDistrict').disabled = false;
+                document.getElementById('editMatrix').disabled = false;
+                document.getElementById('editAction').disabled = false;
+                document.getElementById('editDescription').disabled = false;
+                document.getElementById('editStatus').disabled = false;
+            }
+
             document.getElementById('editIncidentModal').classList.add('is-active');
         }
 
         function closeEditModal() {
+            clearEditIncFormError();
             document.getElementById('editIncidentModal').classList.remove('is-active');
+        }
+
+        function showEditIncFormError(msg) {
+            const errBox = document.getElementById('editIncFormError');
+            if (errBox) {
+                errBox.textContent = '⚠ ' + msg;
+                errBox.style.display = 'block';
+            }
+        }
+
+        function clearEditIncFormError() {
+            const errBox = document.getElementById('editIncFormError');
+            if (errBox) errBox.style.display = 'none';
         }
 
         async function saveIncidentUpdate(e) {
             e.preventDefault();
+            clearEditIncFormError();
+
             const id = document.getElementById('editIncidentId').value;
-            const matrix = document.getElementById('editMatrix').value;
-            const level = matrix.includes('3') ? 3 : matrix.includes('2') ? 2 : 1;
             const status = document.getElementById('editStatus').value;
 
+            // If Dean (and not Ministry), only status update is allowed
+            if (isDeanUser && !isMinistryUser) {
+                const inc = allIncidents.find(i => i.id === id || i.incidentId === id);
+                if (inc) inc.status = status;
+
+                // Sync with local storage
+                try {
+                    const saved = JSON.parse(localStorage.getItem('sentinel_inc_statuses') || '{}');
+                    saved[id] = { status, updatedAt: new Date().toISOString() };
+                    localStorage.setItem('sentinel_inc_statuses', JSON.stringify(saved));
+                } catch (_) {}
+
+                // Try local API endpoint
+                const endpoints = [`/api/incidents/${id}`, getApiUrl(`/api/incidents/${id}`)];
+                for (const ep of endpoints) {
+                    try {
+                        await fetch(ep, {
+                            method: 'PATCH',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ status })
+                        });
+                        break;
+                    } catch (_) {}
+                }
+
+                // Try Supabase directly
+                try {
+                    await fetch(`${SUPABASE_REST_URL}/incidents?id=eq.${id}`, {
+                        method: 'PATCH',
+                        headers: {
+                            'apikey': SUPABASE_ANON_KEY,
+                            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                            'Content-Type': 'application/json',
+                            'Prefer': 'return=minimal'
+                        },
+                        body: JSON.stringify({ status })
+                    });
+                } catch (_) {}
+
+                closeEditModal();
+                renderIncidentsTable(allIncidents);
+                showToast(`✓ Incident status updated to "${status}"`);
+                return;
+            }
+
+            const studentName = document.getElementById('editStudentName').value.trim();
+            const school = document.getElementById('editSchool').value.trim();
+            const district = document.getElementById('editDistrict').value.trim();
+            const matrix = document.getElementById('editMatrix').value;
+            const level = matrix.includes('3') ? 3 : matrix.includes('2') ? 2 : 1;
+            const action = document.getElementById('editAction').value.trim();
+            const status = document.getElementById('editStatus').value;
+            const description = document.getElementById('editDescription').value.trim();
+
+            // ── EDIT VALIDATION 1: Student Name ──
+            if (!studentName || studentName.length < 3) {
+                showEditIncFormError('Student name must be at least 3 characters.');
+                document.getElementById('editStudentName').focus();
+                return;
+            }
+
+            // ── EDIT VALIDATION 2: School ──
+            if (!school || school.length < 3) {
+                showEditIncFormError('Please enter a valid institution or school name.');
+                document.getElementById('editSchool').focus();
+                return;
+            }
+
+            // ── EDIT VALIDATION 3: Action Protocol ──
+            if (!action || action.length < 3) {
+                showEditIncFormError('Please specify the intervention action protocol.');
+                document.getElementById('editAction').focus();
+                return;
+            }
+
+            // ── EDIT VALIDATION 4: Description Narrative ──
+            if (!description || description.length < 25) {
+                showEditIncFormError(`Please provide a detailed incident narrative (minimum 25 characters; currently ${description.length}).`);
+                document.getElementById('editDescription').focus();
+                return;
+            }
+
+            // ── EDIT VALIDATION 5: Policy Safeguard (Matrix vs Action) ──
+            if (level === 3) {
+                const lowerAction = action.toLowerCase();
+                if (lowerAction.includes('privilege') || lowerAction.includes('warning') || lowerAction.includes('reflection')) {
+                    showEditIncFormError('Policy Safeguard: Level 3 infractions represent severe misconduct and require an escalated intervention protocol (Dean Formal Review, Suspension, or Ministry Escalated Review).');
+                    document.getElementById('editAction').focus();
+                    return;
+                }
+            }
+
             const payload = {
-                studentName: document.getElementById('editStudentName').value.trim(),
-                school: document.getElementById('editSchool').value.trim(),
-                district: document.getElementById('editDistrict').value.trim(),
-                matrix, level,
-                action: document.getElementById('editAction').value.trim(),
+                studentName: studentName,
+                school: school,
+                district: district,
+                matrix: matrix,
+                level: level,
+                action: action,
                 status: status,
-                description: document.getElementById('editDescription').value.trim()
+                description: description
             };
 
             let updated = false;
@@ -1206,15 +1501,14 @@
 
         async function submitIncident(e) {
             e.preventDefault();
-
-            const submitBtn = e.target.querySelector('button[type="submit"]');
-            if (submitBtn) {
-                submitBtn.disabled = true;
-                submitBtn.textContent = 'Saving…';
-            }
+            clearIncFormError();
 
             const rawStudent  = document.getElementById('incStudentId').value.trim();
             const studentForm = document.getElementById('incStudentForm').value.trim();
+            const dateInput   = document.getElementById('incDate');
+            const dateVal     = dateInput ? dateInput.value : '';
+            const locInput    = document.getElementById('incLocation');
+            const location    = locInput ? locInput.value : '';
             const school      = document.getElementById('incSchool').value.trim();
             const district    = document.getElementById('incDistrict').value;
             const matrix      = document.getElementById('incMatrix').value;
@@ -1225,8 +1519,85 @@
             const matrixLevel = matrix.toLowerCase().includes('level 3') ? 3 :
                                 matrix.toLowerCase().includes('level 2') ? 2 : 1;
 
-            const today = new Date();
-            const dateStr = today.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+            // ── VALIDATION 1: Student Name / ID ──
+            if (!rawStudent || rawStudent.length < 3) {
+                showIncFormError('Please enter a valid student name or ID (minimum 3 characters).');
+                document.getElementById('incStudentId').focus();
+                return;
+            }
+
+            // ── VALIDATION 2: Student Form / Grade ──
+            if (!studentForm || studentForm.length < 2) {
+                showIncFormError('Please enter the student\'s Form or Grade (e.g. Form 4-B).');
+                document.getElementById('incStudentForm').focus();
+                return;
+            }
+
+            // ── VALIDATION 3: Incident Occurrence Date ──
+            if (!dateVal) {
+                showIncFormError('Please select the incident occurrence date.');
+                if (dateInput) dateInput.focus();
+                return;
+            }
+            const selectedDate = new Date(dateVal + 'T12:00:00');
+            const todayEnd = new Date();
+            todayEnd.setHours(23, 59, 59, 999);
+            if (selectedDate > todayEnd) {
+                showIncFormError('Incident occurrence date cannot be set in the future.');
+                if (dateInput) dateInput.focus();
+                return;
+            }
+
+            // ── VALIDATION 4: Location on School Compound ──
+            if (!location) {
+                showIncFormError('Please select the incident location on the school compound.');
+                if (locInput) locInput.focus();
+                return;
+            }
+
+            // ── VALIDATION 5: Institution / School & District ──
+            if (!school || school.length < 3) {
+                showIncFormError('Please enter a valid school or institution name.');
+                document.getElementById('incSchool').focus();
+                return;
+            }
+            if (!district) {
+                showIncFormError('Please select an Educational District.');
+                document.getElementById('incDistrict').focus();
+                return;
+            }
+
+            // ── VALIDATION 6: Prescribed Action Protocol ──
+            if (!action) {
+                showIncFormError('Please select an intervention action protocol.');
+                document.getElementById('incAction').focus();
+                return;
+            }
+
+            // ── VALIDATION 7: Policy Safeguard (Matrix Level vs Protocol) ──
+            if (matrixLevel === 3) {
+                const lowerAction = action.toLowerCase();
+                if (lowerAction.includes('privilege') || lowerAction.includes('warning') || lowerAction.includes('reflection')) {
+                    showIncFormError('Policy Safeguard: Level 3 infractions represent severe misconduct and require an escalated intervention protocol (Dean Formal Review, Suspension, or Ministry Escalated Review).');
+                    document.getElementById('incAction').focus();
+                    return;
+                }
+            }
+
+            // ── VALIDATION 8: Incident Description Narrative Length ──
+            if (!description || description.length < 25) {
+                showIncFormError(`Please provide a detailed incident narrative (minimum 25 characters; currently ${description.length}).`);
+                if (descEl) descEl.focus();
+                return;
+            }
+
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Saving…';
+            }
+
+            const dateStr = selectedDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
             const newNumericId = Math.floor(Math.random() * 900) + 100;
             const newIncidentCode = `#INC-2026-${newNumericId}`;
             const uniqueDbId = 'inc_' + Date.now();
@@ -1260,6 +1631,7 @@
                 schoolId: currentUser ? (currentUser.schoolId || 'sch_001') : 'sch_001',
                 school: school || (currentUser ? currentUser.schoolName : 'Port of Spain North Secondary'),
                 district: district || 'St. George East District',
+                location: location,
                 matrix: matrix,
                 level: matrixLevel,
                 action: action,
@@ -1268,7 +1640,7 @@
                 loggedById: currentUser ? currentUser.id : 'usr_teacher_01',
                 loggedBy: currentUser ? currentUser.name : 'Staff Member',
                 date: dateStr,
-                createdAt: today.toISOString()
+                createdAt: new Date().toISOString()
             };
 
             let savedSuccessfully = false;
@@ -1346,6 +1718,20 @@
 
             showToast('✓ Incident logged successfully & saved to record');
             e.target.reset();
+
+            // Reset dynamic validation UI states
+            const badge = document.getElementById('stuVerifiedBadge');
+            if (badge) badge.style.display = 'none';
+            const countEl = document.getElementById('descCharCount');
+            if (countEl) {
+                countEl.textContent = 'Minimum 25 characters (0 / 25)';
+                countEl.style.color = '#64748b';
+            }
+            if (dateInput) {
+                const todayStr = new Date().toISOString().split('T')[0];
+                dateInput.value = todayStr;
+            }
+
             toggleForm();
         }
 
