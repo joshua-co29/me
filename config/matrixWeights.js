@@ -82,8 +82,8 @@ const SEVERITY_WEIGHT_MATRIX = {
         level: 5,
         code: 'LEVEL_5',
         name: 'Level 5: Critical Misconduct & Criminal Infractions',
-        weight: 30,
-        weightRange: [25, 50],
+        weight: 25,
+        weightRange: [20, 25],
         category: 'High-Level Security & Criminal Violations',
         examples: [
             'Possession, distribution, or use of illegal narcotics/controlled substances',

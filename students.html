@@ -863,7 +863,17 @@
                 <div class="modal-form-group">
                     <label for="editStuAttendance">Attendance Rate (%)</label>
                     <input type="number" id="editStuAttendance" min="0" max="100" step="1" value="95" required oninput="clearStuFormError()">
-                    <small style="font-size:0.75rem; color:#64748b;">Valid range: 0% to 100%</small>
+                    <small style="font-size:0.75rem; color:#64748b;">Valid range: 0% to 100% (ABC "A" Factor)</small>
+                </div>
+                <div class="modal-form-group">
+                    <label for="editStuGPA">Academic GPA (Coursework)</label>
+                    <input type="number" id="editStuGPA" min="0" max="4.0" step="0.01" value="3.00" required oninput="clearStuFormError()">
+                    <small style="font-size:0.75rem; color:#64748b;">Valid range: 0.00 to 4.00 (ABC "C" Factor)</small>
+                </div>
+                <div class="modal-form-group">
+                    <label for="editStuFailures">Failed Courses Count</label>
+                    <input type="number" id="editStuFailures" min="0" max="15" step="1" value="0" required oninput="clearStuFormError()">
+                    <small style="font-size:0.75rem; color:#64748b;">Active failing core subjects this term (0–15)</small>
                 </div>
                 <div class="modal-actions">
                     <button type="button" class="btn-modal-cancel" onclick="closeStudentModal()">Cancel</button>
@@ -961,24 +971,32 @@
             }
         })();
 
-        const FALLBACK_STUDENTS = [
-            { id: "stu_test_01", studentId: "STU-TEST-2026", name: "Test Student", form: "Form 3", school: "Port of Spain North Secondary", district: "St. George East District", incidentCount: 4, triageLevel: 3, attendance: 20, lastReview: "Oct 28, 2026" },
-            { id: "stu_001", studentId: "STU-2026-001", name: "Marcus J. Williams", form: "Form 4-B", school: "Port of Spain North Secondary", district: "St. George East District", incidentCount: 2, triageLevel: 2, attendance: 84, lastReview: "Oct 25, 2026" },
-            { id: "stu_002", studentId: "STU-2026-002", name: "Alicia M. Rampersad", form: "Form 2-A", school: "San Fernando East Technical", district: "Victoria Educational District", incidentCount: 1, triageLevel: 1, attendance: 96, lastReview: "Oct 24, 2026" },
-            { id: "stu_003", studentId: "STU-2026-003", name: "Denzil T. Mohammed", form: "Form 5-C", school: "Chaguanas Senior Comprehensive", district: "Caroni Educational District", incidentCount: 4, triageLevel: 3, attendance: 20, lastReview: "Oct 26, 2026" },
-            { id: "stu_004", studentId: "STU-2026-004", name: "Priya S. Singh", form: "Form 3-D", school: "Arima Central Secondary", district: "St. George East District", incidentCount: 2, triageLevel: 2, attendance: 85, lastReview: "Oct 22, 2026" },
-            { id: "stu_005", studentId: "STU-2026-005", name: "Jonah A. Clarke", form: "Form 1-C", school: "Scarborough Secondary School", district: "Tobago Educational District", incidentCount: 1, triageLevel: 1, attendance: 96, lastReview: "Oct 21, 2026" },
-            { id: "stu_006", studentId: "STU-2026-006", name: "Kezia N. Baptiste", form: "Form 4-A", school: "Princes Town West Secondary", district: "Victoria Educational District", incidentCount: 3, triageLevel: 3, attendance: 20, lastReview: "Oct 26, 2026" },
-            { id: "stu_007", studentId: "STU-2026-007", name: "Ryan O. Phillip", form: "Form 2-C", school: "Siparia Regional Secondary", district: "St. Patrick Educational District", incidentCount: 1, triageLevel: 1, attendance: 96, lastReview: "Oct 20, 2026" },
-            { id: "stu_008", studentId: "STU-2026-008", name: "Natasha R. Persad", form: "Form 3-A", school: "Couva West Secondary", district: "Caroni Educational District", incidentCount: 0, triageLevel: 0, attendance: 100, lastReview: "Oct 18, 2026" },
-            { id: "stu_009", studentId: "STU-2026-009", name: "Devon I. Charles", form: "Form 5-B", school: "Belmont Secondary School", district: "St. George East District", incidentCount: 2, triageLevel: 2, attendance: 82, lastReview: "Oct 17, 2026" },
-            { id: "stu_010", studentId: "STU-2026-010", name: "Sophia L. Hernandez", form: "Form 1-A", school: "Rio Claro Secondary", district: "Nariva/Mayaro District", incidentCount: 1, triageLevel: 1, attendance: 96, lastReview: "Oct 15, 2026" },
-            { id: "stu_011", studentId: "STU-2026-011", name: "Isaiah K. Thomas", form: "Form 4-D", school: "St. George's College Secondary", district: "St. George East District", incidentCount: 5, triageLevel: 3, attendance: 20, lastReview: "Oct 27, 2026" },
-            { id: "stu_012", studentId: "STU-2026-012", name: "Aaliya F. Ali", form: "Form 3-B", school: "Naparima Girls' High School", district: "Victoria Educational District", incidentCount: 0, triageLevel: 0, attendance: 100, lastReview: "Oct 14, 2026" },
-            { id: "stu_013", studentId: "STU-2026-013", name: "Curtis M. John", form: "Form 2-D", school: "Mason Hall Secondary", district: "Tobago Educational District", incidentCount: 2, triageLevel: 2, attendance: 83, lastReview: "Oct 13, 2026" },
-            { id: "stu_014", studentId: "STU-2026-014", name: "Jasmine T. Ramkhelawan", form: "Form 1-B", school: "Montrose Government Secondary", district: "Caroni Educational District", incidentCount: 1, triageLevel: 1, attendance: 96, lastReview: "Oct 12, 2026" },
-            { id: "stu_015", studentId: "STU-2026-015", name: "Tristan L. Gonzales", form: "Form 5-A", school: "Fyzabad Secondary School", district: "St. Patrick Educational District", incidentCount: 2, triageLevel: 2, attendance: 80, lastReview: "Oct 11, 2026" }
-        ];
+        function isExcludedTestStudent(st) {
+            if (!st) return true;
+            const id = String(st.id || '').toLowerCase();
+            const stuId = String(st.studentId || st.student_id || st.studentNumber || '').toLowerCase();
+            const name = String(st.name || '').trim().toLowerCase();
+            return id === 'stu_test_01' || id === 'stu_1794342607079' || stuId === 'stu-test-2026' ||
+                name === 'test student' || name === 'test' || name === 'automated test student';
+        }
+
+        function isExcludedTestIncident(inc) {
+            if (!inc) return true;
+            const id = String(inc.id || '').toLowerCase();
+            const stuId = String(inc.studentId || inc.student_id || '').toLowerCase();
+            const stuName = String(inc.studentName || inc.student_name || '').trim().toLowerCase();
+            const desc = String(inc.description || '').toLowerCase();
+            return id.startsWith('inc_test_') || stuId === 'stu_test_01' || stuId === 'stu_1794342607079' ||
+                stuName === 'test student' || stuName === 'automated test student' || stuName === 'test' || stuName === 'rarar' ||
+                desc.includes('auditor bot');
+        }
+
+        function getSeedStudentsList() {
+            const raw = (window.SENTINEL_SEED_DATA && Array.isArray(window.SENTINEL_SEED_DATA.students))
+                ? window.SENTINEL_SEED_DATA.students
+                : [];
+            return raw.filter(s => !isExcludedTestStudent(s));
+        }
 
         let lastMutationTime = 0;
 
@@ -1036,7 +1054,7 @@
                             triageLevel: st.triage_level || 0,
                             attendance: (st.attendance !== undefined && st.attendance !== null) ? Number(st.attendance) : 95,
                             status: st.status || 'Active'
-                        }));
+                        })).filter(s => !isExcludedTestStudent(s));
                     }
                 }
             } catch (_) {}
@@ -1048,7 +1066,7 @@
                     const res = await fetch(ep);
                     if (res.ok) {
                         const data = await res.json();
-                        if (Array.isArray(data) && data.length > 0) return data;
+                        if (Array.isArray(data) && data.length > 0) return data.filter(s => !isExcludedTestStudent(s));
                     }
                 } catch (_) {}
             }
@@ -1060,11 +1078,11 @@
                     if (db && Array.isArray(db.attendanceLogs) && db.attendanceLogs.length > 0) {
                         allAttendanceLogs = db.attendanceLogs;
                     }
-                    if (db && Array.isArray(db.students) && db.students.length > 0) return db.students;
+                    if (db && Array.isArray(db.students) && db.students.length > 0) return db.students.filter(s => !isExcludedTestStudent(s));
                 }
             } catch (_) {}
 
-            return FALLBACK_STUDENTS;
+            return getSeedStudentsList();
         }
 
         async function fetchIncidentsLive() {
@@ -1098,7 +1116,7 @@
                 } catch (_) {}
             }
 
-            return list;
+            return list.filter(i => !isExcludedTestIncident(i));
         }
 
         async function fetchAttendanceLive() {
@@ -1130,8 +1148,8 @@
                     fetchAttendanceLive()
                 ]);
 
-                let loadedStudents = (Array.isArray(stus) && stus.length > 0) ? stus : FALLBACK_STUDENTS;
-                let loadedIncidents = Array.isArray(incs) ? incs : [];
+                let loadedStudents = ((Array.isArray(stus) && stus.length > 0) ? stus : getSeedStudentsList()).filter(s => !isExcludedTestStudent(s));
+                let loadedIncidents = (Array.isArray(incs) ? incs : []).filter(i => !isExcludedTestIncident(i));
 
                 if (isPrincipalUser && principalSchoolId) {
                     loadedStudents = loadedStudents.filter(s => {
@@ -1160,7 +1178,7 @@
                 updateStudentStats();
             } catch (err) {
                 console.warn('Live students pull notice, falling back:', err);
-                let fallback = FALLBACK_STUDENTS;
+                let fallback = getSeedStudentsList();
                 if (isPrincipalUser && principalSchoolId) {
                     fallback = fallback.filter(s => {
                         const sSchId = s.schoolId || s.school_id;
@@ -1298,7 +1316,16 @@
                 }
             }
             if (attRate === undefined || attRate === null) attRate = 95;
+            const lsAtt = localStorage.getItem(`sentinel_att_rate_${id}`);
+            if (lsAtt !== null) attRate = parseInt(lsAtt, 10);
             const attColor = attRate >= 90 ? '#15803d' : attRate >= 80 ? '#b45309' : '#b91c1c';
+
+            const lsGpa = localStorage.getItem(`sentinel_gpa_${id}`);
+            const lsFail = localStorage.getItem(`sentinel_failures_${id}`);
+            const baselineGpa = Math.max(1.10, Math.min(3.95, 4.0 - ((100 - attRate) * 0.03) - (studentIncidents.length * 0.25)));
+            const effGpa = lsGpa !== null ? parseFloat(lsGpa) : (student.gpa !== undefined && student.gpa !== null ? Number(student.gpa) : Number(baselineGpa.toFixed(2)));
+            const effFailures = lsFail !== null ? parseInt(lsFail, 10) : (student.courseFailures !== undefined && student.courseFailures !== null ? parseInt(student.courseFailures, 10) : (effGpa < 1.8 ? 3 : effGpa < 2.2 ? 1 : 0));
+            const gpaColor = effGpa >= 2.5 ? '#15803d' : effGpa >= 2.0 ? '#b45309' : '#b91c1c';
 
             const detailHtml = `
                 <tr class="student-detail-row" id="detail-row-${id}">
@@ -1348,6 +1375,14 @@
                                     <span class="detail-field-value" style="font-weight: 700; color: ${attColor}; font-size: 1.05rem;">${attRate}%</span>
                                 </div>
                                 <div class="detail-field">
+                                    <span class="detail-field-label">Academic GPA (ABC "C")</span>
+                                    <span class="detail-field-value" style="font-weight: 700; color: ${gpaColor}; font-size: 1.05rem;">${effGpa.toFixed(2)}</span>
+                                </div>
+                                <div class="detail-field">
+                                    <span class="detail-field-label">Course Failures</span>
+                                    <span class="detail-field-value" style="font-weight: 700; color: ${effFailures > 0 ? '#b91c1c' : '#15803d'};">${effFailures}</span>
+                                </div>
+                                <div class="detail-field">
                                     <span class="detail-field-label">Last Review Date</span>
                                     <span class="detail-field-value">${student.lastReview || 'Oct 2026'}</span>
                                 </div>
@@ -1378,6 +1413,8 @@
 
                             <div class="detail-actions">
                                 <button type="button" class="btn-detail-edit" onclick="openStudentModal('${id}')">Edit / Update Student File</button>
+                                <button type="button" class="btn-detail-edit" style="background:#111111; color:#ffffff; border-color:#111111;" onclick="if (typeof openStatementOfConductModal === 'function') openStatementOfConductModal('${id}', 'conduct')">Statement of Conduct (PDF)</button>
+                                <button type="button" class="btn-detail-edit" style="background:#7f1d1d; color:#ffffff; border-color:#7f1d1d;" onclick="if (typeof openStatementOfConductModal === 'function') openStatementOfConductModal('${id}', 'sssd')">SSSD Case Package</button>
                                 ${isMinistryUser ? `<button type="button" class="btn-stu-delete" style="padding: 0.45rem 1rem; font-size: 0.85rem;" onclick="deleteStudentFile('${id}', '${student.name.replace(/'/g, "\\'")}')">Delete Student File</button>` : ''}
                                 <button type="button" class="btn-modal-cancel" onclick="toggleStudentDetail('${id}')">Close</button>
                             </div>
@@ -1400,6 +1437,10 @@
             document.getElementById('editStuIncidents').value = '0';
             const attEl = document.getElementById('editStuAttendance');
             if (attEl) attEl.value = '95';
+            const gpaEl = document.getElementById('editStuGPA');
+            if (gpaEl) gpaEl.value = '3.00';
+            const failEl = document.getElementById('editStuFailures');
+            if (failEl) failEl.value = '0';
             document.getElementById('editStudentModal').classList.add('is-active');
         }
 
@@ -1415,8 +1456,21 @@
             document.getElementById('editStuDistrict').value = student.district || '';
             document.getElementById('editStuTriage').value = String(student.triageLevel !== undefined ? student.triageLevel : 0);
             document.getElementById('editStuIncidents').value = student.incidentCount !== undefined ? student.incidentCount : 0;
+            const lsAtt = localStorage.getItem(`sentinel_att_rate_${student.id}`);
+            const effAtt = lsAtt !== null ? parseInt(lsAtt, 10) : (student.attendance !== undefined ? student.attendance : 95);
             const attEl = document.getElementById('editStuAttendance');
-            if (attEl) attEl.value = student.attendance !== undefined ? student.attendance : 95;
+            if (attEl) attEl.value = effAtt;
+
+            const lsGpa = localStorage.getItem(`sentinel_gpa_${student.id}`);
+            const lsFail = localStorage.getItem(`sentinel_failures_${student.id}`);
+            const baseGpa = Math.max(1.10, Math.min(3.95, 4.0 - ((100 - effAtt) * 0.03) - ((student.incidentCount || 0) * 0.25)));
+            const effGpa = lsGpa !== null ? parseFloat(lsGpa) : (student.gpa !== undefined && student.gpa !== null ? Number(student.gpa) : Number(baseGpa.toFixed(2)));
+            const effFail = lsFail !== null ? parseInt(lsFail, 10) : (student.courseFailures !== undefined && student.courseFailures !== null ? parseInt(student.courseFailures, 10) : (effGpa < 1.8 ? 3 : effGpa < 2.2 ? 1 : 0));
+
+            const gpaEl = document.getElementById('editStuGPA');
+            if (gpaEl) gpaEl.value = effGpa.toFixed(2);
+            const failEl = document.getElementById('editStuFailures');
+            if (failEl) failEl.value = String(effFail);
 
             document.getElementById('editStudentModal').classList.add('is-active');
         }
@@ -1453,6 +1507,10 @@
             const incidentCount = parseInt(document.getElementById('editStuIncidents').value);
             const attInput = document.getElementById('editStuAttendance');
             const attVal = attInput ? parseInt(attInput.value) : 95;
+            const gpaInput = document.getElementById('editStuGPA');
+            const gpaVal = gpaInput ? parseFloat(gpaInput.value) : 3.00;
+            const failInput = document.getElementById('editStuFailures');
+            const failuresVal = failInput ? parseInt(failInput.value) : 0;
 
             // ── VALIDATION 1: Full Name ──
             if (!name || name.length < 3) {
@@ -1494,6 +1552,18 @@
                 return;
             }
 
+            // ── VALIDATION 5b: Academic GPA & Course Failures (ABC "C" Factor) ──
+            if (isNaN(gpaVal) || gpaVal < 0 || gpaVal > 4.0) {
+                showStuFormError('Academic GPA must be between 0.00 and 4.00.');
+                if (gpaInput) gpaInput.focus();
+                return;
+            }
+            if (isNaN(failuresVal) || failuresVal < 0 || failuresVal > 15) {
+                showStuFormError('Failed courses count must be between 0 and 15.');
+                if (failInput) failInput.focus();
+                return;
+            }
+
             // ── VALIDATION 6: Active Incidents Count ──
             if (isNaN(incidentCount) || incidentCount < 0) {
                 showStuFormError('Active incidents count cannot be negative.');
@@ -1516,7 +1586,7 @@
 
             // ── VALIDATION 8: Policy Consistency Warning ──
             if (attVal < 60 && triageLevel === 0) {
-                _pendingPolicyPayload = { name, form, school, district, triageLevel, incidentCount, attVal, id };
+                _pendingPolicyPayload = { name, form, school, district, triageLevel, incidentCount, attVal, gpaVal, failuresVal, id };
                 const msgEl = document.getElementById('policyWarnMsg');
                 if (msgEl) msgEl.textContent = `Attendance is flagged as critically low (${attVal}%). Under Ministry protocol, students below 60% attendance typically require at least Level 1 (Guidance Referral) review. Saving as Level 0 (No Active Case) may not reflect accurate risk status.`;
                 const overlay = document.getElementById('policyWarnOverlay');
@@ -1524,10 +1594,10 @@
                 return;
             }
 
-            await _commitStudentSave({ name, form, school, district, triageLevel, incidentCount, attVal, id });
+            await _commitStudentSave({ name, form, school, district, triageLevel, incidentCount, attVal, gpaVal, failuresVal, id });
         }
 
-        async function _commitStudentSave({ name, form, school, district, triageLevel, incidentCount, attVal, id }) {
+        async function _commitStudentSave({ name, form, school, district, triageLevel, incidentCount, attVal, gpaVal, failuresVal, id }) {
             const payload = {
                 name: name,
                 form: form,
@@ -1535,7 +1605,9 @@
                 district: district,
                 triageLevel: triageLevel,
                 incidentCount: incidentCount,
-                attendance: attVal
+                attendance: attVal,
+                gpa: gpaVal !== undefined ? Number(gpaVal.toFixed(2)) : 3.00,
+                courseFailures: failuresVal !== undefined ? failuresVal : 0
             };
 
             // CASE 1: ADDING A NEW STUDENT
@@ -1558,9 +1630,16 @@
                     triageLevel: payload.triageLevel,
                     incidentCount: payload.incidentCount,
                     attendance: payload.attendance,
+                    gpa: payload.gpa,
+                    courseFailures: payload.courseFailures,
                     status: 'Active',
                     lastReview: 'Nov 2026'
                 };
+                try {
+                    localStorage.setItem(`sentinel_att_rate_${newId}`, String(payload.attendance));
+                    localStorage.setItem(`sentinel_gpa_${newId}`, payload.gpa.toFixed(2));
+                    localStorage.setItem(`sentinel_failures_${newId}`, String(payload.courseFailures));
+                } catch (_) {}
 
                 // Add to local state & seed
                 allStudents.unshift(newStudent);
@@ -1623,9 +1702,16 @@
             }
 
             // CASE 2: UPDATING AN EXISTING STUDENT
+            // Always update local ABC overrides immediately so Decision Factor Engine reflects edits live
+            try {
+                localStorage.setItem(`sentinel_att_rate_${id}`, String(payload.attendance));
+                localStorage.setItem(`sentinel_gpa_${id}`, payload.gpa.toFixed(2));
+                localStorage.setItem(`sentinel_failures_${id}`, String(payload.courseFailures));
+            } catch (_) {}
+
             // Sync directly to Supabase online database
             try {
-                await fetch(`${SUPABASE_REST_URL}/students?id=eq.${encodeURIComponent(id)}`, {
+                const sRes = await fetch(`${SUPABASE_REST_URL}/students?id=eq.${encodeURIComponent(id)}`, {
                     method: 'PATCH',
                     headers: {
                         'apikey': SUPABASE_ANON_KEY,
@@ -1639,9 +1725,28 @@
                         district: payload.district,
                         triage_level: payload.triageLevel,
                         incident_count: payload.incidentCount,
-                        attendance: payload.attendance
+                        attendance: payload.attendance,
+                        gpa: payload.gpa,
+                        course_failures: payload.courseFailures
                     })
                 });
+                if (!sRes.ok) {
+                    await fetch(`${SUPABASE_REST_URL}/students?id=eq.${encodeURIComponent(id)}`, {
+                        method: 'PATCH',
+                        headers: {
+                            'apikey': SUPABASE_ANON_KEY,
+                            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            name: payload.name,
+                            form: payload.form,
+                            triage_level: payload.triageLevel,
+                            incident_count: payload.incidentCount,
+                            attendance: payload.attendance
+                        })
+                    });
+                }
             } catch (_) {}
 
             try {

@@ -373,9 +373,11 @@
             letter-spacing: 0.03em;
         }
 
-        .status-level-1 { background: transparent; color: #b45309; border: none; } /* Level 1: Soft Amber / Muted Yellow */
+        .status-level-1 { background: transparent; color: #b45309; border: none; } /* Level 1: Soft Amber */
         .status-level-2 { background: transparent; color: #ea580c; border: none; } /* Level 2: Warm Orange */
-        .status-level-3 { background: transparent; color: #991b1b; border: none; } /* Level 3: Deep Red / Crimson */
+        .status-level-3 { background: transparent; color: #dc2626; border: none; } /* Level 3: Crimson */
+        .status-level-4 { background: transparent; color: #991b1b; border: none; } /* Level 4: Serious */
+        .status-level-5 { background: transparent; color: #450a0a; border: none; font-weight: 800; } /* Level 5: Critical */
 
         /* CRUD Action Buttons */
         .table-actions {
@@ -656,7 +658,9 @@
 
         .legend-box.box-level-1 { background: #f59e0b; }
         .legend-box.box-level-2 { background: #ea580c; }
-        .legend-box.box-level-3 { background: #991b1b; }
+        .legend-box.box-level-3 { background: #dc2626; }
+        .legend-box.box-level-4 { background: #991b1b; }
+        .legend-box.box-level-5 { background: #450a0a; }
 
         /* Responsive Breakpoints */
         @media (max-width: 1200px) {
@@ -923,9 +927,11 @@
                         <canvas id="incidentLevelsChart"></canvas>
                     </div>
                     <div class="chart-legend-row">
-                        <div class="legend-item"><span class="legend-box box-level-1"></span> Level 1: <strong>19</strong></div>
-                        <div class="legend-item"><span class="legend-box box-level-2"></span> Level 2: <strong>12</strong></div>
-                        <div class="legend-item"><span class="legend-box box-level-3"></span> Level 3: <strong>7</strong></div>
+                        <div class="legend-item"><span class="legend-box box-level-1"></span> L1: <strong id="dashLegL1">0</strong></div>
+                        <div class="legend-item"><span class="legend-box box-level-2"></span> L2: <strong id="dashLegL2">0</strong></div>
+                        <div class="legend-item"><span class="legend-box box-level-3"></span> L3: <strong id="dashLegL3">0</strong></div>
+                        <div class="legend-item"><span class="legend-box box-level-4"></span> L4: <strong id="dashLegL4">0</strong></div>
+                        <div class="legend-item"><span class="legend-box box-level-5"></span> L5: <strong id="dashLegL5">0</strong></div>
                     </div>
                 </div>
             </div>
@@ -955,9 +961,11 @@
                 <div class="modal-form-group">
                     <label for="editMatrix">Discipline Matrix</label>
                     <select id="editMatrix">
-                        <option value="Level 1 Matrix">Level 1 Matrix (Minor Infraction)</option>
-                        <option value="Level 2 Matrix">Level 2 Matrix (Moderate Violation)</option>
-                        <option value="Level 3 Matrix">Level 3 Matrix (Severe / Criminal)</option>
+                        <option value="Level 1 Matrix">Level 1 Matrix — Minor Infraction</option>
+                        <option value="Level 2 Matrix">Level 2 Matrix — Minor-Moderate</option>
+                        <option value="Level 3 Matrix">Level 3 Matrix — Moderate-Serious</option>
+                        <option value="Level 4 Matrix">Level 4 Matrix — Serious Infraction</option>
+                        <option value="Level 5 Matrix">Level 5 Matrix — Critical / Criminal</option>
                     </select>
                 </div>
                 <div class="modal-form-group">
@@ -1016,9 +1024,11 @@
                 <div class="modal-form-group">
                     <label for="createMatrix">Discipline Matrix Level</label>
                     <select id="createMatrix">
-                        <option value="Level 1 Matrix">Level 1 Matrix (Minor Infraction)</option>
-                        <option value="Level 2 Matrix">Level 2 Matrix (Moderate Violation)</option>
-                        <option value="Level 3 Matrix">Level 3 Matrix (Severe / Criminal)</option>
+                        <option value="Level 1 Matrix">Level 1 Matrix — Minor Infraction</option>
+                        <option value="Level 2 Matrix">Level 2 Matrix — Minor-Moderate</option>
+                        <option value="Level 3 Matrix">Level 3 Matrix — Moderate-Serious</option>
+                        <option value="Level 4 Matrix">Level 4 Matrix — Serious Infraction</option>
+                        <option value="Level 5 Matrix">Level 5 Matrix — Critical / Criminal</option>
                     </select>
                 </div>
                 <div class="modal-form-group">
@@ -1314,7 +1324,7 @@
             e.preventDefault();
             const currentUser = typeof getLoggedInUserData === 'function' ? getLoggedInUserData() : null;
             const matrix = document.getElementById('createMatrix').value;
-            const level = matrix.includes('3') ? 3 : matrix.includes('2') ? 2 : 1;
+            const level = matrix.includes('5') ? 5 : matrix.includes('4') ? 4 : matrix.includes('3') ? 3 : matrix.includes('2') ? 2 : 1;
             const status = document.getElementById('createStatus').value;
 
             const newId = `#INC-2026-${Math.floor(100 + Math.random() * 900)}`;
@@ -1416,8 +1426,9 @@
             }
 
             tbody.innerHTML = incidents.map(inc => {
-                const matrixText = inc.matrix || 'Level 1 Matrix';
-                const levelNum = inc.level || (matrixText.includes('3') ? 3 : matrixText.includes('2') ? 2 : 1);
+                const matrixText = inc.matrix || `Level ${inc.level || 1} Matrix`;
+                const mLow = matrixText.toLowerCase();
+                const levelNum = parseInt(inc.level || (mLow.includes('5') ? 5 : mLow.includes('4') ? 4 : mLow.includes('3') ? 3 : mLow.includes('2') ? 2 : 1), 10) || 1;
                 const badgeClass = `status-level-${levelNum}`;
                 const studentDisplay = inc.studentName || inc.student || 'Unknown Student';
                 const formDisplay = inc.form ? `Form ${inc.form}` : (inc.classId || '');
@@ -1468,9 +1479,11 @@
             document.getElementById('editStatus').value = inc.status || 'Open';
             document.getElementById('editDescription').value = inc.description || '';
 
-            const matrixVal = inc.matrix || 'Level 1 Matrix';
-            if (matrixVal.includes('3')) document.getElementById('editMatrix').value = 'Level 3 Matrix';
-            else if (matrixVal.includes('2')) document.getElementById('editMatrix').value = 'Level 2 Matrix';
+            const matrixVal = inc.matrix || `Level ${inc.level || 1} Matrix`;
+            if (matrixVal.includes('5') || inc.level == 5) document.getElementById('editMatrix').value = 'Level 5 Matrix';
+            else if (matrixVal.includes('4') || inc.level == 4) document.getElementById('editMatrix').value = 'Level 4 Matrix';
+            else if (matrixVal.includes('3') || inc.level == 3) document.getElementById('editMatrix').value = 'Level 3 Matrix';
+            else if (matrixVal.includes('2') || inc.level == 2) document.getElementById('editMatrix').value = 'Level 2 Matrix';
             else document.getElementById('editMatrix').value = 'Level 1 Matrix';
 
             document.getElementById('editIncidentModal').classList.add('is-active');
@@ -1484,7 +1497,7 @@
             e.preventDefault();
             const id = document.getElementById('editIncidentId').value;
             const matrix = document.getElementById('editMatrix').value;
-            const level = matrix.includes('3') ? 3 : matrix.includes('2') ? 2 : 1;
+            const level = matrix.includes('5') ? 5 : matrix.includes('4') ? 4 : matrix.includes('3') ? 3 : matrix.includes('2') ? 2 : 1;
 
             const payload = {
                 studentName: document.getElementById('editStudentName').value.trim(),
@@ -1615,11 +1628,13 @@
         }
 
         function renderAnalyticsCharts(incidents) {
-            let l1 = 0, l2 = 0, l3 = 0;
+            let l1 = 0, l2 = 0, l3 = 0, l4 = 0, l5 = 0;
             incidents.forEach(inc => {
                 const m = (inc.matrix || '').toLowerCase();
-                const lvl = inc.level;
-                if (lvl === 3 || m.includes('level 3')) l3++;
+                const lvl = parseInt(inc.level || 0, 10);
+                if (lvl === 5 || m.includes('level 5')) l5++;
+                else if (lvl === 4 || m.includes('level 4')) l4++;
+                else if (lvl === 3 || m.includes('level 3')) l3++;
                 else if (lvl === 2 || m.includes('level 2')) l2++;
                 else l1++;
             });
@@ -1627,7 +1642,18 @@
             // Update DOM metrics
             const total = incidents.length;
             const badgeL3 = document.querySelector('.chart-pill-badge.badge-danger');
-            if (badgeL3) badgeL3.textContent = `${l3} Level 3`;
+            if (badgeL3) badgeL3.textContent = `${l3 + l4 + l5} Level 3–5`;
+
+            const l1El = document.getElementById('dashLegL1');
+            const l2El = document.getElementById('dashLegL2');
+            const l3El = document.getElementById('dashLegL3');
+            const l4El = document.getElementById('dashLegL4');
+            const l5El = document.getElementById('dashLegL5');
+            if (l1El) l1El.textContent = l1;
+            if (l2El) l2El.textContent = l2;
+            if (l3El) l3El.textContent = l3;
+            if (l4El) l4El.textContent = l4;
+            if (l5El) l5El.textContent = l5;
 
             const pillTotal = document.querySelector('.analytics-chart-card .chart-pill-badge');
             if (pillTotal) pillTotal.textContent = `${total} Active`;
@@ -1683,20 +1709,20 @@
                 });
             }
 
-            // Chart 2: Incidents by Level (Level 1, 2, 3)
+            // Chart 2: Incidents by Level (Levels 1-5)
             const ctxLevels = document.getElementById('incidentLevelsChart');
             if (ctxLevels && typeof Chart !== 'undefined') {
                 if (chartLevels) chartLevels.destroy();
                 chartLevels = new Chart(ctxLevels, {
                     type: 'bar',
                     data: {
-                        labels: ['Level 1', 'Level 2', 'Level 3'],
+                        labels: ['Level 1', 'Level 2', 'Level 3', 'Level 4', 'Level 5'],
                         datasets: [{
                             label: 'Incidents Logged',
-                            data: [l1, l2, l3],
-                            backgroundColor: ['#f59e0b', '#ea580c', '#991b1b'],
+                            data: [l1, l2, l3, l4, l5],
+                            backgroundColor: ['#f59e0b', '#ea580c', '#dc2626', '#991b1b', '#450a0a'],
                             borderRadius: 0,
-                            barThickness: 28
+                            barThickness: 24
                         }]
                     },
                     options: {

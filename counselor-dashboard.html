@@ -42,8 +42,71 @@
 
         .badge-l1 { font-weight: 700; color: #b45309; }
         .badge-l2 { font-weight: 700; color: #ea580c; }
-        .badge-l3 { font-weight: 700; color: #991b1b; }
+        .badge-l3 { font-weight: 700; color: #dc2626; }
+        .badge-l4 { font-weight: 700; color: #991b1b; }
+        .badge-l5 { font-weight: 800; color: #450a0a; }
         .badge-l0 { font-weight: 600; color: #6b7280; }
+
+        .iv-form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 0.85rem;
+            padding: 1.25rem 1.5rem;
+            background: #fafafa;
+            border-bottom: 1px solid rgba(0,0,0,0.07);
+        }
+        .iv-field label {
+            display: block;
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: #4b5563;
+            margin-bottom: 0.3rem;
+        }
+        .iv-input {
+            width: 100%;
+            padding: 0.5rem 0.7rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0;
+            font-family: inherit;
+            font-size: 0.85rem;
+            background: #fff;
+            box-sizing: border-box;
+        }
+        .iv-btn-primary {
+            padding: 0.55rem 1.1rem;
+            background: #111111;
+            color: #ffffff;
+            border: none;
+            font-family: inherit;
+            font-size: 0.84rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .iv-btn-primary:hover { background: #333333; }
+        .welfare-pdf-actions {
+            display: flex;
+            gap: 0.45rem;
+            margin-top: 0.75rem;
+            flex-wrap: wrap;
+        }
+        .welfare-pdf-btn {
+            padding: 0.32rem 0.6rem;
+            font-size: 0.72rem;
+            font-weight: 700;
+            border: 1px solid #111111;
+            background: #ffffff;
+            color: #111111;
+            cursor: pointer;
+            font-family: inherit;
+        }
+        .welfare-pdf-btn:hover { background: #111111; color: #ffffff; }
+        .welfare-pdf-btn.is-sssd {
+            border-color: #7f1d1d;
+            background: #7f1d1d;
+            color: #ffffff;
+        }
 
         .status-pill { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; }
         .status-open      { background: #fef3c7; color: #92400e; }
@@ -123,11 +186,67 @@
         <!-- Level breakdown chart -->
         <div class="section-card" style="margin-bottom:0;">
             <div class="section-head">
-                <h2>Incident Level Breakdown</h2>
+                <h2>Incident Level Breakdown (Levels 1–5)</h2>
             </div>
             <div class="mini-chart" id="levelChart">
                 <div class="loading-text">Loading…</div>
             </div>
+        </div>
+    </div>
+
+    <!-- Guidance & SSSD Clinical Intervention Log -->
+    <div class="section-card" id="interventions" style="margin-top:1.5rem; scroll-margin-top: 90px;">
+        <div class="section-head">
+            <div>
+                <h2>Guidance &amp; SSSD Clinical Intervention Log</h2>
+                <span style="font-size:0.78rem; color:#6b7280;">Track counseling sessions, SSSD referrals, parent conferences, and measurable student risk recovery</span>
+            </div>
+            <span id="interventionCount" style="font-size:0.8rem;color:#9ca3af;">0 interventions</span>
+        </div>
+
+        <form id="interventionForm" onsubmit="submitIntervention(event)">
+            <div class="iv-form-grid">
+                <div class="iv-field">
+                    <label for="ivStudentName">Student Name</label>
+                    <input type="text" id="ivStudentName" class="iv-input" list="counselorStudentList" required placeholder="Select or type student…">
+                    <datalist id="counselorStudentList"></datalist>
+                </div>
+                <div class="iv-field">
+                    <label for="ivType">Intervention Modality</label>
+                    <select id="ivType" class="iv-input" required>
+                        <option value="Individual Guidance Counseling">Individual Guidance Counseling</option>
+                        <option value="SSSD Multidisciplinary Referral">SSSD Multidisciplinary Referral</option>
+                        <option value="Family / Guardian Case Conference">Family / Guardian Case Conference</option>
+                        <option value="Attendance & Truancy Recovery Plan">Attendance & Truancy Recovery Plan</option>
+                        <option value="Restorative Justice Circle">Restorative Justice Circle</option>
+                        <option value="Academic Remediation Support">Academic Remediation Support</option>
+                    </select>
+                </div>
+                <div class="iv-field">
+                    <label for="ivOutcome">Current Outcome</label>
+                    <select id="ivOutcome" class="iv-input">
+                        <option value="In Progress">In Progress</option>
+                        <option value="Stabilized">Stabilized</option>
+                        <option value="Escalated to SSSD">Escalated to SSSD</option>
+                        <option value="Resolved">Resolved</option>
+                    </select>
+                </div>
+                <div class="iv-field">
+                    <label for="ivFollowUp">Follow-Up Review Date</label>
+                    <input type="date" id="ivFollowUp" class="iv-input">
+                </div>
+                <div class="iv-field" style="grid-column: 1 / -1;">
+                    <label for="ivNotes">Clinical Session Summary &amp; Recovery Target</label>
+                    <div style="display:flex; gap:0.75rem; flex-wrap:wrap;">
+                        <input type="text" id="ivNotes" class="iv-input" style="flex:1; min-width:240px;" required placeholder="Document presenting ABC triggers, guardian contact, and recovery goal…">
+                        <button type="submit" class="iv-btn-primary">Log Clinical Intervention</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <div id="interventionsBody">
+            <div class="loading-text">Loading clinical interventions…</div>
         </div>
     </div>
 
@@ -146,12 +265,14 @@
     </div>
 </main>
 
+<script src="data/seed.js"></script>
 <script src="auth.js"></script>
 <script>
 const API_BASE = 'http://localhost:5000';
 
-let currentUser  = null;
-let allIncidents = [];
+let currentUser      = null;
+let allIncidents     = [];
+let allInterventions = [];
 
 document.addEventListener('DOMContentLoaded', async () => {
     currentUser = getLoggedInUserData();
@@ -163,7 +284,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('pageSubtitle').textContent =
         `${currentUser.schoolName || 'Your School'} · Student Welfare Overview`;
 
-    await loadIncidents();
+    await Promise.all([loadIncidents(), loadInterventions()]);
 
     if (window.location.hash) {
         const target = document.querySelector(window.location.hash);
@@ -174,16 +295,164 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 async function loadIncidents() {
+    let fetched = null;
     try {
         const res = await fetch(`${API_BASE}/api/incidents/by-school/${currentUser.schoolId}`);
-        const data = await res.json();
-        allIncidents = Array.isArray(data) ? data : [];
-    } catch { allIncidents = []; }
+        if (res.ok) {
+            const data = await res.json();
+            if (Array.isArray(data)) fetched = data;
+        }
+    } catch (_) {}
 
+    if (!fetched && window.SENTINEL_SEED_DATA && Array.isArray(window.SENTINEL_SEED_DATA.incidents)) {
+        fetched = window.SENTINEL_SEED_DATA.incidents.filter(i => !currentUser.schoolId || i.schoolId === currentUser.schoolId);
+    }
+    let localIncs = [];
+    try { localIncs = JSON.parse(localStorage.getItem('sentinel_incidents') || '[]'); } catch (_) {}
+    const seen = new Set();
+    allIncidents = [...localIncs, ...(fetched || [])].filter(inc => {
+        const k = inc.id || inc.incidentId;
+        if (!k || seen.has(k)) return false;
+        seen.add(k);
+        return true;
+    });
+
+    populateStudentDatalist();
     updateMetrics();
     renderWelfareCards();
     renderLevelChart();
     renderTable(allIncidents);
+}
+
+function populateStudentDatalist() {
+    const dl = document.getElementById('counselorStudentList');
+    if (!dl) return;
+    const names = new Set();
+    allIncidents.forEach(i => { if (i.studentName) names.add(i.studentName); });
+    if (window.SENTINEL_SEED_DATA && Array.isArray(window.SENTINEL_SEED_DATA.students)) {
+        window.SENTINEL_SEED_DATA.students.forEach(s => { if (s.name) names.add(s.name); });
+    }
+    dl.innerHTML = Array.from(names).sort().map(n => `<option value="${n}"></option>`).join('');
+}
+
+async function loadInterventions() {
+    let serverList = [];
+    try {
+        const res = await fetch(`${API_BASE}/api/interventions`);
+        if (res.ok) {
+            const data = await res.json();
+            if (Array.isArray(data)) serverList = data;
+        }
+    } catch (_) {}
+
+    let localList = [];
+    try { localList = JSON.parse(localStorage.getItem('sentinel_interventions') || '[]'); } catch (_) {}
+
+    const seen = new Set();
+    allInterventions = [...localList, ...serverList].filter(iv => {
+        if (!iv || !iv.id || seen.has(iv.id)) return false;
+        seen.add(iv.id);
+        return !currentUser.schoolId || !iv.schoolId || iv.schoolId === currentUser.schoolId;
+    });
+    renderInterventionsTable();
+}
+
+async function submitIntervention(e) {
+    e.preventDefault();
+    const stuName = document.getElementById('ivStudentName').value.trim();
+    const type = document.getElementById('ivType').value;
+    const outcome = document.getElementById('ivOutcome').value;
+    const followUpDate = document.getElementById('ivFollowUp').value;
+    const notes = document.getElementById('ivNotes').value.trim();
+    if (!stuName || !notes) return;
+
+    const matchedStu = (window.SENTINEL_SEED_DATA && Array.isArray(window.SENTINEL_SEED_DATA.students))
+        ? window.SENTINEL_SEED_DATA.students.find(s => (s.name || '').toLowerCase() === stuName.toLowerCase())
+        : null;
+
+    const entry = {
+        id: 'int_' + Date.now(),
+        studentId: matchedStu ? matchedStu.id : null,
+        studentName: stuName,
+        schoolId: currentUser.schoolId || 'sch_001',
+        school: currentUser.schoolName || 'Port of Spain North Secondary',
+        type,
+        counselorName: currentUser.name || 'Guidance Officer',
+        outcome,
+        followUpDate,
+        notes,
+        createdAt: new Date().toISOString()
+    };
+
+    allInterventions.unshift(entry);
+    try {
+        const existing = JSON.parse(localStorage.getItem('sentinel_interventions') || '[]');
+        existing.unshift(entry);
+        localStorage.setItem('sentinel_interventions', JSON.stringify(existing));
+    } catch (_) {}
+
+    try {
+        await fetch(`${API_BASE}/api/interventions`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(entry)
+        });
+    } catch (_) {}
+
+    document.getElementById('interventionForm').reset();
+    renderInterventionsTable();
+}
+
+async function updateInterventionOutcome(id, newOutcome) {
+    const item = allInterventions.find(iv => iv.id === id);
+    if (item) item.outcome = newOutcome;
+    try {
+        const list = JSON.parse(localStorage.getItem('sentinel_interventions') || '[]');
+        const lsItem = list.find(iv => iv.id === id);
+        if (lsItem) lsItem.outcome = newOutcome;
+        localStorage.setItem('sentinel_interventions', JSON.stringify(list));
+    } catch (_) {}
+    try {
+        await fetch(`${API_BASE}/api/interventions/${encodeURIComponent(id)}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ outcome: newOutcome })
+        });
+    } catch (_) {}
+}
+
+function renderInterventionsTable() {
+    const body = document.getElementById('interventionsBody');
+    const countEl = document.getElementById('interventionCount');
+    if (countEl) countEl.textContent = `${allInterventions.length} logged intervention${allInterventions.length !== 1 ? 's' : ''}`;
+    if (!body) return;
+    if (!allInterventions.length) {
+        body.innerHTML = '<div class="empty-state">No clinical interventions logged yet. Use the form above to start tracking SSSD &amp; Guidance recovery sessions.</div>';
+        return;
+    }
+    body.innerHTML = `<table class="data-table">
+        <thead><tr>
+            <th>Date</th><th>Student</th><th>Intervention Modality</th><th>Outcome</th><th>Follow-Up</th><th>Clinical Notes</th><th>Case File</th>
+        </tr></thead>
+        <tbody>${allInterventions.map(iv => `<tr>
+            <td style="white-space:nowrap;">${fmtDate(iv.createdAt)}</td>
+            <td><strong>${iv.studentName}</strong></td>
+            <td>${iv.type}</td>
+            <td>
+                <select class="iv-input" style="padding:0.3rem 0.5rem; font-size:0.78rem;" onchange="updateInterventionOutcome('${iv.id}', this.value)">
+                    ${['In Progress', 'Stabilized', 'Escalated to SSSD', 'Resolved'].map(opt => `<option value="${opt}" ${iv.outcome === opt ? 'selected' : ''}>${opt}</option>`).join('')}
+                </select>
+            </td>
+            <td style="white-space:nowrap;">${iv.followUpDate || '–'}</td>
+            <td style="font-size:0.82rem; color:#4b5563; max-width:260px;">${iv.notes || '–'}</td>
+            <td><button type="button" class="welfare-pdf-btn is-sssd" onclick="openCounselorPdf('${(iv.studentId || iv.studentName).replace(/'/g, "\\'")}', '${iv.studentName.replace(/'/g, "\\'")}', 'sssd')">SSSD PDF</button></td>
+        </tr>`).join('')}</tbody>
+    </table>`;
+}
+
+function openCounselorPdf(idOrName, fallbackName, mode) {
+    if (typeof window.openStatementOfConductModal !== 'function') return;
+    window.openStatementOfConductModal(idOrName || { name: fallbackName, school: currentUser.schoolName }, mode);
 }
 
 function updateMetrics() {
@@ -204,7 +473,7 @@ function renderWelfareCards() {
     const students = {};
     allIncidents.forEach(inc => {
         const name = inc.studentName || 'Unknown';
-        if (!students[name]) students[name] = { name, form: inc.form, count: 0, maxLevel: 0 };
+        if (!students[name]) students[name] = { id: inc.studentId || name, name, form: inc.form, count: 0, maxLevel: 0 };
         students[name].count++;
         const lvl = parseInt(inc.level || inc.triageLevel) || 0;
         if (lvl > students[name].maxLevel) students[name].maxLevel = lvl;
@@ -215,25 +484,32 @@ function renderWelfareCards() {
 
     if (!atRisk.length) { grid.innerHTML = '<div class="empty-state">No students with incidents.</div>'; return; }
 
-    const lvlColors = { 1: '#b45309', 2: '#ea580c', 3: '#991b1b' };
+    const lvlColors = { 1: '#b45309', 2: '#ea580c', 3: '#dc2626', 4: '#991b1b', 5: '#450a0a' };
     grid.innerHTML = atRisk.map(s => {
         const col = lvlColors[s.maxLevel] || '#6b7280';
+        const safeId = (s.id || s.name).replace(/'/g, "\\'");
+        const safeName = s.name.replace(/'/g, "\\'");
         return `<div class="welfare-card" style="border-left: 3px solid ${col};">
             <div class="welfare-name">${s.name}</div>
             <div class="welfare-form">${s.form || '–'}</div>
             <div class="welfare-count"><strong style="color:${col};">${s.count}</strong> incident${s.count !== 1 ? 's' : ''} · Max Level ${s.maxLevel || '–'}</div>
+            <div class="welfare-pdf-actions">
+                <button type="button" class="welfare-pdf-btn" onclick="openCounselorPdf('${safeId}', '${safeName}', 'conduct')">Conduct PDF</button>
+                <button type="button" class="welfare-pdf-btn is-sssd" onclick="openCounselorPdf('${safeId}', '${safeName}', 'sssd')">SSSD Case</button>
+            </div>
         </div>`;
     }).join('');
 }
 
 function renderLevelChart() {
-    const levels = [1, 2, 3];
+    const levels = [1, 2, 3, 4, 5];
     const counts = levels.map(l => allIncidents.filter(i => parseInt(i.level || i.triageLevel) === l).length);
     const max    = Math.max(...counts, 1);
-    const colors = { 1: '#f59e0b', 2: '#ea580c', 3: '#991b1b' };
-    const labels = { 1: 'Level 1', 2: 'Level 2', 3: 'Level 3' };
+    const colors = { 1: '#f59e0b', 2: '#ea580c', 3: '#dc2626', 4: '#991b1b', 5: '#450a0a' };
+    const labels = { 1: 'Level 1', 2: 'Level 2', 3: 'Level 3', 4: 'Level 4', 5: 'Level 5' };
     const el     = document.getElementById('levelChart');
 
+    const highSeverityCount = counts[2] + counts[3] + counts[4];
     el.innerHTML = levels.map((l, i) => {
         const pct = Math.round((counts[i] / max) * 100);
         return `<div class="bar-row">
@@ -241,8 +517,8 @@ function renderLevelChart() {
             <div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${colors[l]};"></div></div>
             <div class="bar-count">${counts[i]}</div>
         </div>`;
-    }).join('') + `<div style="margin-top:1rem; font-size:0.8rem; color:#9ca3af;">
-        ${counts[2]} Level 3 incident${counts[2] !== 1 ? 's' : ''} requiring immediate attention
+    }).join('') + `<div style="margin-top:1rem; font-size:0.8rem; color:#6b7280;">
+        ${highSeverityCount} Level 3–5 incident${highSeverityCount !== 1 ? 's' : ''} requiring SSSD / Guidance oversight
     </div>`;
 }
 
@@ -288,6 +564,8 @@ function lvlBadge(lvl) {
     if (n === 1) return `<span class="badge-l1">Level 1</span>`;
     if (n === 2) return `<span class="badge-l2">Level 2</span>`;
     if (n === 3) return `<span class="badge-l3">Level 3</span>`;
+    if (n === 4) return `<span class="badge-l4">Level 4</span>`;
+    if (n === 5) return `<span class="badge-l5">Level 5</span>`;
     return `<span class="badge-l0">–</span>`;
 }
 function statusPill(s) {

@@ -182,7 +182,6 @@
         <nav>
             <ul class="nav-links">
                 <li><a href="index.html#academics">Programs</a></li>
-                <li><a href="engine.html">Engine</a></li>
                 <li><a href="index.html#footer">Contact</a></li>
             </ul>
         </nav>
@@ -323,22 +322,33 @@
             const txt = document.getElementById('serverStatusText');
             try {
                 const ctrl = new AbortController();
-                setTimeout(() => ctrl.abort(), 4000);
-                const res = await fetch('http://localhost:5000/api/health', { signal: ctrl.signal });
+                setTimeout(() => ctrl.abort(), 2500);
+                const res = await fetch(`http://localhost:5000/api/health?_t=${Date.now()}`, {
+                    signal: ctrl.signal,
+                    cache: 'no-store',
+                    headers: { 'Accept': 'application/json' }
+                });
                 if (res.ok) {
-                    dot.style.background = '#22c55e';
-                    txt.textContent = 'Server connected · Ready to sign in';
-                    txt.style.color = '#15803d';
-                } else {
-                    throw new Error('not ok');
+                    const ct = (res.headers && res.headers.get && res.headers.get('content-type')) || '';
+                    if (ct.includes('application/json')) {
+                        const data = await res.json();
+                        if (data && data.status === 'online') {
+                            dot.style.background = '#22c55e';
+                            txt.textContent = 'Server connected · Ready to sign in';
+                            txt.style.color = '#15803d';
+                            return;
+                        }
+                    }
                 }
+                throw new Error('not ok');
             } catch {
-                dot.style.background = '#f59e0b';
-                txt.style.color = '#92400e';
-                txt.textContent = 'Server offline — open http://localhost:5000 first';
+                dot.style.background = '#ef4444';
+                txt.style.color = '#991b1b';
+                txt.textContent = 'Offline — open http://localhost:5000 first';
             }
         }
         checkServer();
+        setInterval(checkServer, 5000);
     </script>
 </body>
 

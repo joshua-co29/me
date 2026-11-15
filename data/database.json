@@ -319,7 +319,9 @@
       "form": "Form 2",
       "incidentCount": 0,
       "triageLevel": 0,
-      "attendance": 98,
+      "attendance": 100,
+      "gpa": null,
+      "courseFailures": null,
       "status": "Active"
     },
     {
@@ -334,6 +336,8 @@
       "incidentCount": 3,
       "triageLevel": 2,
       "attendance": 85,
+      "gpa": null,
+      "courseFailures": null,
       "status": "Active"
     },
     {
@@ -348,6 +352,8 @@
       "incidentCount": 1,
       "triageLevel": 1,
       "attendance": 93,
+      "gpa": null,
+      "courseFailures": null,
       "status": "Active"
     },
     {
@@ -362,6 +368,8 @@
       "incidentCount": 1,
       "triageLevel": 1,
       "attendance": 93,
+      "gpa": null,
+      "courseFailures": null,
       "status": "Active"
     },
     {
@@ -376,6 +384,8 @@
       "incidentCount": 0,
       "triageLevel": 0,
       "attendance": 95,
+      "gpa": null,
+      "courseFailures": null,
       "status": "active"
     },
     {
@@ -390,6 +400,8 @@
       "incidentCount": 0,
       "triageLevel": 0,
       "attendance": 95,
+      "gpa": null,
+      "courseFailures": null,
       "status": "active"
     },
     {
@@ -404,6 +416,8 @@
       "incidentCount": 0,
       "triageLevel": 0,
       "attendance": 98,
+      "gpa": null,
+      "courseFailures": null,
       "status": "active"
     },
     {
@@ -418,6 +432,8 @@
       "incidentCount": 0,
       "triageLevel": 0,
       "attendance": 98,
+      "gpa": null,
+      "courseFailures": null,
       "status": "active"
     },
     {
@@ -432,6 +448,8 @@
       "incidentCount": 5,
       "triageLevel": 3,
       "attendance": 20,
+      "gpa": null,
+      "courseFailures": null,
       "status": "Active"
     },
     {
@@ -446,6 +464,8 @@
       "incidentCount": 1,
       "triageLevel": 1,
       "attendance": 96,
+      "gpa": null,
+      "courseFailures": null,
       "status": "Active"
     },
     {
@@ -460,6 +480,8 @@
       "incidentCount": 3,
       "triageLevel": 2,
       "attendance": 80,
+      "gpa": null,
+      "courseFailures": null,
       "status": "Active"
     },
     {
@@ -474,6 +496,8 @@
       "incidentCount": 1,
       "triageLevel": 1,
       "attendance": 94,
+      "gpa": null,
+      "courseFailures": null,
       "status": "Active"
     },
     {
@@ -488,6 +512,8 @@
       "incidentCount": 1,
       "triageLevel": 1,
       "attendance": 95,
+      "gpa": null,
+      "courseFailures": null,
       "status": "active"
     },
     {
@@ -502,6 +528,8 @@
       "incidentCount": 0,
       "triageLevel": 0,
       "attendance": 99,
+      "gpa": null,
+      "courseFailures": null,
       "status": "active"
     },
     {
@@ -516,6 +544,8 @@
       "incidentCount": 1,
       "triageLevel": 1,
       "attendance": 95,
+      "gpa": null,
+      "courseFailures": null,
       "status": "Active"
     },
     {
@@ -530,6 +560,8 @@
       "incidentCount": 0,
       "triageLevel": 0,
       "attendance": 99,
+      "gpa": null,
+      "courseFailures": null,
       "status": "Active"
     },
     {
@@ -544,6 +576,8 @@
       "incidentCount": 2,
       "triageLevel": 2,
       "attendance": 84,
+      "gpa": null,
+      "courseFailures": null,
       "status": "active"
     },
     {
@@ -558,6 +592,8 @@
       "incidentCount": 2,
       "triageLevel": 1,
       "attendance": 92,
+      "gpa": null,
+      "courseFailures": null,
       "status": "active"
     },
     {
@@ -572,6 +608,8 @@
       "incidentCount": 1,
       "triageLevel": 1,
       "attendance": 96,
+      "gpa": null,
+      "courseFailures": null,
       "status": "Active"
     },
     {
@@ -586,6 +624,8 @@
       "incidentCount": 1,
       "triageLevel": 1,
       "attendance": 96,
+      "gpa": null,
+      "courseFailures": null,
       "status": "Active"
     },
     {
@@ -600,6 +640,8 @@
       "incidentCount": 6,
       "triageLevel": 3,
       "attendance": 20,
+      "gpa": null,
+      "courseFailures": null,
       "status": "Active"
     },
     {
@@ -614,6 +656,8 @@
       "incidentCount": 0,
       "triageLevel": 0,
       "attendance": 96,
+      "gpa": null,
+      "courseFailures": null,
       "status": "active"
     },
     {
@@ -628,6 +672,8 @@
       "incidentCount": 2,
       "triageLevel": 3,
       "attendance": 20,
+      "gpa": null,
+      "courseFailures": null,
       "status": "Active"
     },
     {
@@ -642,6 +688,8 @@
       "incidentCount": 0,
       "triageLevel": 0,
       "attendance": 97,
+      "gpa": null,
+      "courseFailures": null,
       "status": "Active"
     },
     {
@@ -656,6 +704,8 @@
       "incidentCount": 0,
       "triageLevel": 0,
       "attendance": 95,
+      "gpa": null,
+      "courseFailures": null,
       "status": "active"
     },
     {
@@ -670,6 +720,8 @@
       "incidentCount": 0,
       "triageLevel": 0,
       "attendance": 95,
+      "gpa": null,
+      "courseFailures": null,
       "status": "Active"
     },
     {
@@ -684,6 +736,8 @@
       "incidentCount": 1,
       "triageLevel": 1,
       "attendance": 95,
+      "gpa": null,
+      "courseFailures": null,
       "status": "active"
     },
     {
@@ -698,6 +752,8 @@
       "incidentCount": 2,
       "triageLevel": 1,
       "attendance": 93,
+      "gpa": null,
+      "courseFailures": null,
       "status": "Active"
     },
     {
@@ -712,6 +768,8 @@
       "incidentCount": 1,
       "triageLevel": 1,
       "attendance": 96,
+      "gpa": null,
+      "courseFailures": null,
       "status": "Active"
     },
     {
@@ -726,6 +784,8 @@
       "incidentCount": 3,
       "triageLevel": 2,
       "attendance": 83,
+      "gpa": null,
+      "courseFailures": null,
       "status": "active"
     },
     {
@@ -740,6 +800,8 @@
       "incidentCount": 0,
       "triageLevel": 0,
       "attendance": 100,
+      "gpa": null,
+      "courseFailures": null,
       "status": "Active"
     },
     {
@@ -754,6 +816,8 @@
       "incidentCount": 0,
       "triageLevel": 0,
       "attendance": 97,
+      "gpa": null,
+      "courseFailures": null,
       "status": "active"
     },
     {
@@ -768,6 +832,8 @@
       "incidentCount": 0,
       "triageLevel": 0,
       "attendance": 97,
+      "gpa": null,
+      "courseFailures": null,
       "status": "Active"
     },
     {
@@ -782,6 +848,8 @@
       "incidentCount": 1,
       "triageLevel": 1,
       "attendance": 94,
+      "gpa": null,
+      "courseFailures": null,
       "status": "active"
     },
     {
@@ -796,6 +864,8 @@
       "incidentCount": 2,
       "triageLevel": 2,
       "attendance": 84,
+      "gpa": null,
+      "courseFailures": null,
       "status": "Active"
     },
     {
@@ -810,6 +880,8 @@
       "incidentCount": 2,
       "triageLevel": 0,
       "attendance": 83,
+      "gpa": null,
+      "courseFailures": null,
       "status": "Active"
     },
     {
@@ -824,6 +896,8 @@
       "incidentCount": 4,
       "triageLevel": 3,
       "attendance": 20,
+      "gpa": null,
+      "courseFailures": null,
       "status": "Active"
     },
     {
@@ -838,6 +912,8 @@
       "incidentCount": 0,
       "triageLevel": 0,
       "attendance": 97,
+      "gpa": null,
+      "courseFailures": null,
       "status": "active"
     },
     {
@@ -852,6 +928,8 @@
       "incidentCount": 4,
       "triageLevel": 2,
       "attendance": 80,
+      "gpa": null,
+      "courseFailures": null,
       "status": "Active"
     },
     {
@@ -866,6 +944,8 @@
       "incidentCount": 1,
       "triageLevel": 1,
       "attendance": 92,
+      "gpa": null,
+      "courseFailures": null,
       "status": "active"
     }
   ],
@@ -15295,5 +15375,6 @@
       "period": "Full Day",
       "remarks": "Unexcused absence - truancy / disciplinary suspension"
     }
-  ]
+  ],
+  "interventions": []
 }

@@ -1,11 +1,849 @@
 <!DOCTYPE html>
-<html>
-<head>
-    <meta http-equiv="refresh" content="0; url=students.html">
-    <title>Redirecting to Students...</title>
-</head>
-<body>
-    <script>window.location.replace('students.html');</script>
-</body>
-</html>
+<html lang="en">
 
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Self View and Voice Portal — Sentinel Edu</title>
+
+    <!-- Google Fonts: Google Sans & Product Sans for Header Only -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Product+Sans:wght@400;700&display=swap" rel="stylesheet">
+
+    <!-- Shared Stylesheet -->
+    <link rel="stylesheet" href="style/style.css">
+
+    <style>
+        body {
+            background-color: rgba(17, 17, 17, 0.72);
+            color: #111111;
+            font-family: 'Google Sans', sans-serif;
+            margin: 0;
+            min-height: 100vh;
+        }
+
+        .site-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1.5rem;
+            flex-wrap: nowrap;
+            background: #ffffff;
+        }
+
+        .brand-logo {
+            white-space: nowrap !important;
+            flex-shrink: 0 !important;
+            display: inline-flex !important;
+            align-items: baseline !important;
+        }
+
+        .header-actions {
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+        }
+
+        .doc-shell {
+            max-width: 820px;
+            margin: 2rem auto 4rem;
+            padding: 0 1rem;
+        }
+
+        .doc-toolbar {
+            width: 100%;
+            background: #111111;
+            color: #ffffff;
+            padding: 0.85rem 1.25rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            border: 1px solid #111111;
+            box-sizing: border-box;
+        }
+
+        .doc-selector-select {
+            border: 1px solid #525252;
+            background: #1f2937;
+            color: #ffffff;
+            padding: 0.42rem 0.7rem;
+            font-family: inherit;
+            font-size: 0.82rem;
+            font-weight: 600;
+            max-width: 280px;
+        }
+
+        .doc-toolbar-btn {
+            border: 1px solid #525252;
+            background: transparent;
+            color: #ffffff;
+            padding: 0.45rem 0.9rem;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            cursor: pointer;
+            font-family: inherit;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            text-decoration: none;
+        }
+
+        .doc-toolbar-btn.is-print {
+            background: #16a34a;
+            border-color: #16a34a;
+            color: #ffffff;
+        }
+
+        .doc-toolbar-btn.is-close:hover {
+            background: #dc2626;
+            border-color: #dc2626;
+            color: #ffffff;
+        }
+
+        .doc-toolbar-icon {
+            width: 16px;
+            height: 16px;
+            display: block;
+            object-fit: contain;
+        }
+
+        #studentSelfViewPaper {
+            width: 100%;
+            background: #ffffff;
+            color: #000000;
+            border: 1px solid #000000;
+            padding: 2.5rem 2.75rem;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.14);
+            box-sizing: border-box;
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 11pt;
+            font-weight: 400;
+        }
+
+        .doc-letterhead {
+            padding-bottom: 6pt;
+            margin-bottom: 12pt;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 1rem;
+            font-size: 11pt;
+            font-weight: 400;
+            color: #000000;
+        }
+
+        .doc-h1 {
+            font-size: 20pt;
+            font-weight: 400;
+            line-height: 1.15;
+            color: #000000;
+            margin: 4pt 0 4pt 0;
+        }
+
+        .doc-h2 {
+            font-size: 16pt;
+            font-weight: 400;
+            line-height: 1.15;
+            color: #000000;
+            margin: 16pt 0 6pt 0;
+        }
+
+        .doc-para {
+            font-size: 11pt;
+            font-weight: 400;
+            line-height: 1.5;
+            text-align: justify;
+            margin: 0 0 10pt 0;
+            color: #000000;
+        }
+
+        .doc-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11pt;
+            font-weight: 400;
+            margin-bottom: 14pt;
+            color: #000000;
+            background: #ffffff;
+        }
+
+        .doc-table th,
+        .doc-table td {
+            border: 1px solid #000000;
+            padding: 6pt 8pt;
+            text-align: left;
+            vertical-align: top;
+            font-weight: 400;
+            color: #000000;
+            background: #ffffff;
+        }
+
+        .voice-form-doc {
+            display: flex;
+            flex-direction: column;
+            gap: 8pt;
+            margin-bottom: 14pt;
+        }
+
+        .voice-label {
+            display: block;
+            font-size: 11pt;
+            font-weight: 400;
+            color: #000000;
+            margin-bottom: 3pt;
+        }
+
+        .voice-input,
+        .voice-textarea {
+            width: 100%;
+            box-sizing: border-box;
+            border: 1px solid #000000;
+            padding: 6pt 8pt;
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 11pt;
+            font-weight: 400;
+            color: #000000;
+            background: #ffffff;
+        }
+
+        .voice-textarea {
+            min-height: 90pt;
+            resize: vertical;
+        }
+
+        .btn-submit-doc {
+            align-self: flex-start;
+            border: 1px solid #000000;
+            background: #ffffff;
+            color: #000000;
+            padding: 6pt 14pt;
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 11pt;
+            font-weight: 400;
+            cursor: pointer;
+        }
+
+        .btn-submit-doc:hover {
+            background: #000000;
+            color: #ffffff;
+        }
+
+        .status-toast-doc {
+            padding: 6pt 8pt;
+            border: 1px solid #000000;
+            font-size: 11pt;
+            font-weight: 400;
+            color: #000000;
+            background: #ffffff;
+            display: none;
+        }
+
+        @media print {
+            .site-header,
+            .doc-toolbar,
+            #concernFormSection {
+                display: none !important;
+            }
+            html,
+            body {
+                background: #ffffff !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+            .doc-shell {
+                max-width: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+            #studentSelfViewPaper {
+                border: none !important;
+                box-shadow: none !important;
+                padding: 0.4in !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="site-header">
+        <a href="index.html" class="brand-logo">
+            Sentinel Edu<span class="brand-dot"></span>
+        </a>
+
+        <nav>
+            <ul class="nav-links">
+                <!-- Populated by auth.js -->
+            </ul>
+        </nav>
+
+        <div class="header-actions">
+            <a href="login.html" class="login-btn">
+                <span class="login-avatar">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                    </svg>
+                </span>
+                Staff Login
+            </a>
+        </div>
+    </header>
+
+    <main class="doc-shell">
+
+        <div class="doc-toolbar">
+            <div style="display:flex; align-items:center; gap:0.65rem; flex-wrap:wrap;">
+                <label for="studentSelfSelector" style="font-size:0.8rem; font-weight:700; text-transform:uppercase; letter-spacing:0.04em;">Student:</label>
+                <select id="studentSelfSelector" class="doc-selector-select" onchange="renderStudentSelfView(this.value)">
+                    <option value="">Loading student profiles...</option>
+                </select>
+            </div>
+            <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+                <button type="button" class="doc-toolbar-btn is-print" id="btnDownloadStudentPdf" onclick="downloadStudentSelfViewPdf()">
+                    <img src="icons/download_24dp_E3E3E3_FILL0_wght400_GRAD0_opsz24.png" alt="Download" class="doc-toolbar-icon">
+                    <span>Download PDF</span>
+                </button>
+                <button type="button" class="doc-toolbar-btn" id="btnPrintStudentDoc" onclick="printStudentSelfView()">
+                    <img src="icons/print_24dp_E3E3E3_FILL0_wght400_GRAD0_opsz24.png" alt="Print" class="doc-toolbar-icon">
+                    <span>Print</span>
+                </button>
+                <a href="engine.html" class="doc-toolbar-btn is-close" aria-label="Close">
+                    <img src="icons/close_24dp_E3E3E3_FILL0_wght400_GRAD0_opsz24.png" alt="Close" class="doc-toolbar-icon">
+                    <span>Close</span>
+                </a>
+            </div>
+        </div>
+
+        <article id="studentSelfViewPaper">
+            <div class="doc-letterhead">
+                <div>
+                    <div>Republic of Trinidad and Tobago, Ministry of Education</div>
+                    <h1 class="doc-h1">Student Self View and Support Recovery Statement</h1>
+                    <div>Student Transparency, Progress Guidance and Confidential Voice Record</div>
+                </div>
+                <div style="text-align:right; line-height:1.45;">
+                    <div id="docRefNo">Ref No: MOE SSV 2026</div>
+                    <div id="docIssuedDate">Issued: —</div>
+                    <div id="docStudentIdLine">Student ID: —</div>
+                </div>
+            </div>
+
+            <h2 class="doc-h2">1. Plain Language Explanation of Support Score</h2>
+            <p class="doc-para" id="svIntroPara">
+                Loading student support calculation...
+            </p>
+            <p class="doc-para" id="svDetailPara">
+                Loading factor explanation...
+            </p>
+
+            <h2 class="doc-h2">2. Summary of Scoring Factors and Recovery Opportunities</h2>
+            <table class="doc-table">
+                <thead>
+                    <tr>
+                        <th>Support Indicator</th>
+                        <th>Current Record</th>
+                        <th>Score Contribution</th>
+                        <th>Recommended Recovery Opportunity</th>
+                    </tr>
+                </thead>
+                <tbody id="svFactorsTableBody">
+                    <tr>
+                        <td colspan="4">Loading student indicators...</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2 class="doc-h2">3. Guidance Recovery Plan and Next Steps</h2>
+            <div id="svRecoveryParagraphs">
+                <p class="doc-para">Loading recommended recovery plan...</p>
+            </div>
+
+            <h2 class="doc-h2">4. Confidential Student Voice and Concern Submission</h2>
+            <p class="doc-para">
+                Students may submit bullying reports, coursework stress requests, campus safety observations, or counseling inquiries confidentially using the form below. Submissions are stored for review by School Guidance Officers and the Student Support Services Division.
+            </p>
+
+            <section id="concernFormSection">
+                <form class="voice-form-doc" id="studentConcernForm" onsubmit="submitStudentConcern(event)">
+                    <div>
+                        <label class="voice-label" for="concernCategory">Concern Category</label>
+                        <select id="concernCategory" class="voice-input" required>
+                            <option value="Bullying or Peer Conflict">Bullying or Peer Conflict</option>
+                            <option value="Academic or Coursework Stress">Academic or Coursework Stress</option>
+                            <option value="Mental Health or Counseling Request">Mental Health or Counseling Request</option>
+                            <option value="Facility or Campus Safety Issue">Facility or Campus Safety Issue</option>
+                            <option value="General Suggestion or School Climate">General Suggestion or School Climate</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="voice-label" for="concernText">Statement of Concern or Request for Support</label>
+                        <textarea id="concernText" class="voice-textarea" required placeholder="Enter your statement here..."></textarea>
+                    </div>
+
+                    <label style="display:flex; align-items:center; gap:6pt; font-size:11pt; font-weight:400; color:#000000; cursor:pointer;">
+                        <input type="checkbox" id="concernAnonymous" checked>
+                        Submit anonymously without recording student name or student identification number
+                    </label>
+
+                    <button type="submit" class="btn-submit-doc" id="submitConcernBtn">
+                        Submit Confidential Statement
+                    </button>
+
+                    <div class="status-toast-doc" id="concernStatusToast">
+                        Your statement has been recorded for Guidance and Student Support Services Division review.
+                    </div>
+                </form>
+            </section>
+
+            <div id="concernsFeedList">
+                <p class="doc-para">No confidential student submissions have been recorded yet in this browser.</p>
+            </div>
+        </article>
+
+    </main>
+
+    <script src="data/seed.js"></script>
+    <script src="auth.js?v=3"></script>
+
+    <script>
+        const SUPABASE_REST_URL = "https://wrumedevccqkopguaxdi.supabase.co/rest/v1";
+        const SUPABASE_ANON_KEY = "sb_publishable_zpd_lzgRqghcN-0X7qw7SA_I2hAZHXH";
+        const MONTH_MS = 30 * 24 * 60 * 60 * 1000;
+        const DAY_MS = 24 * 60 * 60 * 1000;
+
+        const WEIGHT_MATRIX = { 1: 1, 2: 3, 3: 7, 4: 12, 5: 25 };
+
+        let allStudentsList = [];
+        let allIncidentsList = [];
+        let selectedStudentRecord = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadStudentPortalData();
+            renderConcernsFeed();
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('#studentSelfViewPaper, .doc-toolbar, .site-header')) {
+                    window.location.href = 'engine.html';
+                }
+            });
+        });
+
+        function getActiveParticipationPoints(studentId, referenceTime = Date.now()) {
+            try {
+                const logRaw = localStorage.getItem(`sentinel_points_log_${studentId}`);
+                if (logRaw) {
+                    const log = JSON.parse(logRaw);
+                    if (Array.isArray(log)) {
+                        let decayedTotal = 0;
+                        log.forEach(entry => {
+                            const amt = Number(entry.amount) || 0;
+                            const ts = entry.timestamp ? new Date(entry.timestamp).getTime() : referenceTime;
+                            const ageMs = Math.max(0, referenceTime - ts);
+                            const monthsElapsed = Math.floor(ageMs / MONTH_MS);
+                            const factor = monthsElapsed <= 0 ? 1.0 : Math.pow(0.5, monthsElapsed);
+                            decayedTotal += amt * factor;
+                        });
+                        return Math.round(decayedTotal);
+                    }
+                }
+                const pts = localStorage.getItem(`sentinel_points_${studentId}`);
+                if (pts !== null) return parseInt(pts, 10) || 0;
+            } catch (_) {}
+
+            let hash = 0;
+            const str = String(studentId || 'stu');
+            for (let i = 0; i < str.length; i++) {
+                hash = (hash << 5) - hash + str.charCodeAt(i);
+            }
+            return Math.abs(hash % 20) + 5;
+        }
+
+        function getSavedAttendance(studentId, seedAtt) {
+            try {
+                const saved = localStorage.getItem(`sentinel_att_rate_${studentId}`);
+                if (saved !== null) {
+                    const n = parseFloat(saved);
+                    if (!isNaN(n)) return Math.max(0, Math.min(100, n));
+                }
+            } catch (_) {}
+            return Number(seedAtt !== undefined ? seedAtt : 92);
+        }
+
+        function getSavedGpa(studentId, seedGpa) {
+            try {
+                const saved = localStorage.getItem(`sentinel_gpa_${studentId}`);
+                if (saved !== null) {
+                    const n = parseFloat(saved);
+                    if (!isNaN(n)) return Math.max(0, Math.min(4.0, n));
+                }
+            } catch (_) {}
+            return Number(seedGpa !== undefined ? seedGpa : 2.8);
+        }
+
+        function getSavedFailures(studentId, seedFailures) {
+            try {
+                const saved = localStorage.getItem(`sentinel_failures_${studentId}`);
+                if (saved !== null) {
+                    const n = parseInt(saved, 10);
+                    if (!isNaN(n)) return Math.max(0, Math.min(10, n));
+                }
+            } catch (_) {}
+            return Number(seedFailures || 0);
+        }
+
+        function isExcludedTestStudentRecord(st) {
+            if (!st) return true;
+            const id = String(st.id || '').toLowerCase();
+            const stuNum = String(st.studentNumber || st.studentId || '').toLowerCase();
+            const name = String(st.name || '').trim().toLowerCase();
+            return id === 'stu_test_01' || id === 'stu_1794342607079' || stuNum === 'stu-test-2026' ||
+                name === 'test student' || name === 'test' || name === 'automated test student';
+        }
+
+        function isExcludedTestIncidentRecord(inc) {
+            if (!inc) return true;
+            const id = String(inc.id || '').toLowerCase();
+            const stuId = String(inc.studentId || inc.student_id || '').toLowerCase();
+            const stuName = String(inc.studentName || inc.student_name || '').trim().toLowerCase();
+            const desc = String(inc.description || '').toLowerCase();
+            return id === 'inc_test_01' || id === 'inc_test_02' || id === 'inc_test_03' ||
+                stuId === 'stu_test_01' || stuId === 'stu_1794342607079' ||
+                stuName === 'test student' || stuName === 'automated test student' || stuName === 'test' || stuName === 'rarar' ||
+                desc.includes('auditor bot');
+        }
+
+        function loadStudentPortalData() {
+            const seed = window.SENTINEL_SEED_DATA || {};
+            allStudentsList = (Array.isArray(seed.students) ? seed.students : []).filter(s => !isExcludedTestStudentRecord(s));
+            allIncidentsList = (Array.isArray(seed.incidents) ? seed.incidents : []).filter(i => !isExcludedTestIncidentRecord(i));
+
+            const sel = document.getElementById('studentSelfSelector');
+            if (!sel) return;
+
+            if (allStudentsList.length === 0) {
+                sel.innerHTML = '<option value="">No student records found</option>';
+                return;
+            }
+
+            sel.innerHTML = allStudentsList.map(st => {
+                const label = `${st.name} (${st.form || 'Form 3'})`;
+                return `<option value="${st.id}">${label}</option>`;
+            }).join('');
+
+            const params = new URLSearchParams(window.location.search);
+            const requestedId = params.get('id');
+            const initialId = (requestedId && allStudentsList.some(s => s.id === requestedId))
+                ? requestedId
+                : allStudentsList[0].id;
+
+            sel.value = initialId;
+            renderStudentSelfView(initialId);
+        }
+
+        function computeStudentProfile(st) {
+            const now = Date.now();
+            const rawId = st.id || 'stu';
+            const sName = st.name || 'Student';
+            let savedStatuses = {};
+            try {
+                savedStatuses = JSON.parse(localStorage.getItem('sentinel_inc_statuses') || '{}') || {};
+            } catch (_) {}
+
+            const studentIncs = allIncidentsList.filter(i => {
+                const sidMatch = i.studentId && i.studentId === rawId;
+                const nameMatch = i.studentName && i.studentName.toLowerCase() === sName.toLowerCase();
+                return sidMatch || nameMatch;
+            }).map(i => {
+                const ls = savedStatuses[i.id || i.incidentId];
+                return ls ? Object.assign({}, i, { status: ls.status || i.status }) : i;
+            });
+
+            let weightedIncSum = 0;
+            let hasL5 = false;
+            let openCount = 0;
+            studentIncs.forEach(inc => {
+                let lvl = inc.level ? parseInt(inc.level, 10) : 1;
+                if (!inc.level && inc.matrix) {
+                    const m = String(inc.matrix).toLowerCase();
+                    if (m.includes('5')) lvl = 5;
+                    else if (m.includes('4')) lvl = 4;
+                    else if (m.includes('3')) lvl = 3;
+                    else if (m.includes('2')) lvl = 2;
+                }
+                if (lvl === 5) hasL5 = true;
+                const isResolved = (inc.status || '').toLowerCase() === 'resolved';
+                if (!isResolved) openCount++;
+                const baseW = (inc.weight !== undefined && inc.weight !== null && !isNaN(Number(inc.weight)))
+                    ? Number(inc.weight)
+                    : (WEIGHT_MATRIX[lvl] || 1);
+                let recency = 1.0;
+                if (inc.created_at || inc.createdAt || inc.date) {
+                    const t = new Date(inc.created_at || inc.createdAt || inc.date).getTime();
+                    if (!isNaN(t)) {
+                        const days = Math.max(0, (now - t) / DAY_MS);
+                        if (days > 180) recency = 0.50;
+                        else if (days > 90) recency = 0.70;
+                        else if (days > 30) recency = 0.85;
+                    }
+                }
+                weightedIncSum += baseW * recency * (isResolved ? 0.80 : 1.25);
+            });
+
+            const attRate = getSavedAttendance(rawId, st.attendance);
+            const attPenalty = Math.max(0, 100 - attRate) * 0.45;
+            const gpaNum = getSavedGpa(rawId, st.gpa);
+            const failures = getSavedFailures(rawId, st.courseFailures);
+            const coursePenalty = Math.max(0, (2.5 - gpaNum) * 8) + Math.min(20, failures * 4);
+            const pbisPts = getActiveParticipationPoints(rawId, now);
+            const pbisOffset = Math.min(25, pbisPts * 0.4);
+            const behaviorBase = studentIncs.length > 0 ? 5 : 0;
+            const behaviorTotal = weightedIncSum + behaviorBase;
+
+            let score = attPenalty + behaviorTotal + coursePenalty - pbisOffset;
+            if (hasL5) score = Math.max(score, 75);
+            score = Math.min(98, Math.max(4, Math.round(score)));
+
+            return {
+                id: rawId,
+                studentNumber: st.studentNumber || st.studentId || rawId,
+                name: sName,
+                form: st.form || 'Form 3',
+                school: st.school || 'Port of Spain North Secondary',
+                schoolId: st.schoolId || st.school_id || 'sch_001',
+                district: st.district || 'Port of Spain & Environs District',
+                attRate,
+                attPenalty,
+                behaviorTotal,
+                openCount,
+                totalIncs: studentIncs.length,
+                gpa: gpaNum.toFixed(2),
+                failures,
+                coursePenalty,
+                pbisPts,
+                pbisOffset,
+                riskScore: score
+            };
+        }
+
+        function buildStudentRecoveryData(p) {
+            const todayStr = new Date().toLocaleDateString('en-TT', { day: '2-digit', month: 'long', year: 'numeric' });
+            const tierLabel = p.riskScore >= 50
+                ? 'Tier 3 Priority Support and Guidance Intervention'
+                : p.riskScore >= 25
+                    ? 'Tier 2 Targeted Check In and Mentoring'
+                    : 'Tier 1 Healthy Preventive Baseline';
+
+            const attAction = p.attRate < 95
+                ? `Increase attendance toward 95 percent (each +5 percent lowers risk by 2.25 points)`
+                : 'Maintain current regular attendance above 95 percent';
+            const behAction = p.openCount > 0
+                ? `Meet with Form Dean to resolve ${p.openCount} open referral(s) and shift weight from 1.25x to 0.80x`
+                : 'Continue positive conduct record with zero open infractions';
+            const courseAction = (parseFloat(p.gpa) < 2.5 || p.failures > 0)
+                ? 'Attend after school tutoring, 1 on 5 Mentoring, or Vocational and Cooperative Learning tracks'
+                : 'Maintain passing grades across all enrolled courses';
+            const pbisAction = p.pbisPts < 30
+                ? 'Earn +10 PBIS merits via class participation or leadership to remove 4.0 risk points'
+                : 'Continue active participation merits before 30 day decay cycle';
+
+            const recoveryParagraphs = [];
+            if (p.openCount > 0) {
+                recoveryParagraphs.push(
+                    `First, the student currently has ${p.openCount} open disciplinary referral(s). Scheduling a restorative conference with the Form Dean or Guidance Counselor to close active cases will immediately reduce incident weighting from 1.25 times to 0.80 times and support steady score recovery.`
+                );
+            }
+            if (p.attRate < 95) {
+                const gain = Math.round(95 - p.attRate);
+                recoveryParagraphs.push(
+                    `Second, raising attendance from ${Math.round(p.attRate)} percent to 95 percent represents a ${gain} percentage point improvement, which reduces the Attendance Penalty by ${(gain * 0.45).toFixed(1)} points over subsequent reporting cycles.`
+                );
+            }
+            if (parseFloat(p.gpa) < 2.5 || p.failures > 0) {
+                recoveryParagraphs.push(
+                    `Third, because current academic records show a GPA of ${p.gpa} and ${p.failures} course failure(s), the student is eligible for structured 1 on 5 Mentoring, after school academic tutoring, or a Vocational and Trade Course Pivot paired with Cooperative Learning placement.`
+                );
+            }
+            recoveryParagraphs.push(
+                `Finally, consistent classroom participation directly rewards positive behaviour: earning additional Positive Behavioural Interventions and Supports merits offsets up to 25 risk points, helping transition the student smoothly toward Tier 1 standing.`
+            );
+
+            return {
+                todayStr,
+                tierLabel,
+                introText: `This Student Self View and Support Recovery Statement is prepared on ${todayStr} for ${p.name} (Student ID: ${p.studentNumber}), enrolled in ${p.form} at ${p.school}. Based on current attendance, behavioural conduct, coursework performance, and positive participation merits, the student holds an advisory triage score of ${p.riskScore} out of 100 and is currently placed in ${tierLabel}.`,
+                detailText: `The composite score combines an attendance rate of ${Math.round(p.attRate)} percent (+${p.attPenalty.toFixed(1)} risk points), ${p.totalIncs} recorded behavioural referral(s) including ${p.openCount} open case(s) (+${p.behaviorTotal.toFixed(1)} risk points), and an academic Grade Point Average of ${p.gpa} with ${p.failures} course failure(s) (+${p.coursePenalty.toFixed(1)} risk points), offset by ${p.pbisPts} active Positive Behavioural Interventions and Supports merit points (minus ${p.pbisOffset.toFixed(1)} risk points). Earned merits decay by 50 percent every 30 days to encourage steady ongoing participation.`,
+                tableRows: [
+                    ['Factor A: Attendance', `${Math.round(p.attRate)} percent attended`, `+${p.attPenalty.toFixed(1)} pts`, attAction],
+                    ['Factor B: Behaviour Referrals', `${p.totalIncs} total (${p.openCount} open)`, `+${p.behaviorTotal.toFixed(1)} pts`, behAction],
+                    ['Factor C: Coursework & GPA', `GPA ${p.gpa} (${p.failures} failed)`, `+${p.coursePenalty.toFixed(1)} pts`, courseAction],
+                    ['PBIS Positive Merit Shield', `${p.pbisPts} active merits`, `minus ${p.pbisOffset.toFixed(1)} pts`, pbisAction]
+                ],
+                recoveryParagraphs
+            };
+        }
+
+        function renderStudentSelfView(studentId) {
+            const raw = allStudentsList.find(s => s.id === studentId) || allStudentsList[0];
+            if (!raw) return;
+
+            const p = computeStudentProfile(raw);
+            selectedStudentRecord = p;
+            const d = buildStudentRecoveryData(p);
+            const cleanId = String(p.id).replace(/[^a-zA-Z0-9]/g, '').slice(-4).toUpperCase() || '001';
+
+            document.getElementById('docRefNo').textContent = `Ref No: MOE SSV 2026 ${cleanId}`;
+            document.getElementById('docIssuedDate').textContent = `Issued: ${d.todayStr}`;
+            document.getElementById('docStudentIdLine').textContent = `Student ID: ${p.studentNumber}`;
+            document.getElementById('svIntroPara').textContent = d.introText;
+            document.getElementById('svDetailPara').textContent = d.detailText;
+
+            document.getElementById('svFactorsTableBody').innerHTML = d.tableRows.map(row => `
+                <tr>
+                    <td>${row[0]}</td>
+                    <td>${row[1]}</td>
+                    <td>${row[2]}</td>
+                    <td>${row[3]}</td>
+                </tr>
+            `).join('');
+
+            document.getElementById('svRecoveryParagraphs').innerHTML = d.recoveryParagraphs
+                .map(txt => `<p class="doc-para">${txt}</p>`)
+                .join('');
+        }
+
+        function printStudentSelfView() {
+            if (typeof window.focus === 'function') window.focus();
+            if (typeof window.print === 'function') window.print();
+        }
+
+        function downloadStudentSelfViewPdf() {
+            if (!selectedStudentRecord || typeof window.downloadCustomDocumentPdf !== 'function') return;
+            const p = selectedStudentRecord;
+            const d = buildStudentRecoveryData(p);
+            const cleanId = String(p.id).replace(/[^a-zA-Z0-9]/g, '').slice(-4).toUpperCase() || '001';
+            const safeName = String(p.name || 'Student').replace(/[^a-zA-Z0-9]+/g, '_').replace(/^_|_$/g, '');
+
+            window.downloadCustomDocumentPdf({
+                fileName: `Student_Self_View_${safeName}.pdf`,
+                institutionLine: 'Republic of Trinidad and Tobago, Ministry of Education',
+                title: 'Student Self View and Support Recovery Statement',
+                metaLine: `Ref No: MOE SSV 2026 ${cleanId} | Issued: ${d.todayStr} | Student ID: ${p.studentNumber}`,
+                blocks: [
+                    { type: 'h2', text: '1. Plain Language Explanation of Support Score' },
+                    { type: 'p', text: d.introText },
+                    { type: 'p', text: d.detailText },
+                    { type: 'h2', text: '2. Summary of Scoring Factors and Recovery Opportunities' },
+                    {
+                        type: 'table',
+                        headers: ['Support Indicator', 'Current Record', 'Score Impact', 'Recovery Opportunity'],
+                        colWidths: [110, 105, 85, 204],
+                        rows: d.tableRows
+                    },
+                    { type: 'h2', text: '3. Guidance Recovery Plan and Next Steps' },
+                    ...d.recoveryParagraphs.map(text => ({ type: 'p', text }))
+                ]
+            });
+        }
+
+        function getSavedConcerns() {
+            try {
+                const raw = localStorage.getItem('sentinel_student_concerns');
+                const parsed = raw ? JSON.parse(raw) : [];
+                return Array.isArray(parsed) ? parsed : [];
+            } catch (_) {
+                return [];
+            }
+        }
+
+        function submitStudentConcern(event) {
+            event.preventDefault();
+            const categoryEl = document.getElementById('concernCategory');
+            const textEl = document.getElementById('concernText');
+            const anonEl = document.getElementById('concernAnonymous');
+            const toastEl = document.getElementById('concernStatusToast');
+
+            const text = (textEl && textEl.value || '').trim();
+            if (!text) return;
+
+            const isAnonymous = anonEl ? Boolean(anonEl.checked) : true;
+            const nowIso = new Date().toISOString();
+            const entry = {
+                id: `con_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+                school_id: (selectedStudentRecord && selectedStudentRecord.schoolId) || 'sch_001',
+                school: (selectedStudentRecord && selectedStudentRecord.school) || 'Port of Spain North Secondary',
+                category: categoryEl ? categoryEl.value : 'General Suggestion or School Climate',
+                concern_text: text,
+                is_anonymous: isAnonymous,
+                student_id: isAnonymous ? null : (selectedStudentRecord && selectedStudentRecord.id) || null,
+                student_label: isAnonymous ? 'Anonymous Student' : ((selectedStudentRecord && selectedStudentRecord.name) || 'Student'),
+                status: 'Open',
+                created_at: nowIso
+            };
+
+            const existing = getSavedConcerns();
+            existing.unshift(entry);
+            try {
+                localStorage.setItem('sentinel_student_concerns', JSON.stringify(existing.slice(0, 100)));
+            } catch (_) {}
+
+            try {
+                const dbPayload = {
+                    id: entry.id,
+                    school_id: entry.school_id,
+                    school: entry.school,
+                    category: entry.category,
+                    concern_text: entry.concern_text,
+                    is_anonymous: entry.is_anonymous,
+                    student_id: entry.student_id,
+                    status: entry.status,
+                    created_at: entry.created_at
+                };
+                if (window.supabaseClient && typeof window.supabaseClient.from === 'function') {
+                    Promise.resolve(window.supabaseClient.from('student_concerns').insert(dbPayload)).catch(() => {});
+                } else {
+                    fetch(`${SUPABASE_REST_URL}/student_concerns`, {
+                        method: 'POST',
+                        headers: {
+                            'apikey': SUPABASE_ANON_KEY,
+                            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(dbPayload)
+                    }).catch(() => {});
+                }
+            } catch (_) {}
+
+            if (textEl) textEl.value = '';
+            if (toastEl) {
+                toastEl.style.display = 'block';
+                setTimeout(() => { toastEl.style.display = 'none'; }, 4000);
+            }
+            renderConcernsFeed();
+        }
+
+        function renderConcernsFeed() {
+            const container = document.getElementById('concernsFeedList');
+            if (!container) return;
+            const list = getSavedConcerns();
+            if (list.length === 0) {
+                container.innerHTML = '<p class="doc-para">No confidential student submissions have been recorded yet in this browser.</p>';
+                return;
+            }
+            container.innerHTML = list.slice(0, 10).map(item => {
+                const when = item.created_at ? new Date(item.created_at).toLocaleString() : 'Current date';
+                const who = item.is_anonymous ? 'Anonymous Student' : (item.student_label || 'Identified Student');
+                const safeText = String(item.concern_text || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                return `<p class="doc-para">Submitted on ${when} by ${who} under category ${item.category}: ${safeText}</p>`;
+            }).join('');
+        }
+    </script>
+
+</body>
+
+</html>

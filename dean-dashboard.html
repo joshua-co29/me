@@ -287,7 +287,9 @@
         }
         .level-1 { background: #fef3c7; color: #92400e; }
         .level-2 { background: #fed7aa; color: #9a3412; }
-        .level-3 { background: #fee2e2; color: #991b1b; }
+        .level-3 { background: #fee2e2; color: #dc2626; }
+        .level-4 { background: #fecaca; color: #7f1d1d; }
+        .level-5 { background: #450a0a; color: #ffffff; }
         .level-0 { background: #f3f4f6; color: #6b7280; }
 
         .status-pill {
@@ -930,9 +932,11 @@
                             <label style="display:block; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #4b5563; margin-bottom: 0.35rem;">Discipline Matrix Level</label>
                             <select id="deanIncMatrix" required onchange="handleDeanMatrixChange(this.value)" style="width: 100%; padding: 0.65rem 0.85rem; border: 1px solid rgba(0,0,0,0.15); border-radius: 4px; font-size: 0.88rem; font-family: inherit; box-sizing: border-box;">
                                 <option value="">Select matrix level…</option>
-                                <option value="Level 1 Matrix">Level 1 — Minor Infraction</option>
-                                <option value="Level 2 Matrix">Level 2 — Moderate Infraction</option>
-                                <option value="Level 3 Matrix">Level 3 — Severe Infraction</option>
+                                <option value="Level 1 Matrix">Level 1 — Minor Infraction (1 pt)</option>
+                                <option value="Level 2 Matrix">Level 2 — Minor-Moderate Infraction (3 pts)</option>
+                                <option value="Level 3 Matrix">Level 3 — Moderate-Serious Infraction (7 pts)</option>
+                                <option value="Level 4 Matrix">Level 4 — Serious Infraction (12 pts)</option>
+                                <option value="Level 5 Matrix">Level 5 — Critical Misconduct / Criminal (25 pts)</option>
                             </select>
                         </div>
 
@@ -1522,7 +1526,11 @@
         function handleDeanMatrixChange(val) {
             const actionEl = document.getElementById('deanIncAction');
             if (!actionEl) return;
-            if (val === 'Level 3 Matrix') {
+            if (val === 'Level 5 Matrix') {
+                actionEl.value = 'Ministry Escalated Review';
+            } else if (val === 'Level 4 Matrix') {
+                actionEl.value = 'Administrative Suspension';
+            } else if (val === 'Level 3 Matrix') {
                 actionEl.value = 'Dean Formal Review';
             } else if (val === 'Level 2 Matrix' && !actionEl.value) {
                 actionEl.value = 'Parent Conference Logged';
@@ -1553,7 +1561,7 @@
                 return;
             }
 
-            const levelNum = matrixVal.includes('3') ? 3 : matrixVal.includes('2') ? 2 : 1;
+            const levelNum = matrixVal.includes('5') ? 5 : matrixVal.includes('4') ? 4 : matrixVal.includes('3') ? 3 : matrixVal.includes('2') ? 2 : 1;
             const matchStudent = allStudents.find(s => {
                 const name = (s.name || `${s.firstName || ''} ${s.lastName || ''}`).toLowerCase();
                 return name === studentName.toLowerCase();
@@ -1772,12 +1780,14 @@
                     <th>Incidents</th>
                     <th>Triage Level</th>
                     <th>Status</th>
+                    <th style="text-align:right;">Official Record</th>
                 </tr></thead>
                 <tbody>
                 ${students.map(s => {
                     const sName = s.name || `${s.firstName || ''} ${s.lastName || ''}`.trim() || 'Student';
                     const sId   = s.studentId || s.studentNumber || s.id || '–';
-                    const att   = Number(s.attendance) || 85;
+                    const rawId = (s.id || sId).replace(/'/g, "\\'");
+                    const att   = Number(localStorage.getItem(`sentinel_att_rate_${s.id}`) || s.attendance) || 85;
                     const attCls = att >= 85 ? 'att-good' : att >= 70 ? 'att-warn' : 'att-risk';
                     const incCount = s.incidentCount !== undefined ? s.incidentCount
                         : allIncidents.filter(i => i.studentId === s.id || (i.studentName || '').toLowerCase() === sName.toLowerCase()).length;
@@ -1790,6 +1800,10 @@
                         <td><strong style="color:${incCount > 2 ? '#991b1b' : '#111'};">${incCount}</strong></td>
                         <td>${levelBadge(s.triageLevel)}</td>
                         <td><span class="status-pill status-active">${s.status || 'Active'}</span></td>
+                        <td style="text-align:right; white-space:nowrap;">
+                            <button type="button" class="btn-edit-status" onclick="if (typeof openStatementOfConductModal === 'function') openStatementOfConductModal('${rawId}', 'conduct')">Conduct PDF</button>
+                            <button type="button" class="btn-edit-status" style="margin-left:0.3rem; border-color:#7f1d1d; color:#7f1d1d;" onclick="if (typeof openStatementOfConductModal === 'function') openStatementOfConductModal('${rawId}', 'sssd')">SSSD PDF</button>
+                        </td>
                     </tr>`;
                 }).join('')}
                 </tbody>
@@ -1802,6 +1816,8 @@
             if (n === 1) return `<span class="level-badge level-1">Level 1</span>`;
             if (n === 2) return `<span class="level-badge level-2">Level 2</span>`;
             if (n === 3) return `<span class="level-badge level-3">Level 3 ⚠</span>`;
+            if (n === 4) return `<span class="level-badge level-4">Level 4 ⚠</span>`;
+            if (n === 5) return `<span class="level-badge level-5">Level 5 CRITICAL</span>`;
             return `<span class="level-badge level-0">–</span>`;
         }
 

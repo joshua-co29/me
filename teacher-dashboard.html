@@ -998,13 +998,14 @@
                                     <th>Student ID</th>
                                     <th>Form / Class</th>
                                     <th>Attendance</th>
+                                    <th>GPA</th>
                                     <th>Incidents</th>
                                     <th style="text-align: right;">Action</th>
                                 </tr>
                             </thead>
                             <tbody id="classRollBody">
                                 <tr>
-                                    <td colspan="6" style="text-align: center; padding: 2.5rem; color: #717682;">
+                                    <td colspan="7" style="text-align: center; padding: 2.5rem; color: #717682;">
                                         Select a class above to inspect enrolled students…
                                     </td>
                                 </tr>
@@ -1131,9 +1132,9 @@
                     <label for="modalMatrixLevel">Discipline Matrix Level *</label>
                     <select id="modalMatrixLevel" required>
                         <option value="1">Level 1 — Minor Classroom Infraction</option>
-                        <option value="2">Level 2 — Moderate Behavioral Disruption</option>
-                        <option value="3">Level 3 — Severe / Critical Misconduct</option>
+                        <option value="2">Level 2 — Minor-Moderate Behavioral Disruption</option>
                     </select>
+                    <small style="font-size:0.74rem; color:#92400e;">Teacher RBAC: Teachers may log Levels 1–2 only. Refer Level 3–5 infractions to the Dean of Discipline.</small>
                 </div>
                 <div class="modal-form-group">
                     <label for="modalActionTaken">Initial Action Taken *</label>
@@ -1151,6 +1152,33 @@
                 <div class="modal-actions">
                     <button type="button" class="btn-modal-cancel" onclick="closeQuickIncidentModal()">Cancel</button>
                     <button type="submit" class="btn-modal-save">Submit Report</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal for Updating Student ABC Metrics (Attendance & GPA / Course Failures) -->
+    <div class="modal-overlay" id="abcQuickEditModal">
+        <div class="modal-card">
+            <h3>Update Student ABC Indicators</h3>
+            <p class="modal-sub" id="abcModalStudentLabel">Attendance ("A") &amp; Coursework GPA ("C") Roll Update</p>
+            <form id="abcQuickEditForm" onsubmit="saveTeacherAbcUpdate(event)">
+                <input type="hidden" id="abcStudentId">
+                <div class="modal-form-group">
+                    <label for="abcAttendance">Attendance Rate (%)</label>
+                    <input type="number" id="abcAttendance" min="0" max="100" step="1" value="95" required>
+                </div>
+                <div class="modal-form-group">
+                    <label for="abcGpa">Academic GPA (0.00 – 4.00)</label>
+                    <input type="number" id="abcGpa" min="0" max="4.0" step="0.01" value="3.00" required>
+                </div>
+                <div class="modal-form-group">
+                    <label for="abcFailures">Failed Courses Count</label>
+                    <input type="number" id="abcFailures" min="0" max="15" step="1" value="0" required>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-modal-cancel" onclick="closeTeacherAbcModal()">Cancel</button>
+                    <button type="submit" class="btn-modal-save">Save ABC Record</button>
                 </div>
             </form>
         </div>
@@ -1429,16 +1457,21 @@
             }
 
             if (students.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #717682; padding: 2.5rem;">No students found matching your search.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #717682; padding: 2.5rem;">No students found matching your search.</td></tr>`;
                 return;
             }
 
             tbody.innerHTML = students.map(s => {
+                const rawId = s.id || s.studentId || s.studentNumber || 'STU-2026';
                 const name = s.name || `${s.firstName || ''} ${s.lastName || ''}`.trim() || 'Student Record';
                 const id = s.studentId || s.studentNumber || s.id || 'STU-2026';
                 const form = s.form || (cls ? cls.form : 'Form 1');
-                const att = (s.attendance !== undefined && s.attendance !== null) ? `${s.attendance}%` : '96%';
+                const lsAtt = localStorage.getItem(`sentinel_att_rate_${rawId}`);
+                const attNum = lsAtt !== null ? parseInt(lsAtt, 10) : ((s.attendance !== undefined && s.attendance !== null) ? Number(s.attendance) : 96);
                 const incCnt = s.incidentCount || 0;
+                const lsGpa = localStorage.getItem(`sentinel_gpa_${rawId}`);
+                const baseGpa = Math.max(1.10, Math.min(3.95, 4.0 - ((100 - attNum) * 0.03) - (incCnt * 0.25)));
+                const gpaNum = lsGpa !== null ? parseFloat(lsGpa) : (s.gpa !== undefined && s.gpa !== null ? Number(s.gpa) : baseGpa);
 
                 return `
                     <tr>
@@ -1452,12 +1485,18 @@
                             <span style="font-weight: 600; color: #111;">${form}</span>
                         </td>
                         <td>
-                            <strong style="color: ${parseInt(att) < 80 ? '#991b1b' : '#111'};">${att}</strong>
+                            <strong style="color: ${attNum < 80 ? '#991b1b' : '#111'};">${attNum}%</strong>
+                        </td>
+                        <td>
+                            <strong style="color: ${gpaNum < 2.0 ? '#991b1b' : '#111'};">${gpaNum.toFixed(2)}</strong>
                         </td>
                         <td>
                             <strong style="color: ${incCnt > 2 ? '#991b1b' : '#111'};">${incCnt}</strong>
                         </td>
-                        <td style="text-align: right;">
+                        <td style="text-align: right; white-space: nowrap;">
+                            <button type="button" class="btn-action-small" style="background:#ffffff; color:#111111; border:1px solid #d1d5db; margin-right:0.35rem;" onclick="openTeacherAbcModal('${String(rawId).replace(/'/g, "\\'")}', '${name.replace(/'/g, "\\'")}')">
+                                Update ABC
+                            </button>
                             <button type="button" class="btn-action-small" onclick="openQuickIncidentModal('${name.replace(/'/g, "\\'")}', '${cls ? cls.id : ''}')">
                                 + Log Incident
                             </button>
@@ -1465,6 +1504,65 @@
                     </tr>
                 `;
             }).join('');
+        }
+
+        function openTeacherAbcModal(studentId, studentName) {
+            const stu = (typeof allStudents !== 'undefined' ? allStudents : []).find(s => (s.id === studentId || s.studentId === studentId));
+            const lsAtt = localStorage.getItem(`sentinel_att_rate_${studentId}`);
+            const effAtt = lsAtt !== null ? parseInt(lsAtt, 10) : (stu && stu.attendance !== undefined ? Number(stu.attendance) : 95);
+            const incCnt = stu ? (stu.incidentCount || 0) : 0;
+            const lsGpa = localStorage.getItem(`sentinel_gpa_${studentId}`);
+            const baseGpa = Math.max(1.10, Math.min(3.95, 4.0 - ((100 - effAtt) * 0.03) - (incCnt * 0.25)));
+            const effGpa = lsGpa !== null ? parseFloat(lsGpa) : (stu && stu.gpa !== undefined && stu.gpa !== null ? Number(stu.gpa) : baseGpa);
+            const lsFail = localStorage.getItem(`sentinel_failures_${studentId}`);
+            const effFail = lsFail !== null ? parseInt(lsFail, 10) : (stu && stu.courseFailures !== undefined && stu.courseFailures !== null ? parseInt(stu.courseFailures, 10) : (effGpa < 1.8 ? 3 : effGpa < 2.2 ? 1 : 0));
+
+            document.getElementById('abcStudentId').value = studentId;
+            document.getElementById('abcModalStudentLabel').textContent = `${studentName} — Update Attendance ("A") & GPA ("C")`;
+            document.getElementById('abcAttendance').value = effAtt;
+            document.getElementById('abcGpa').value = effGpa.toFixed(2);
+            document.getElementById('abcFailures').value = effFail;
+            document.getElementById('abcQuickEditModal').classList.add('is-active');
+        }
+
+        function closeTeacherAbcModal() {
+            const modal = document.getElementById('abcQuickEditModal');
+            if (modal) modal.classList.remove('is-active');
+        }
+
+        async function saveTeacherAbcUpdate(e) {
+            e.preventDefault();
+            const studentId = document.getElementById('abcStudentId').value;
+            const att = Math.max(0, Math.min(100, parseInt(document.getElementById('abcAttendance').value, 10) || 0));
+            const gpa = Math.max(0, Math.min(4.0, parseFloat(document.getElementById('abcGpa').value) || 0));
+            const courseFailures = Math.max(0, Math.min(15, parseInt(document.getElementById('abcFailures').value, 10) || 0));
+
+            try {
+                localStorage.setItem(`sentinel_att_rate_${studentId}`, String(att));
+                localStorage.setItem(`sentinel_gpa_${studentId}`, gpa.toFixed(2));
+                localStorage.setItem(`sentinel_failures_${studentId}`, String(courseFailures));
+            } catch (_) {}
+
+            if (typeof allStudents !== 'undefined' && Array.isArray(allStudents)) {
+                const st = allStudents.find(s => s.id === studentId || s.studentId === studentId);
+                if (st) {
+                    st.attendance = att;
+                    st.gpa = Number(gpa.toFixed(2));
+                    st.courseFailures = courseFailures;
+                }
+            }
+
+            try {
+                const apiBase = (typeof API_BASE !== 'undefined') ? API_BASE : 'http://localhost:5000';
+                await fetch(`${apiBase}/api/students/${encodeURIComponent(studentId)}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ attendance: att, gpa: Number(gpa.toFixed(2)), courseFailures })
+                });
+            } catch (_) {}
+
+            closeTeacherAbcModal();
+            renderClassRoll();
         }
 
         function renderIncidentsTable() {
@@ -1480,8 +1578,9 @@
             }
 
             tbody.innerHTML = myIncidents.map(inc => {
-                const matrixText = inc.matrix || 'Level 1 Matrix';
-                const levelNum = inc.level ? parseInt(inc.level) : (matrixText.includes('3') ? 3 : matrixText.includes('2') ? 2 : 1);
+                const matrixText = inc.matrix || `Level ${inc.level || 1} Matrix`;
+                const mLow = matrixText.toLowerCase();
+                const levelNum = inc.level ? parseInt(inc.level) : (mLow.includes('5') ? 5 : mLow.includes('4') ? 4 : mLow.includes('3') ? 3 : mLow.includes('2') ? 2 : 1);
                 const status = inc.status || 'Open';
                 const statusColor = status.toLowerCase() === 'resolved' ? '#059669' :
                                     status.toLowerCase() === 'escalated' ? '#dc2626' : '#d97706';
@@ -1665,7 +1764,7 @@
             e.preventDefault();
             const studentName = document.getElementById('modalStudentName').value.trim();
             const classId = document.getElementById('modalClassSelect').value;
-            const level = parseInt(document.getElementById('modalMatrixLevel').value || 1);
+            const level = Math.min(2, Math.max(1, parseInt(document.getElementById('modalMatrixLevel').value || 1, 10) || 1));
             const action = document.getElementById('modalActionTaken').value;
             const desc = document.getElementById('modalDescription').value.trim();
 
@@ -1688,11 +1787,17 @@
                 status: 'Open',
                 loggedById: currentUser.id || 'usr_teacher_01',
                 loggedBy: currentUser.name || 'Teacher',
+                loggedByRole: currentUser.role || 'Teacher',
                 date: new Date().toISOString().split('T')[0],
                 createdAt: new Date().toISOString()
             };
 
             myIncidents.unshift(newIncident);
+            try {
+                const lsList = JSON.parse(localStorage.getItem('sentinel_incidents') || '[]');
+                lsList.unshift(newIncident);
+                localStorage.setItem('sentinel_incidents', JSON.stringify(lsList));
+            } catch (_) {}
             if (window.SENTINEL_SEED_DATA && Array.isArray(window.SENTINEL_SEED_DATA.incidents)) {
                 window.SENTINEL_SEED_DATA.incidents.unshift(newIncident);
             }

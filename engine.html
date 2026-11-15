@@ -271,11 +271,11 @@
 
         .card-header-bar {
             padding: 1.25rem 1.75rem;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+            border-bottom: 1px solid #057a7a;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: #fafafa;
+            background: #069494;
         }
 
         .card-header-bar h3 {
@@ -283,13 +283,14 @@
             font-size: 1.15rem;
             font-weight: 700;
             letter-spacing: -0.01em;
-            color: #111111;
+            color: #ffffff;
         }
 
         .card-header-bar p {
             margin: 0.2rem 0 0;
             font-size: 0.85rem;
-            color: #64748b;
+            color: rgba(255, 255, 255, 0.92);
+            font-weight: 600;
         }
 
         .matrix-table {
@@ -301,7 +302,7 @@
 
         .matrix-table th {
             background: #ffffff;
-            color: #475569;
+            color: #334155;
             font-weight: 700;
             text-transform: uppercase;
             font-size: 0.75rem;
@@ -340,8 +341,9 @@
         .examples-list {
             margin: 0;
             padding-left: 1.2rem;
-            color: #475569;
+            color: #334155;
             font-size: 0.85rem;
+            font-weight: 500;
             line-height: 1.45;
         }
 
@@ -366,9 +368,524 @@
 
         .btn-calc-engine:hover { background: #333333; }
 
+        /* Decision Support Studio & Statement Export Actions */
+        .report-card-actions {
+            display: flex;
+            justify-content: center;
+            gap: 0.75rem;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+        .btn-outline-dark {
+            padding: 0.65rem 1.15rem;
+            background: #ffffff;
+            color: #111111;
+            border: 1.5px solid #111111;
+            border-radius: 0;
+            font-family: inherit;
+            font-size: 0.84rem;
+            font-weight: 700;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        .btn-outline-dark:hover { background: #111111; color: #ffffff; }
+        .btn-sssd-dark {
+            padding: 0.65rem 1.15rem;
+            background: #7f1d1d;
+            color: #ffffff;
+            border: 1.5px solid #7f1d1d;
+            border-radius: 0;
+            font-family: inherit;
+            font-size: 0.84rem;
+            font-weight: 700;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        .btn-sssd-dark:hover { background: #991b1b; }
+
+        .decision-studio-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .abc-whatif-bar {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0;
+            margin: 0.75rem 0 1rem;
+            padding: 0.5rem 0;
+        }
+        .abc-box {
+            background: transparent;
+            border: none;
+            padding: 0.25rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.55rem;
+        }
+        .abc-box:first-child {
+            padding-left: 0;
+        }
+        .abc-box:last-child {
+            padding-right: 0;
+        }
+        .abc-box:not(:last-child) {
+            border-right: 1px solid #111111;
+        }
+        .abc-box-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+            border-bottom: 1px solid #111111;
+            padding-bottom: 0.45rem;
+        }
+        .abc-badge {
+            display: inline;
+            width: auto;
+            height: auto;
+            background: transparent;
+            color: #111111;
+            font-weight: 800;
+            font-size: 0.95rem;
+        }
+        .abc-box-title {
+            font-size: 0.86rem;
+            font-weight: 800;
+            color: #111111;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+        .abc-field-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: #334155;
+        }
+        .abc-input {
+            width: 90px;
+            padding: 0.35rem 0.5rem;
+            border: 1.5px solid #111111;
+            font-family: inherit;
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: #111111;
+            text-align: right;
+            background: #ffffff;
+        }
+        .abc-summary-strip {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+            background: transparent;
+            border: none;
+            border-top: 1px solid #111111;
+            border-bottom: 1px solid #111111;
+            padding: 0.85rem 0;
+            margin-bottom: 2rem;
+        }
+        .studio-card {
+            background: transparent;
+            border: none;
+            padding: 0.5rem 0;
+            box-sizing: border-box;
+        }
+        .studio-card h3 {
+            margin: 0 0 0.25rem;
+            font-size: 1rem;
+            font-weight: 700;
+            color: #111111;
+            letter-spacing: -0.01em;
+        }
+        .studio-sub {
+            font-size: 0.8rem;
+            color: #64748b;
+            margin: 0 0 1.1rem;
+        }
+        .breakdown-list { border-top: 1px solid #e2e8f0; }
+        .breakdown-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.55rem 0;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 0.86rem;
+            color: #334155;
+        }
+        .breakdown-row.is-total {
+            border-top: 2px solid #111111;
+            border-bottom: none;
+            padding-top: 0.75rem;
+            margin-top: 0.25rem;
+            font-weight: 800;
+            font-size: 0.95rem;
+            color: #111111;
+        }
+        .rules-box {
+            margin-top: 1.1rem;
+            padding: 0.5rem 0;
+            background: transparent;
+            border: none;
+            border-left: none;
+        }
+        .rules-box-title {
+            font-size: 0.72rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #111111;
+            margin-bottom: 0.4rem;
+        }
+        .rule-item {
+            font-size: 0.82rem;
+            color: #334155;
+            margin: 0.25rem 0;
+            line-height: 1.4;
+        }
+        .ethical-disclaimer {
+            margin-top: 0.9rem;
+            font-size: 0.75rem;
+            color: #334155;
+            font-weight: 600;
+            line-height: 1.45;
+            border-top: 1px dashed #94a3b8;
+            padding-top: 0.65rem;
+        }
+        .sim-control-row { margin-bottom: 0.85rem; }
+        .sim-control-head {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 0.25rem;
+        }
+        .sim-slider { width: 100%; accent-color: #111111; cursor: pointer; }
+        .sim-result-banner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            padding: 0.75rem 1rem;
+            margin: 1rem 0;
+        }
+
+        .help-tip-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 17px;
+            height: 17px;
+            border: 1.5px solid #475569;
+            border-radius: 50%;
+            font-size: 0.7rem;
+            font-weight: 800;
+            color: #1e293b;
+            background: #ffffff;
+            cursor: help;
+            position: relative;
+            vertical-align: middle;
+            margin-left: 0.25rem;
+            text-transform: none;
+            letter-spacing: 0;
+        }
+        .help-tip-badge:hover,
+        .help-tip-badge:focus {
+            background: #111111;
+            color: #ffffff;
+            border-color: #111111;
+            outline: none;
+        }
+        .help-tip-badge::after {
+            content: attr(data-tip);
+            position: absolute;
+            left: 50%;
+            bottom: calc(100% + 8px);
+            transform: translateX(-50%);
+            width: 250px;
+            padding: 0.55rem 0.7rem;
+            background: #111111;
+            color: #ffffff;
+            font-size: 0.74rem;
+            font-weight: 500;
+            line-height: 1.4;
+            text-align: left;
+            z-index: 200;
+            pointer-events: none;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.15s ease;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.22);
+        }
+        .help-tip-badge:hover::after,
+        .help-tip-badge:focus::after {
+            opacity: 1;
+            visibility: visible;
+        }
+        .training-guide-modal-backdrop {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 100000;
+            background: rgba(17, 17, 17, 0.72);
+            backdrop-filter: blur(2px);
+            overflow-y: auto;
+            padding: 2rem 1rem;
+        }
+        .matrix-select {
+            width: 100%;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            padding: 0.42rem 0.55rem;
+            font-size: 0.82rem;
+            font-family: inherit;
+            color: #111111;
+            background: #ffffff;
+            margin-top: 0.35rem;
+            cursor: pointer;
+        }
+        .matrix-select:focus {
+            outline: none;
+            border-color: #111111;
+        }
+        .matrix-stu-count {
+            margin-top: 0.35rem;
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: #1e40af;
+        }
+        .btn-sim-matrix {
+            margin-top: 0.45rem;
+            padding: 0.3rem 0.6rem;
+            border: 1px solid #111111;
+            border-radius: 6px;
+            background: #ffffff;
+            color: #111111;
+            font-size: 0.74rem;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: inherit;
+            display: inline-block;
+        }
+        .btn-sim-matrix:hover {
+            background: #111111;
+            color: #ffffff;
+        }
+        #engineStudentSelfViewPaper {
+            width: 100%;
+            max-width: 820px;
+            background: #ffffff;
+            color: #000000;
+            border: 1px solid #000000;
+            padding: 2.5rem 2.75rem;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+            box-sizing: border-box;
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 11pt;
+            font-weight: 400;
+        }
+        .sv-voice-input, .sv-voice-textarea {
+            width: 100%;
+            box-sizing: border-box;
+            border: 1px solid #000000;
+            padding: 6pt 8pt;
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 11pt;
+            font-weight: 400;
+            color: #000000;
+            background: #ffffff;
+        }
+        .sv-voice-textarea {
+            min-height: 75pt;
+            resize: vertical;
+        }
+        .btn-sv-submit {
+            align-self: flex-start;
+            border: 1px solid #000000;
+            background: #ffffff;
+            color: #000000;
+            padding: 6pt 14pt;
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 11pt;
+            font-weight: 400;
+            cursor: pointer;
+        }
+        .btn-sv-submit:hover {
+            background: #000000;
+            color: #ffffff;
+        }
+        .training-guide-modal-backdrop.is-open {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .guide-toolbar {
+            width: 100%;
+            max-width: 820px;
+            background: #111111;
+            color: #ffffff;
+            padding: 0.85rem 1.25rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            border: 1px solid #111111;
+            box-sizing: border-box;
+        }
+        .guide-toolbar-btn {
+            border: 1px solid #525252;
+            background: transparent;
+            color: #ffffff;
+            padding: 0.45rem 0.9rem;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            cursor: pointer;
+            font-family: inherit;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .guide-toolbar-btn.is-print {
+            background: #16a34a;
+            border-color: #16a34a;
+            color: #ffffff;
+        }
+        .guide-toolbar-btn.is-close:hover {
+            background: #dc2626;
+            border-color: #dc2626;
+            color: #ffffff;
+        }
+        .guide-toolbar-icon {
+            width: 16px;
+            height: 16px;
+            display: block;
+            object-fit: contain;
+        }
+        #staffTrainingGuidePaper {
+            width: 100%;
+            max-width: 820px;
+            background: #ffffff;
+            color: #000000;
+            border: 1px solid #000000;
+            padding: 2.5rem 2.75rem;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+            box-sizing: border-box;
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 11pt;
+            font-weight: 400;
+        }
+        .guide-letterhead {
+            padding-bottom: 6pt;
+            margin-bottom: 12pt;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 1rem;
+            font-size: 11pt;
+            font-weight: 400;
+            color: #000000;
+        }
+        .guide-h1 {
+            font-size: 20pt;
+            font-weight: 400;
+            line-height: 1.15;
+            color: #000000;
+            margin: 4pt 0 4pt 0;
+        }
+        .guide-h2 {
+            font-size: 16pt;
+            font-weight: 400;
+            line-height: 1.15;
+            color: #000000;
+            margin: 16pt 0 6pt 0;
+        }
+        .guide-para {
+            font-size: 11pt;
+            font-weight: 400;
+            line-height: 1.5;
+            text-align: justify;
+            margin: 0 0 10pt 0;
+            color: #000000;
+        }
+        .guide-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11pt;
+            font-weight: 400;
+            margin-bottom: 14pt;
+            color: #000000;
+            background: #ffffff;
+        }
+        .guide-table th, .guide-table td {
+            border: 1px solid #000000;
+            padding: 6pt 8pt;
+            text-align: left;
+            vertical-align: top;
+            font-weight: 400;
+            color: #000000;
+            background: #ffffff;
+        }
+        @media print {
+            body.staff-guide-open > *:not(#staffTrainingGuideModal) { display: none !important; }
+            body.staff-guide-open #staffTrainingGuideModal {
+                position: static !important;
+                inset: auto !important;
+                width: 100% !important;
+                height: auto !important;
+                display: block !important;
+                background: #ffffff !important;
+                padding: 0 !important;
+                overflow: visible !important;
+            }
+            body.staff-guide-open .guide-toolbar { display: none !important; }
+            body.staff-guide-open #staffTrainingGuidePaper {
+                max-width: 100% !important;
+                width: 100% !important;
+                border: none !important;
+                box-shadow: none !important;
+                padding: 0.4in !important;
+            }
+            body.student-sv-open > *:not(#studentSelfViewModal) { display: none !important; }
+            body.student-sv-open #studentSelfViewModal {
+                position: static !important;
+                inset: auto !important;
+                width: 100% !important;
+                height: auto !important;
+                display: block !important;
+                background: #ffffff !important;
+                padding: 0 !important;
+                overflow: visible !important;
+            }
+            body.student-sv-open .guide-toolbar,
+            body.student-sv-open #engineConcernFormSection { display: none !important; }
+            body.student-sv-open #engineStudentSelfViewPaper {
+                max-width: 100% !important;
+                width: 100% !important;
+                border: none !important;
+                box-shadow: none !important;
+                padding: 0.4in !important;
+            }
+        }
+
         @media (max-width: 900px) {
             .report-card-tiles { gap: 1.5rem; }
             .floating-student-card { position: static; width: 100%; margin-top: 1rem; }
+            .decision-studio-grid { grid-template-columns: 1fr; }
+            .abc-whatif-bar { grid-template-columns: 1fr; }
+            .abc-box { padding: 0.75rem 0; }
+            .abc-box:not(:last-child) { border-right: none; border-bottom: 1px solid #111111; }
         }
     </style>
 </head>
@@ -383,12 +900,7 @@
 
         <nav>
             <ul class="nav-links">
-                <li><a href="dashboard.html">Dashboard</a></li>
-                <li><a href="students.html">Students</a></li>
-                <li><a href="schools.html">Schools</a></li>
-                <li><a href="teachers.html">Teachers</a></li>
-                <li><a href="incidents.html">Incidents</a></li>
-                <li><a href="engine.html" style="font-weight: 700; color: #000;">Engine</a></li>
+                <!-- Populated by auth.js when logged in -->
             </ul>
         </nav>
 
@@ -412,7 +924,13 @@
                 <div class="page-subtitle">National School Discipline Matrix • Ministry of Education</div>
                 <h1 class="page-title">Decision Factor Engine Dashboard</h1>
             </div>
-            <div class="page-banner-right">
+            <div class="page-banner-right" style="display:flex; align-items:center; gap:0.65rem; flex-wrap:wrap;">
+                <button type="button" class="btn-outline-dark" id="btnOpenStaffGuide" onclick="openStaffTrainingGuide()">
+                    ? Staff Training &amp; Scoring Guide
+                </button>
+                <button type="button" class="btn-outline-dark" id="btnOpenStudentSelfView" onclick="openStudentSelfViewModal()">
+                    Student Self-View &amp; Voice
+                </button>
                 <a href="incidents.html" class="btn-calc-engine" style="text-decoration:none;">
                     + Log New Incident
                 </a>
@@ -429,45 +947,9 @@
                 </div>
                 <div class="fsc-subtitle">(sorted by risk score)</div>
                 <div class="fsc-list" id="floatingStudentList">
-                    <div class="fsc-item active" id="fsc_item_stu_test_01" onclick="selectStudent('stu_test_01')" onmouseenter="highlightStudent('stu_test_01', true)" onmouseleave="highlightStudent('stu_test_01', false)">
+                    <div class="fsc-item">
                         <span class="fsc-dash">—</span>
-                        <span>Test Student</span>
-                    </div>
-                    <div class="fsc-item" id="fsc_item_stu_009" onclick="selectStudent('stu_009')" onmouseenter="highlightStudent('stu_009', true)" onmouseleave="highlightStudent('stu_009', false)">
-                        <span class="fsc-dash">—</span>
-                        <span>Darian Joseph</span>
-                    </div>
-                    <div class="fsc-item" id="fsc_item_stu_011" onclick="selectStudent('stu_011')" onmouseenter="highlightStudent('stu_011', true)" onmouseleave="highlightStudent('stu_011', false)">
-                        <span class="fsc-dash">—</span>
-                        <span>Keshan Singh</span>
-                    </div>
-                    <div class="fsc-item" id="fsc_item_stu_dummy_02" onclick="selectStudent('stu_dummy_02')" onmouseenter="highlightStudent('stu_dummy_02', true)" onmouseleave="highlightStudent('stu_dummy_02', false)">
-                        <span class="fsc-dash">—</span>
-                        <span>Marcus Pierre</span>
-                    </div>
-                    <div class="fsc-item" id="fsc_item_stu_005" onclick="selectStudent('stu_005')" onmouseenter="highlightStudent('stu_005', true)" onmouseleave="highlightStudent('stu_005', false)">
-                        <span class="fsc-dash">—</span>
-                        <span>Aiden Mohammed</span>
-                    </div>
-                    <div class="fsc-item" id="fsc_item_stu_008" onclick="selectStudent('stu_008')" onmouseenter="highlightStudent('stu_008', true)" onmouseleave="highlightStudent('stu_008', false)">
-                        <span class="fsc-dash">—</span>
-                        <span>Alicia Ramsundar</span>
-                    </div>
-                    <div class="fsc-item" id="fsc_item_stu_013" onclick="selectStudent('stu_013')" onmouseenter="highlightStudent('stu_013', true)" onmouseleave="highlightStudent('stu_013', false)">
-                        <span class="fsc-dash">—</span>
-                        <span>Andre Garcia</span>
-                    </div>
-                    <div class="fsc-item" id="fsc_item_stu_002" onclick="selectStudent('stu_002')" onmouseenter="highlightStudent('stu_002', true)" onmouseleave="highlightStudent('stu_002', false)">
-                        <span class="fsc-dash">—</span>
-                        <span>Devon Castillo</span>
-                    </div>
-                    <div class="fsc-item" id="fsc_item_stu_001" onclick="selectStudent('stu_001')" onmouseenter="highlightStudent('stu_001', true)" onmouseleave="highlightStudent('stu_001', false)">
-                        <span class="fsc-dash">—</span>
-                        <span>Aaliyah Mohammed</span>
-                    </div>
-                    <div class="fsc-item" id="fsc_item_stu_003" onclick="selectStudent('stu_003')" onmouseenter="highlightStudent('stu_003', true)" onmouseleave="highlightStudent('stu_003', false)">
-                        <span class="fsc-dash">—</span>
-                        <span>Maya Roberts</span>
+                        <span>Loading students…</span>
                     </div>
                 </div>
                 <div class="fsc-pagination">
@@ -483,30 +965,154 @@
             </div>
         </div>
 
+        <!-- ── Reactive A / B / C What-If Input Controls (+2 Months Future Projection) ── -->
+        <div class="abc-whatif-bar" id="abcWhatIfSection">
+            <div class="abc-box">
+                <div class="abc-box-header">
+                    <div style="display:flex; align-items:center; gap:0.4rem;">
+                        <span class="abc-badge">A</span>
+                        <span class="abc-box-title">Attendance</span>
+                        <span class="help-tip-badge" tabindex="0" data-tip="Attendance Penalty equals (100 minus Attendance%) multiplied by 0.45 pts. Chronic absenteeism below 85% triggers Welfare Officer outreach.">?</span>
+                    </div>
+                    <span id="simAttLabel" style="font-size:0.78rem; font-weight:700; color:#475569; white-space:nowrap;">Natural: 95%</span>
+                </div>
+                <div class="abc-field-row">
+                    <label for="simAtt">Attendance Rate (%)</label>
+                    <input type="number" id="simAtt" class="abc-input" min="0" max="100" step="1" value="95" oninput="updateWhatIfSimulation(true)">
+                </div>
+                <div style="font-size:0.74rem; color:#64748b;">+0.45 risk pts per 1% absence</div>
+            </div>
+
+            <div class="abc-box">
+                <div class="abc-box-header">
+                    <div style="display:flex; align-items:center; gap:0.4rem;">
+                        <span class="abc-badge">B</span>
+                        <span class="abc-box-title">Behaviour &amp; PBIS</span>
+                        <span class="help-tip-badge" tabindex="0" data-tip="Weighted Level 1 to 5 incidents (Open x1.25, Resolved x0.80) minus active PBIS Merit Shield (Pts x 0.40, capped at 25 pts, 50% 30 day decay).">?</span>
+                    </div>
+                    <span id="simBonusPbisLabel" style="font-size:0.78rem; font-weight:700; color:#475569; white-space:nowrap;">Natural: 0 pts • 0 open</span>
+                </div>
+                <div class="abc-field-row">
+                    <label for="simBonusPbis">Bonus PBIS Merit Pts</label>
+                    <input type="number" id="simBonusPbis" class="abc-input" min="0" max="100" step="5" value="0" oninput="updateWhatIfSimulation(true)">
+                </div>
+                <div class="abc-field-row" style="margin-top:0.25rem;">
+                    <label for="simAddIncidentPts">Simulated Matrix Infraction (+Pts)</label>
+                    <input type="number" id="simAddIncidentPts" class="abc-input" min="0" max="100" step="1" value="0" oninput="updateWhatIfSimulation(true)">
+                </div>
+                <label style="display:flex; align-items:center; gap:0.45rem; font-size:0.78rem; font-weight:600; color:#1e293b; cursor:pointer; margin-top:0.15rem;">
+                    <input type="checkbox" id="simResolveOpen" onchange="updateWhatIfSimulation(true)">
+                    Resolve Open Incidents (1.25× → 0.80× &amp; Clear L5 Floor)
+                </label>
+            </div>
+
+            <div class="abc-box">
+                <div class="abc-box-header">
+                    <div style="display:flex; align-items:center; gap:0.4rem;">
+                        <span class="abc-badge">C</span>
+                        <span class="abc-box-title">Coursework &amp; GPA</span>
+                        <span class="help-tip-badge" tabindex="0" data-tip="GPA Deficit equals max(0, (2.5 minus GPA) x 8) plus Course Failures x 4 (capped at 20). Academic failure with incidents triggers Vocational and Trade Pivot.">?</span>
+                    </div>
+                    <span style="font-size:0.78rem; font-weight:700; color:#475569; white-space:nowrap;">Natural: <span id="simGpaLabel">3.00</span> GPA • <span id="simFailuresLabel">0</span> failed</span>
+                </div>
+                <div class="abc-field-row">
+                    <label for="simGpa">Academic GPA (0–4.0)</label>
+                    <input type="number" id="simGpa" class="abc-input" min="0" max="4" step="0.05" value="3.00" oninput="updateWhatIfSimulation(true)">
+                </div>
+                <div class="abc-field-row">
+                    <label for="simFailures">Course Failures (0–10)</label>
+                    <input type="number" id="simFailures" class="abc-input" min="0" max="10" step="1" value="0" oninput="updateWhatIfSimulation(true)">
+                </div>
+            </div>
+        </div>
+
+        <div class="abc-summary-strip">
+            <div style="flex:1; min-width:240px;">
+                <div id="whatIfStudentSub" style="font-size:0.84rem; font-weight:700; color:#111111;">Reactive What-If Projection (+2 Months • 1%/mo Natural Improvement)</div>
+                <div id="whatIfDriversList" style="display:flex; gap:1.15rem; flex-wrap:wrap; font-size:0.76rem; color:#475569; margin-top:0.35rem;"></div>
+            </div>
+            <div style="display:flex; align-items:center; gap:1.25rem; flex-wrap:wrap;">
+                <div style="font-size:0.84rem; color:#334155;">
+                    Projected (+2 Mo): <strong id="simProjectedScore" style="color:#111111;">— / 100</strong>
+                </div>
+                <div style="font-size:0.84rem; color:#334155;">
+                    Change: <strong id="simDeltaLabel" style="color:#475569;">0 pts</strong>
+                </div>
+                <button type="button" class="btn-outline-dark" onclick="resetWhatIfSliders()">Reset</button>
+            </div>
+        </div>
+
         <!-- ── Report Card Section (Centered, exactly as shown in reference) ── -->
         <div class="report-card-section" id="reportCardSection">
-            <h2 class="report-card-title">Report Card for <span id="rcStudentName">Test Student (Form 3)</span></h2>
+            <h2 class="report-card-title">Report Card for <span id="rcStudentName">Select a Student</span></h2>
 
             <div class="report-card-tiles">
                 <div class="rc-tile-col">
                     <div class="rc-tile-label">Risk Score</div>
-                    <div class="rc-tile-box box-red" id="rcScore">84</div>
+                    <div class="rc-tile-box box-neutral" id="rcScore">—</div>
                 </div>
                 <div class="rc-tile-col">
                     <div class="rc-tile-label">GPA</div>
-                    <div class="rc-tile-box box-red" id="rcGPA">1.25</div>
+                    <div class="rc-tile-box box-neutral" id="rcGPA">—</div>
                 </div>
                 <div class="rc-tile-col">
                     <div class="rc-tile-label">Absence Rate</div>
-                    <div class="rc-tile-box box-red" id="rcAbsence">80.0%</div>
+                    <div class="rc-tile-box box-neutral" id="rcAbsence">—</div>
                 </div>
                 <div class="rc-tile-col">
                     <div class="rc-tile-label">Suspensions</div>
-                    <div class="rc-tile-box box-blue" id="rcSuspensions">4.00</div>
+                    <div class="rc-tile-box box-blue" id="rcSuspensions">—</div>
                 </div>
                 <div class="rc-tile-col">
-                    <div class="rc-tile-label">Mobility</div>
-                    <div class="rc-tile-box box-pink" id="rcMobility">3</div>
+                    <div class="rc-tile-label">Triage Tier</div>
+                    <div class="rc-tile-box box-pink" id="rcMobility">—</div>
+                </div>
+            </div>
+
+            <div class="report-card-actions">
+                <button type="button" class="btn-outline-dark" onclick="exportSelectedStudentReport('conduct')">Statement of Conduct (PDF)</button>
+                <button type="button" class="btn-sssd-dark" onclick="exportSelectedStudentReport('sssd')">SSSD Referral Case Package (PDF)</button>
+            </div>
+        </div>
+
+        <!-- ── Decision Support Studio: Breakdown, Rules Engine & What-If Simulator ── -->
+        <div class="decision-studio-grid" id="decisionStudioSection">
+            <div class="studio-card">
+                <h3>Mathematical Score Breakdown &amp; Rules Engine <span class="help-tip-badge" tabindex="0" data-tip="Shows how A, B, and C minus PBIS Shield sum into the 0 to 100 Risk Score, plus live MOE, Escalation, and Vocational triggers.">?</span></h3>
+                <p class="studio-sub" id="breakdownSubtitle">Transparent ABC factor attribution for the selected student</p>
+
+                <div class="breakdown-list">
+                    <div class="breakdown-row">
+                        <span>A • Attendance Penalty</span>
+                        <strong id="bdAttPenalty">+0.0 pts</strong>
+                    </div>
+                    <div class="breakdown-row">
+                        <span>B • Behaviour &amp; Incidents</span>
+                        <strong id="bdBehPenalty">+0.0 pts</strong>
+                    </div>
+                    <div class="breakdown-row">
+                        <span>C • Coursework &amp; GPA</span>
+                        <strong id="bdCoursePenalty">+0.0 pts</strong>
+                    </div>
+                    <div class="breakdown-row">
+                        <span>PBIS Merit Shield</span>
+                        <strong id="bdPbisOffset" style="color:#15803d;">−0.0 pts</strong>
+                    </div>
+                    <div class="breakdown-row is-total">
+                        <span>Composite Risk Score</span>
+                        <span id="bdTotalScore">0 / 100</span>
+                    </div>
+                </div>
+
+                <div class="rules-box">
+                    <div class="rules-box-title">Automated Intervention Protocol Triggers</div>
+                    <div id="rulesRecommendations">
+                        <div class="rule-item">Select a student from the chart list to view triggered protocols.</div>
+                    </div>
+                </div>
+
+                <div class="ethical-disclaimer">
+                    <strong>Human-in-the-Loop Governance Notice:</strong> Algorithmic triage scores are decision-support aids aligned with the MOE National School Code of Conduct. Formal disciplinary sanctions or SSSD placements require Principal, Dean, or Guidance Officer review.
                 </div>
             </div>
         </div>
@@ -537,25 +1143,32 @@
                                 <span style="font-size: 0.75rem; color: #64748b;">Minor</span>
                             </td>
                             <td>
-                                <span class="weight-pill weight-lvl-1">1 pt</span><br>
+                                <span class="weight-pill weight-lvl-1" id="matrixWeightPill1">1 pt</span><br>
                                 <small style="color: #64748b; font-size: 0.72rem;">Range: 1–2</small>
+                                <div class="matrix-stu-count" id="matrixStuCountLvl1">Student: 0 logged</div>
                             </td>
                             <td>
                                 <strong>Classroom &amp; Procedural Violations</strong>
-                                <ul class="examples-list">
-                                    <li>Tardiness or repeated unpunctuality</li>
-                                    <li>Uniform / grooming code non-compliance</li>
-                                    <li>Missing homework or instructional supplies</li>
-                                    <li>Talking out of turn, eating in class</li>
-                                </ul>
+                                <select id="matrixInfLvl1" class="matrix-select" onchange="handleEngineMatrixRowChange(1, 'inf')" aria-label="Level 1 infraction selection">
+                                    <option value="1|Tardiness or repeated unpunctuality" selected>Tardiness or repeated unpunctuality (1 pt)</option>
+                                    <option value="1|Uniform or grooming non-compliance">Uniform or grooming non-compliance (1 pt)</option>
+                                    <option value="2|Missing homework or instructional supplies">Missing homework or instructional supplies (2 pts)</option>
+                                    <option value="2|Talking out of turn or eating in class">Talking out of turn or eating in class (2 pts)</option>
+                                </select>
                             </td>
                             <td>
                                 <strong>Classroom Teacher Protocol</strong>
-                                <p style="font-size: 0.82rem; color: #475569; margin: 0.2rem 0 0;">Teacher warning, behavioral reflection log, classroom privileges review.</p>
+                                <select id="matrixActLvl1" class="matrix-select" onchange="handleEngineMatrixRowChange(1, 'act')" aria-label="Level 1 action selection">
+                                    <option value="1|Teacher Warning & Conference" selected>Teacher Warning &amp; Conference (1 pt)</option>
+                                    <option value="1|Classroom Privileges Review / Reflection Log">Classroom Privileges Review / Reflection Log (1 pt)</option>
+                                    <option value="2|Peer Mediation Protocol">Peer Mediation Protocol (2 pts)</option>
+                                    <option value="2|Guidance Counseling Referral">Guidance Counseling Referral (2 pts)</option>
+                                </select>
                             </td>
                             <td>
                                 <span style="font-weight: 600; font-size: 0.82rem; color: #0f172a;">3 occurrences</span><br>
-                                <small style="color: #64748b;">Escalates to Level 2 review</small>
+                                <small style="color: #64748b;">Escalates to Level 2 review</small><br>
+                                <button type="button" class="btn-sim-matrix" id="btnSimMatrix1" onclick="simulateMatrixLevelOnStudent(1)">Simulate (+1 pt)</button>
                             </td>
                         </tr>
 
@@ -565,25 +1178,31 @@
                                 <span style="font-size: 0.75rem; color: #64748b;">Moderate</span>
                             </td>
                             <td>
-                                <span class="weight-pill weight-lvl-2">3 pts</span><br>
+                                <span class="weight-pill weight-lvl-2" id="matrixWeightPill2">3 pts</span><br>
                                 <small style="color: #64748b; font-size: 0.72rem;">Range: 2–3</small>
+                                <div class="matrix-stu-count" id="matrixStuCountLvl2">Student: 0 logged</div>
                             </td>
                             <td>
                                 <strong>Disruptive Conduct &amp; Defiance</strong>
-                                <ul class="examples-list">
-                                    <li>Persistent classroom disruption</li>
-                                    <li>Truancy / unexcused class absence</li>
-                                    <li>Unauthorized smartphone or electronic usage</li>
-                                    <li>Disrespectful language directed at classmates</li>
-                                </ul>
+                                <select id="matrixInfLvl2" class="matrix-select" onchange="handleEngineMatrixRowChange(2, 'inf')" aria-label="Level 2 infraction selection">
+                                    <option value="2|Disrespectful language directed at classmates">Disrespectful language directed at classmates (2 pts)</option>
+                                    <option value="2|Unauthorized smartphone or electronic usage">Unauthorized smartphone or electronic usage (2 pts)</option>
+                                    <option value="3|Persistent classroom disruption" selected>Persistent classroom disruption (3 pts)</option>
+                                    <option value="3|Truancy or unexcused class absence">Truancy or unexcused class absence (3 pts)</option>
+                                </select>
                             </td>
                             <td>
                                 <strong>Guidance &amp; Family Protocol</strong>
-                                <p style="font-size: 0.82rem; color: #475569; margin: 0.2rem 0 0;">Mandatory parent conference logged, guidance counselor referral, attendance contract.</p>
+                                <select id="matrixActLvl2" class="matrix-select" onchange="handleEngineMatrixRowChange(2, 'act')" aria-label="Level 2 action selection">
+                                    <option value="2|Guidance Counseling Referral">Guidance Counseling Referral (2 pts)</option>
+                                    <option value="3|Parent Conference Logged" selected>Parent Conference Logged (3 pts)</option>
+                                    <option value="3|Attendance Contract & Check-In">Attendance Contract &amp; Check-In (3 pts)</option>
+                                </select>
                             </td>
                             <td>
                                 <span style="font-weight: 600; font-size: 0.82rem; color: #0f172a;">2 occurrences</span><br>
-                                <small style="color: #64748b;">Escalates to Level 3 Dean review</small>
+                                <small style="color: #64748b;">Escalates to Level 3 Dean review</small><br>
+                                <button type="button" class="btn-sim-matrix" id="btnSimMatrix2" onclick="simulateMatrixLevelOnStudent(2)">Simulate (+3 pts)</button>
                             </td>
                         </tr>
 
@@ -593,26 +1212,32 @@
                                 <span style="font-size: 0.75rem; color: #64748b;">Serious</span>
                             </td>
                             <td>
-                                <span class="weight-pill weight-lvl-3">7 pts</span><br>
+                                <span class="weight-pill weight-lvl-3" id="matrixWeightPill3">7 pts</span><br>
                                 <small style="color: #64748b; font-size: 0.72rem;">Range: 5–8</small>
+                                <div class="matrix-stu-count" id="matrixStuCountLvl3">Student: 0 logged</div>
                             </td>
                             <td>
                                 <strong>Defiance of Authority &amp; Vandalism</strong>
-                                <ul class="examples-list">
-                                    <li>Direct insubordination / refusal to comply</li>
-                                    <li>Profanity or verbal abuse toward staff</li>
-                                    <li>Vandalism / defacing of school property</li>
-                                    <li>Gambling, unauthorized wagering</li>
-                                    <li>Leaving school grounds without pass</li>
-                                </ul>
+                                <select id="matrixInfLvl3" class="matrix-select" onchange="handleEngineMatrixRowChange(3, 'inf')" aria-label="Level 3 infraction selection">
+                                    <option value="5|Gambling or unauthorized wagering">Gambling or unauthorized wagering (5 pts)</option>
+                                    <option value="6|Profanity or verbal abuse toward staff">Profanity or verbal abuse toward staff (6 pts)</option>
+                                    <option value="7|Direct insubordination or refusal to comply" selected>Direct insubordination or refusal to comply (7 pts)</option>
+                                    <option value="8|Vandalism or defacing of school property">Vandalism or defacing of school property (8 pts)</option>
+                                    <option value="8|Leaving school grounds without pass">Leaving school grounds without pass (8 pts)</option>
+                                </select>
                             </td>
                             <td>
                                 <strong>Dean Formal Intervention</strong>
-                                <p style="font-size: 0.82rem; color: #475569; margin: 0.2rem 0 0;">Dean of Discipline hearing, formal behavioral contract, peer mediation protocol, restorative task.</p>
+                                <select id="matrixActLvl3" class="matrix-select" onchange="handleEngineMatrixRowChange(3, 'act')" aria-label="Level 3 action selection">
+                                    <option value="5|Restorative Task & Behavioral Contract">Restorative Task &amp; Behavioral Contract (5 pts)</option>
+                                    <option value="7|Dean Formal Review" selected>Dean Formal Review (7 pts)</option>
+                                    <option value="8|External Support Assigned">External Support Assigned (8 pts)</option>
+                                </select>
                             </td>
                             <td>
                                 <span style="font-weight: 600; font-size: 0.82rem; color: #0f172a;">2 occurrences</span><br>
-                                <small style="color: #64748b;">Automatic suspension hearing</small>
+                                <small style="color: #64748b;">Automatic suspension hearing</small><br>
+                                <button type="button" class="btn-sim-matrix" id="btnSimMatrix3" onclick="simulateMatrixLevelOnStudent(3)">Simulate (+7 pts)</button>
                             </td>
                         </tr>
 
@@ -622,26 +1247,32 @@
                                 <span style="font-size: 0.75rem; color: #64748b;">Severe</span>
                             </td>
                             <td>
-                                <span class="weight-pill weight-lvl-4">12 pts</span><br>
+                                <span class="weight-pill weight-lvl-4" id="matrixWeightPill4">12 pts</span><br>
                                 <small style="color: #64748b; font-size: 0.72rem;">Range: 10–15</small>
+                                <div class="matrix-stu-count" id="matrixStuCountLvl4">Student: 0 logged</div>
                             </td>
                             <td>
                                 <strong>Physical Altercation &amp; Endangerment</strong>
-                                <ul class="examples-list">
-                                    <li>Physical fighting causing minor injury</li>
-                                    <li>Systematic bullying or cyberbullying</li>
-                                    <li>Extortion, intimidation, or coercion</li>
-                                    <li>Theft or possession of stolen items</li>
-                                    <li>Alcohol, tobacco, or vaping on compound</li>
-                                </ul>
+                                <select id="matrixInfLvl4" class="matrix-select" onchange="handleEngineMatrixRowChange(4, 'inf')" aria-label="Level 4 infraction selection">
+                                    <option value="10|Alcohol, tobacco, or vaping on compound">Alcohol, tobacco, or vaping on compound (10 pts)</option>
+                                    <option value="12|Physical fighting causing minor injury" selected>Physical fighting causing minor injury (12 pts)</option>
+                                    <option value="12|Theft or possession of stolen items">Theft or possession of stolen items (12 pts)</option>
+                                    <option value="14|Systematic bullying or cyberbullying">Systematic bullying or cyberbullying (14 pts)</option>
+                                    <option value="15|Extortion, intimidation, or coercion">Extortion, intimidation, or coercion (15 pts)</option>
+                                </select>
                             </td>
                             <td>
                                 <strong>Administrative Suspension &amp; Case Conference</strong>
-                                <p style="font-size: 0.82rem; color: #475569; margin: 0.2rem 0 0;">In-school/out-of-school suspension (up to 7 days), mandatory multidisciplinary case conference with SSSD officer.</p>
+                                <select id="matrixActLvl4" class="matrix-select" onchange="handleEngineMatrixRowChange(4, 'act')" aria-label="Level 4 action selection">
+                                    <option value="10|In-School Suspension & Case Review">In-School Suspension &amp; Case Review (10 pts)</option>
+                                    <option value="12|Administrative Suspension" selected>Administrative Suspension (12 pts)</option>
+                                    <option value="15|SSSD Multidisciplinary Case Conference">SSSD Multidisciplinary Case Conference (15 pts)</option>
+                                </select>
                             </td>
                             <td>
                                 <span style="font-weight: 600; font-size: 0.82rem; color: #b91c1c;">1 occurrence</span><br>
-                                <small style="color: #b91c1c;">Immediate administrative action</small>
+                                <small style="color: #b91c1c;">Immediate administrative action</small><br>
+                                <button type="button" class="btn-sim-matrix" id="btnSimMatrix4" onclick="simulateMatrixLevelOnStudent(4)">Simulate (+12 pts)</button>
                             </td>
                         </tr>
 
@@ -651,26 +1282,30 @@
                                 <span style="font-size: 0.75rem; color: #991b1b; font-weight: 700;">Critical Misconduct</span>
                             </td>
                             <td>
-                                <span class="weight-pill weight-lvl-5">30 pts</span><br>
-                                <small style="color: #64748b; font-size: 0.72rem;">Range: 25–50</small>
+                                <span class="weight-pill weight-lvl-5" id="matrixWeightPill5">25 pts</span><br>
+                                <small style="color: #64748b; font-size: 0.72rem;">Range: 20–25</small>
+                                <div class="matrix-stu-count" id="matrixStuCountLvl5">Student: 0 logged</div>
                             </td>
                             <td>
                                 <strong>Critical Security &amp; Criminal Infractions</strong>
-                                <ul class="examples-list">
-                                    <li>Weapons possession (knives, firearms, bladed tools)</li>
-                                    <li>Possession or distribution of illegal narcotics</li>
-                                    <li>Aggravated assault / grievous bodily harm</li>
-                                    <li>Sexual harassment, sexual assault, indecent acts</li>
-                                    <li>Arson, bomb threats, extortion with violence</li>
-                                </ul>
+                                <select id="matrixInfLvl5" class="matrix-select" onchange="handleEngineMatrixRowChange(5, 'inf')" aria-label="Level 5 infraction selection">
+                                    <option value="20|Arson or critical threat against compound">Arson or critical threat against compound (20 pts)</option>
+                                    <option value="22|Possession or distribution of illegal narcotics">Possession or distribution of illegal narcotics (22 pts)</option>
+                                    <option value="24|Sexual harassment or indecent assault">Sexual harassment or indecent assault (24 pts)</option>
+                                    <option value="25|Weapons possession or aggravated assault" selected>Weapons possession or aggravated assault (25 pts)</option>
+                                </select>
                             </td>
                             <td>
                                 <strong>National Ministry Escalation &amp; Police Referral</strong>
-                                <p style="font-size: 0.82rem; color: #475569; margin: 0.2rem 0 0;">Immediate removal from compound, police report logged, Ministry Education Officer emergency intervention, formal extended suspension / placement review.</p>
+                                <select id="matrixActLvl5" class="matrix-select" onchange="handleEngineMatrixRowChange(5, 'act')" aria-label="Level 5 action selection">
+                                    <option value="20|Emergency Compound Removal & Suspension">Emergency Compound Removal &amp; Suspension (20 pts)</option>
+                                    <option value="25|Ministry Escalated Review & Police Referral" selected>Ministry Escalated Review &amp; Police Referral (25 pts)</option>
+                                </select>
                             </td>
                             <td>
                                 <span style="font-weight: 700; font-size: 0.85rem; color: #b91c1c;">Immediate Override</span><br>
-                                <small style="color: #b91c1c;">Direct elevation to Tier 3 Crisis</small>
+                                <small style="color: #b91c1c;">Direct elevation to Tier 3 Crisis</small><br>
+                                <button type="button" class="btn-sim-matrix" id="btnSimMatrix5" onclick="simulateMatrixLevelOnStudent(5)">Simulate (+25 pts)</button>
                             </td>
                         </tr>
                     </tbody>
@@ -680,9 +1315,218 @@
 
     </div><!-- end .page-wrapper -->
 
+    <!-- Staff Training & Scoring Guide Modal Overlay (Document & PDF Style) -->
+    <div class="training-guide-modal-backdrop" id="staffTrainingGuideModal" onclick="if(event.target === this) closeStaffTrainingGuide();">
+        <div class="guide-toolbar">
+            <div style="font-size:0.82rem; font-weight:700; text-transform:uppercase; letter-spacing:0.04em;">
+                Staff Training and Scoring Guide
+            </div>
+            <div style="display:flex; gap:0.5rem;">
+                <button type="button" class="guide-toolbar-btn is-print" id="btnDownloadStaffGuidePdf" onclick="downloadStaffGuidePdf()">
+                    <img src="icons/download_24dp_E3E3E3_FILL0_wght400_GRAD0_opsz24.png" alt="Download" class="guide-toolbar-icon">
+                    <span>Download PDF</span>
+                </button>
+                <button type="button" class="guide-toolbar-btn" id="btnPrintStaffGuide" onclick="printStaffGuide()">
+                    <img src="icons/print_24dp_E3E3E3_FILL0_wght400_GRAD0_opsz24.png" alt="Print" class="guide-toolbar-icon">
+                    <span>Print</span>
+                </button>
+                <button type="button" class="guide-toolbar-btn is-close" id="btnCloseStaffGuide" onclick="closeStaffTrainingGuide()" aria-label="Close">
+                    <img src="icons/close_24dp_E3E3E3_FILL0_wght400_GRAD0_opsz24.png" alt="Close" class="guide-toolbar-icon">
+                    <span>Close</span>
+                </button>
+            </div>
+        </div>
+
+        <div id="staffTrainingGuidePaper" role="dialog" aria-modal="true" aria-labelledby="trainingGuideTitle">
+            <div class="guide-letterhead">
+                <div>
+                    <div>Republic of Trinidad and Tobago, Ministry of Education</div>
+                    <h1 class="guide-h1" id="trainingGuideTitle">Staff Training and Scoring Guide</h1>
+                    <div>National School Code of Conduct Decision Support Calibration Reference</div>
+                </div>
+                <div style="text-align:right; line-height:1.45;">
+                    <div>Ref No: MOE STG 2026</div>
+                    <div>Classification: Staff Reference</div>
+                    <div>Audience: Principals, Deans, Counselors and Teachers</div>
+                </div>
+            </div>
+
+            <h2 class="guide-h2">1. Early Warning ABC Methodology and PBIS Calibration</h2>
+            <p class="guide-para">
+                Sentinel Edu computes a composite triage risk score from 0 to 100 across three core indicators balanced by positive behavioural recognition. Attendance Penalty (Factor A) assigns 0.45 risk points for every percentage point below 100 percent attendance, automatically recommending Welfare Officer outreach whenever attendance falls below 85 percent. Behaviour and Severity (Factor B) sums weighted referrals across Levels 1 through 5 multiplied by recency (1.0 within 30 days, 0.85 within 90 days, 0.70 within 180 days, and 0.50 beyond 180 days) and case status (1.25 for open referrals and 0.80 for resolved referrals), adding a 5 point base indicator when one or more incidents exist.
+            </p>
+            <p class="guide-para">
+                Coursework and Academic Progress (Factor C) contributes 8 points per Grade Point Average unit below 2.50 plus 4 points per failed course up to a maximum of 20 failure points. To reinforce positive conduct, Positive Behavioural Interventions and Supports merits subtract 0.40 points per active merit up to a maximum 25 point offset. To prevent points inflation, teacher awards are capped at 50 points per student over a rolling 30 day window, and earned merit balances decay by 50 percent every 30 days so only sustained positive engagement lowers risk.
+            </p>
+
+            <h2 class="guide-h2">2. National Scoring Factors and Severity Reference Table</h2>
+            <table class="guide-table">
+                <thead>
+                    <tr>
+                        <th>Component or Severity Level</th>
+                        <th>Weight or Formula</th>
+                        <th>Scope and Recency / Decay Rule</th>
+                        <th>Mandatory Protocol Trigger</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Factor A: Attendance</td>
+                        <td>(100 minus Att%) x 0.45</td>
+                        <td>Applied continuously against enrolled term days</td>
+                        <td>Welfare Officer outreach below 85 percent attendance</td>
+                    </tr>
+                    <tr>
+                        <td>Factor C: Coursework &amp; GPA</td>
+                        <td>max(0, (2.5 minus GPA) x 8) + Fails x 4</td>
+                        <td>Course failure penalty capped at 20 points</td>
+                        <td>Tutoring, Vocational Pivot, Cooperative Learning if failing with incidents</td>
+                    </tr>
+                    <tr>
+                        <td>PBIS Positive Merit Shield</td>
+                        <td>minus min(25, Active Pts x 0.40)</td>
+                        <td>50 percent half life decay every 30 days; 50 pt rolling 30 day award cap</td>
+                        <td>Logged with staff attribution in PBIS Audit Log</td>
+                    </tr>
+                    <tr>
+                        <td>Level 1 &amp; Level 2 Infractions</td>
+                        <td>1 pt (Level 1), 3 pts (Level 2)</td>
+                        <td>Minor procedural or repetitive classroom disruptions</td>
+                        <td>Teacher redirection, detention, restorative warning</td>
+                    </tr>
+                    <tr>
+                        <td>Level 3 &amp; Level 4 Infractions</td>
+                        <td>7 pts (Level 3), 12 pts (Level 4)</td>
+                        <td>Moderate to serious defiance, truancy, fighting, property damage</td>
+                        <td>Dean tribunal, suspension review, 1 on 5 Mentoring &amp; SSSD referral</td>
+                    </tr>
+                    <tr>
+                        <td>Level 5 Critical Misconduct</td>
+                        <td>25 pts (75 pt Tier 3 Floor)</td>
+                        <td>Weapons, narcotics, aggravated assault, critical threats</td>
+                        <td>Immediate removal, Police and Ministry Emergency Intervention</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2 class="guide-h2">3. Interpreting Trajectories, Escalation Alerts and Support Pivots</h2>
+            <p class="guide-para">
+                The longitudinal chart displays five historical months alongside a two month future trajectory reflecting natural progression or simulated What If interventions. Students scoring below 25 points remain in Tier 1 Preventive Support, scores between 25 and 49 trigger Tier 2 Targeted Monitoring and 1 on 5 Mentoring, and scores of 50 or higher initiate Tier 3 Guidance and Student Support Services Division intervention.
+            </p>
+            <p class="guide-para">
+                Whenever an incident history progresses from minor Level 1 or Level 2 infractions into Level 3 through Level 5 referrals, or whenever five month risk increases by 12 points or more, the rules engine issues an Escalating Trajectory Alert for immediate restorative de escalation. Where academic GPA below 2.00 or two or more failed courses co occur with disciplinary referrals, staff are prompted to consider a Vocational and Trade Course Pivot paired with Cooperative Learning rather than punitive exclusion alone. Algorithmic scores serve strictly as advisory decision support aids under Principal, Dean, and Guidance Officer oversight.
+            </p>
+        </div>
+    </div>
+
+    <!-- Student Self-View & Voice Modal Overlay (Times New Roman Document & PDF Style) -->
+    <div class="training-guide-modal-backdrop" id="studentSelfViewModal" onclick="if(event.target === this) closeStudentSelfViewModal();">
+        <div class="guide-toolbar">
+            <div style="display:flex; align-items:center; gap:0.65rem; flex-wrap:wrap;">
+                <label for="svModalStudentSelect" style="font-size:0.8rem; font-weight:700; text-transform:uppercase; letter-spacing:0.04em;">Student:</label>
+                <select id="svModalStudentSelect" onchange="renderEngineStudentSelfView(this.value)" style="border:1px solid #525252; background:#1f2937; color:#ffffff; padding:0.4rem 0.65rem; font-family:inherit; font-size:0.82rem; font-weight:600; max-width:260px;">
+                    <option value="">Loading students...</option>
+                </select>
+            </div>
+            <div style="display:flex; gap:0.5rem;">
+                <button type="button" class="guide-toolbar-btn is-print" id="btnDownloadEngineStudentPdf" onclick="downloadEngineStudentSelfViewPdf()">
+                    <img src="icons/download_24dp_E3E3E3_FILL0_wght400_GRAD0_opsz24.png" alt="Download" class="guide-toolbar-icon">
+                    <span>Download PDF</span>
+                </button>
+                <button type="button" class="guide-toolbar-btn" id="btnPrintEngineStudentPdf" onclick="printEngineStudentSelfView()">
+                    <img src="icons/print_24dp_E3E3E3_FILL0_wght400_GRAD0_opsz24.png" alt="Print" class="guide-toolbar-icon">
+                    <span>Print</span>
+                </button>
+                <button type="button" class="guide-toolbar-btn is-close" id="btnCloseStudentSelfView" onclick="closeStudentSelfViewModal()" aria-label="Close">
+                    <img src="icons/close_24dp_E3E3E3_FILL0_wght400_GRAD0_opsz24.png" alt="Close" class="guide-toolbar-icon">
+                    <span>Close</span>
+                </button>
+            </div>
+        </div>
+
+        <div id="engineStudentSelfViewPaper" role="dialog" aria-modal="true" aria-labelledby="engineSvDocTitle">
+            <div class="guide-letterhead">
+                <div>
+                    <div>Republic of Trinidad and Tobago, Ministry of Education</div>
+                    <h1 class="guide-h1" id="engineSvDocTitle">Student Self View and Support Recovery Statement</h1>
+                    <div>Student Transparency, Progress Guidance and Confidential Voice Record</div>
+                </div>
+                <div style="text-align:right; line-height:1.45;">
+                    <div id="engineSvRefNo">Ref No: MOE SSV 2026</div>
+                    <div id="engineSvIssuedDate">Issued: —</div>
+                    <div id="engineSvStudentIdLine">Student ID: —</div>
+                </div>
+            </div>
+
+            <h2 class="guide-h2">1. Plain Language Explanation of Support Score</h2>
+            <p class="guide-para" id="engineSvIntroPara">Loading student support calculation...</p>
+            <p class="guide-para" id="engineSvDetailPara">Loading factor explanation...</p>
+
+            <h2 class="guide-h2">2. Summary of Scoring Factors and Recovery Opportunities</h2>
+            <table class="guide-table">
+                <thead>
+                    <tr>
+                        <th>Support Indicator</th>
+                        <th>Current Record</th>
+                        <th>Score Contribution</th>
+                        <th>Recommended Recovery Opportunity</th>
+                    </tr>
+                </thead>
+                <tbody id="engineSvFactorsTableBody">
+                    <tr>
+                        <td colspan="4">Loading student indicators...</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2 class="guide-h2">3. Guidance Recovery Plan and Next Steps</h2>
+            <div id="engineSvRecoveryParagraphs">
+                <p class="guide-para">Loading recommended recovery plan...</p>
+            </div>
+
+            <h2 class="guide-h2">4. Confidential Student Voice and Concern Submission</h2>
+            <p class="guide-para">
+                Students may submit bullying reports, coursework stress requests, campus safety observations, or counseling inquiries confidentially using the form below. Submissions are stored for review by School Guidance Officers and the Student Support Services Division.
+            </p>
+
+            <section id="engineConcernFormSection">
+                <form id="engineStudentConcernForm" onsubmit="submitEngineStudentConcern(event)" style="display:flex; flex-direction:column; gap:8pt; margin-bottom:14pt;">
+                    <div>
+                        <label for="engineConcernCategory" style="display:block; font-size:11pt; font-weight:400; color:#000000; margin-bottom:3pt;">Concern Category</label>
+                        <select id="engineConcernCategory" class="sv-voice-input" required>
+                            <option value="Bullying or Peer Conflict">Bullying or Peer Conflict</option>
+                            <option value="Academic or Coursework Stress">Academic or Coursework Stress</option>
+                            <option value="Mental Health or Counseling Request">Mental Health or Counseling Request</option>
+                            <option value="Facility or Campus Safety Issue">Facility or Campus Safety Issue</option>
+                            <option value="General Suggestion or School Climate">General Suggestion or School Climate</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="engineConcernText" style="display:block; font-size:11pt; font-weight:400; color:#000000; margin-bottom:3pt;">Statement of Concern or Request for Support</label>
+                        <textarea id="engineConcernText" class="sv-voice-textarea" required placeholder="Enter your statement here..."></textarea>
+                    </div>
+                    <label style="display:flex; align-items:center; gap:6pt; font-size:11pt; font-weight:400; color:#000000; cursor:pointer;">
+                        <input type="checkbox" id="engineConcernAnonymous" checked>
+                        Submit anonymously without recording student name or student identification number
+                    </label>
+                    <button type="submit" class="btn-sv-submit" id="btnEngineSubmitConcern">
+                        Submit Confidential Statement
+                    </button>
+                    <div id="engineConcernStatusToast" style="padding:6pt 8pt; border:1px solid #000000; font-size:11pt; font-weight:400; color:#000000; background:#ffffff; display:none;">
+                        Your statement has been recorded for Guidance and Student Support Services Division review.
+                    </div>
+                </form>
+            </section>
+
+            <div id="engineConcernsFeedList">
+                <p class="guide-para">No confidential student submissions have been recorded yet in this browser.</p>
+            </div>
+        </div>
+    </div>
+
     <!-- Shared Database & Auth scripts -->
     <script src="data/seed.js"></script>
-    <script src="auth.js"></script>
+    <script src="auth.js?v=3"></script>
 
     <script>
         // ── DECISION FACTOR ENGINE DASHBOARD LOGIC ────────────────────────────
@@ -690,21 +1534,517 @@
         const SUPABASE_REST_URL = "https://wrumedevccqkopguaxdi.supabase.co/rest/v1";
         const SUPABASE_ANON_KEY = "sb_publishable_zpd_lzgRqghcN-0X7qw7SA_I2hAZHXH";
 
-        const YEARS = ['2022', '2023', '2024', '2025', '2026'];
+        const MONTH_MS = 30 * 24 * 60 * 60 * 1000;
+
+        // Build labels for the past 5 months ending at the current month
+        function buildPast5Months(refTime = Date.now()) {
+            const monthShort = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            const labels = [];
+            const refDate = new Date(refTime);
+            for (let i = 4; i >= 0; i--) {
+                const d = new Date(refDate.getFullYear(), refDate.getMonth() - i, 1);
+                labels.push(`${monthShort[d.getMonth()]} ${d.getFullYear()}`);
+            }
+            return labels;
+        }
+
+        const MONTHS = buildPast5Months();
+
+        function buildFuture2Months(refTime = Date.now()) {
+            const monthShort = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            const labels = [];
+            const refDate = new Date(refTime);
+            for (let i = 1; i <= 2; i++) {
+                const d = new Date(refDate.getFullYear(), refDate.getMonth() + i, 1);
+                labels.push(`${monthShort[d.getMonth()]} ${d.getFullYear()} (Proj.)`);
+            }
+            return labels;
+        }
+
+        const FUTURE_MONTHS = buildFuture2Months();
+        const CHART_LABELS = [...MONTHS, ...FUTURE_MONTHS];
+
+        // Track each student's natural baseline stats & natural 2% monthly improvement helper
+        const naturalStudentStatsCache = {};
+        const sessionWhatIfEditedIds = {};
+        function applyNaturalMonthlyImprovement(score, monthsAhead) {
+            return Math.min(100, Math.round(score + (1 * monthsAhead)));
+        }
+
+        // Participation points with 1-month (30-day) half-life decay
+        function getActiveParticipationPoints(studentId, referenceTime = Date.now()) {
+            try {
+                const logRaw = typeof localStorage !== 'undefined' ? localStorage.getItem(`sentinel_points_log_${studentId}`) : null;
+                if (logRaw) {
+                    const log = JSON.parse(logRaw);
+                    if (Array.isArray(log)) {
+                        let decayedTotal = 0;
+                        log.forEach(entry => {
+                            const amt = Number(entry.amount) || 0;
+                            const ts = entry.timestamp ? new Date(entry.timestamp).getTime() : referenceTime;
+                            if (ts > referenceTime) return; // Not yet awarded at that point in time
+                            const ageMs = Math.max(0, referenceTime - ts);
+                            const monthsElapsed = Math.floor(ageMs / MONTH_MS);
+                            const factor = monthsElapsed <= 0 ? 1.0 : Math.pow(0.5, monthsElapsed);
+                            decayedTotal += amt * factor;
+                        });
+                        return Math.round(decayedTotal);
+                    }
+                }
+
+                const val = typeof localStorage !== 'undefined' ? localStorage.getItem(`sentinel_points_${studentId}`) : null;
+                if (val !== null) {
+                    const rawPts = parseInt(val, 10) || 0;
+                    const tsRaw = localStorage.getItem(`sentinel_points_ts_${studentId}`);
+                    if (tsRaw) {
+                        const ts = Number(tsRaw);
+                        if (ts > referenceTime) return 0;
+                        const ageMs = Math.max(0, referenceTime - ts);
+                        const monthsElapsed = Math.floor(ageMs / MONTH_MS);
+                        if (monthsElapsed > 0) {
+                            return Math.round(rawPts * Math.pow(0.5, monthsElapsed));
+                        }
+                    }
+                    return rawPts;
+                }
+            } catch (_) {}
+
+            let hash = 0;
+            const idStr = String(studentId || 'stu');
+            for (let i = 0; i < idStr.length; i++) {
+                hash = (hash << 5) - hash + idStr.charCodeAt(i);
+            }
+            const basePts = Math.abs(hash % 20) + 5;
+            // Apply decay if evaluating a time more than 1 month after baseline award
+            return basePts;
+        }
+
+        function getSavedAttendanceRate(studentId, defaultRate) {
+            try {
+                if (typeof localStorage !== 'undefined') {
+                    const saved = localStorage.getItem(`sentinel_att_rate_${studentId}`);
+                    if (saved !== null) return Number(saved);
+                }
+            } catch (_) {}
+            return (defaultRate !== undefined && defaultRate !== null) ? Number(defaultRate) : 95;
+        }
+
+        function getSavedStudentGPA(studentId, defaultGpa, absenceRate, incCount) {
+            try {
+                if (typeof localStorage !== 'undefined') {
+                    const saved = localStorage.getItem(`sentinel_gpa_${studentId}`);
+                    if (saved !== null && !isNaN(parseFloat(saved))) {
+                        return Math.max(0, Math.min(4.0, parseFloat(saved)));
+                    }
+                }
+            } catch (_) {}
+            if (defaultGpa !== undefined && defaultGpa !== null && !isNaN(parseFloat(defaultGpa))) {
+                return Math.max(0, Math.min(4.0, parseFloat(defaultGpa)));
+            }
+            return Math.max(1.10, Math.min(3.95, 4.0 - (absenceRate * 0.03) - (incCount * 0.25)));
+        }
+
+        function getSavedCourseFailures(studentId, defaultFailures, effGpa) {
+            try {
+                if (typeof localStorage !== 'undefined') {
+                    const saved = localStorage.getItem(`sentinel_failures_${studentId}`);
+                    if (saved !== null && !isNaN(parseInt(saved, 10))) {
+                        return Math.max(0, parseInt(saved, 10));
+                    }
+                }
+            } catch (_) {}
+            if (defaultFailures !== undefined && defaultFailures !== null && !isNaN(parseInt(defaultFailures, 10))) {
+                return Math.max(0, parseInt(defaultFailures, 10));
+            }
+            return effGpa < 1.8 ? 3 : effGpa < 2.2 ? 1 : 0;
+        }
+
+        function getSavedIncidentStatuses() {
+            try {
+                if (typeof localStorage !== 'undefined') {
+                    return JSON.parse(localStorage.getItem('sentinel_inc_statuses') || '{}') || {};
+                }
+            } catch (_) {}
+            return {};
+        }
 
         const WEIGHT_MATRIX = {
             1: { weight: 1, label: 'Level 1: Minor (1 pt)' },
             2: { weight: 3, label: 'Level 2: Minor-Moderate (3 pts)' },
             3: { weight: 7, label: 'Level 3: Moderate-Serious (7 pts)' },
             4: { weight: 12, label: 'Level 4: Serious (12 pts)' },
-            5: { weight: 30, label: 'Level 5: Critical Misconduct (30 pts)' }
+            5: { weight: 25, label: 'Level 5: Critical Misconduct (25 pts)' }
         };
+
+        function getIncidentLevelNumber(inc) {
+            let lvl = inc && inc.level ? parseInt(inc.level, 10) : 1;
+            if ((!inc || !inc.level) && inc && inc.matrix) {
+                const m = String(inc.matrix).toLowerCase();
+                if (m.includes('5')) lvl = 5;
+                else if (m.includes('4')) lvl = 4;
+                else if (m.includes('3')) lvl = 3;
+                else if (m.includes('2')) lvl = 2;
+            }
+            return isNaN(lvl) ? 1 : Math.max(1, Math.min(5, lvl));
+        }
+
+        function openStaffTrainingGuide() {
+            const modal = typeof document !== 'undefined' ? document.getElementById('staffTrainingGuideModal') : null;
+            if (modal) modal.classList.add('is-open');
+            if (typeof document !== 'undefined' && document.body) document.body.classList.add('staff-guide-open');
+        }
+
+        function closeStaffTrainingGuide() {
+            const modal = typeof document !== 'undefined' ? document.getElementById('staffTrainingGuideModal') : null;
+            if (modal) modal.classList.remove('is-open');
+            if (typeof document !== 'undefined' && document.body) document.body.classList.remove('staff-guide-open');
+        }
+
+        function printStaffGuide() {
+            if (typeof window !== 'undefined') {
+                if (typeof window.focus === 'function') window.focus();
+                if (typeof window.print === 'function') window.print();
+            }
+        }
+
+        function downloadStaffGuidePdf() {
+            if (typeof window.downloadCustomDocumentPdf !== 'function') return;
+            const todayStr = new Date().toLocaleDateString('en-TT', { day: '2-digit', month: 'long', year: 'numeric' });
+            window.downloadCustomDocumentPdf({
+                fileName: 'Staff_Training_and_Scoring_Guide.pdf',
+                institutionLine: 'Republic of Trinidad and Tobago, Ministry of Education',
+                title: 'Staff Training and Scoring Guide',
+                metaLine: `Ref No: MOE STG 2026 | Issued: ${todayStr} | Audience: Principals, Deans, Counselors and Teachers`,
+                blocks: [
+                    { type: 'h2', text: '1. Early Warning ABC Methodology and PBIS Calibration' },
+                    { type: 'p', text: 'Sentinel Edu computes a composite triage risk score from 0 to 100 across three core indicators balanced by positive behavioural recognition. Attendance Penalty (Factor A) assigns 0.45 risk points for every percentage point below 100 percent attendance, automatically recommending Welfare Officer outreach whenever attendance falls below 85 percent. Behaviour and Severity (Factor B) sums weighted referrals across Levels 1 through 5 multiplied by recency (1.0 within 30 days, 0.85 within 90 days, 0.70 within 180 days, and 0.50 beyond 180 days) and case status (1.25 for open referrals and 0.80 for resolved referrals), adding a 5 point base indicator when one or more incidents exist.' },
+                    { type: 'p', text: 'Coursework and Academic Progress (Factor C) contributes 8 points per Grade Point Average unit below 2.50 plus 4 points per failed course up to a maximum of 20 failure points. To reinforce positive conduct, Positive Behavioural Interventions and Supports merits subtract 0.40 points per active merit up to a maximum 25 point offset. To prevent points inflation, teacher awards are capped at 50 points per student over a rolling 30 day window, and earned merit balances decay by 50 percent every 30 days so only sustained positive engagement lowers risk.' },
+                    { type: 'h2', text: '2. National Scoring Factors and Severity Reference Table' },
+                    {
+                        type: 'table',
+                        headers: ['Factor / Level', 'Weight / Formula', 'Scope & Decay Rule', 'Protocol Trigger'],
+                        colWidths: [115, 130, 135, 124],
+                        rows: [
+                            ['Factor A: Attendance', '(100 minus Att%) x 0.45', 'Enrolled term attendance rate', 'Welfare Officer below 85%'],
+                            ['Factor C: GPA & Courses', 'max(0,(2.5 minus GPA)x8)+Failsx4', 'Failure penalty capped at 20 pts', 'Tutoring, Vocational Pivot'],
+                            ['PBIS Merit Shield', 'minus min(25, Active x 0.40)', '50% 30 day decay; 50 pt cap', 'Logged in PBIS Audit Log'],
+                            ['Levels 1 & 2', '1 pt (L1), 3 pts (L2)', 'Minor procedural disruptions', 'Restorative redirection'],
+                            ['Levels 3 & 4', '7 pts (L3), 12 pts (L4)', 'Defiance, truancy, fighting', 'Dean tribunal, 1 on 5 Mentoring'],
+                            ['Level 5 Critical', '25 pts (75 pt Tier 3 floor)', 'Weapons, narcotics, assault', 'Emergency Ministry Intervention']
+                        ]
+                    },
+                    { type: 'h2', text: '3. Interpreting Trajectories, Escalation Alerts and Support Pivots' },
+                    { type: 'p', text: 'The longitudinal chart displays five historical months alongside a two month future trajectory reflecting natural progression or simulated What If interventions. Students scoring below 25 points remain in Tier 1 Preventive Support, scores between 25 and 49 trigger Tier 2 Targeted Monitoring and 1 on 5 Mentoring, and scores of 50 or higher initiate Tier 3 Guidance and Student Support Services Division intervention.' },
+                    { type: 'p', text: 'Whenever an incident history progresses from minor Level 1 or Level 2 infractions into Level 3 through Level 5 referrals, or whenever five month risk increases by 12 points or more, the rules engine issues an Escalating Trajectory Alert for immediate restorative de escalation. Where academic GPA below 2.00 or two or more failed courses co occur with disciplinary referrals, staff are prompted to consider a Vocational and Trade Course Pivot paired with Cooperative Learning rather than punitive exclusion alone. Algorithmic scores serve strictly as advisory decision support aids under Principal, Dean, and Guidance Officer oversight.' }
+                ]
+            });
+        }
+
+        function handleEngineMatrixRowChange(level, source) {
+            if (typeof document === 'undefined' || !WEIGHT_MATRIX[level]) return;
+            const infSel = document.getElementById(`matrixInfLvl${level}`);
+            const actSel = document.getElementById(`matrixActLvl${level}`);
+            const chosenSel = source === 'act' ? actSel : infSel;
+            if (!chosenSel) return;
+
+            const newW = parseInt(String(chosenSel.value || '').split('|')[0], 10);
+            if (!isNaN(newW) && newW > 0) {
+                WEIGHT_MATRIX[level].weight = newW;
+                const pill = document.getElementById(`matrixWeightPill${level}`);
+                if (pill) pill.textContent = `${newW} ${newW === 1 ? 'pt' : 'pts'}`;
+                const simBtn = document.getElementById(`btnSimMatrix${level}`);
+                if (simBtn) simBtn.textContent = `Simulate (+${newW} ${newW === 1 ? 'pt' : 'pts'})`;
+                // Sync paired select to matching weight option if available
+                const otherSel = source === 'act' ? infSel : actSel;
+                if (otherSel && otherSel.options) {
+                    const matchOpt = Array.from(otherSel.options).find(o => parseInt(String(o.value).split('|')[0], 10) === newW);
+                    if (matchOpt) otherSel.value = matchOpt.value;
+                }
+            }
+            if (typeof refreshEngineFromChanges === 'function' && evaluatedStudents.length > 0) {
+                refreshEngineFromChanges();
+            }
+        }
+
+        function updateMatrixStudentCounts(st) {
+            if (typeof document === 'undefined') return;
+            const counts = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+            if (st && Array.isArray(st.incidentsList)) {
+                st.incidentsList.forEach(inc => {
+                    const lv = getIncidentLevelNumber(inc);
+                    counts[lv] = (counts[lv] || 0) + 1;
+                });
+            }
+            for (let lv = 1; lv <= 5; lv++) {
+                const el = document.getElementById(`matrixStuCountLvl${lv}`);
+                if (el) el.textContent = `Student: ${counts[lv]} logged`;
+            }
+        }
+
+        function simulateMatrixLevelOnStudent(level) {
+            if (typeof document === 'undefined') return;
+            const inp = document.getElementById('simAddIncidentPts');
+            const w = (WEIGHT_MATRIX[level] && WEIGHT_MATRIX[level].weight) || 1;
+            if (inp) {
+                const current = parseFloat(inp.value) || 0;
+                inp.value = String(Math.min(100, current + w));
+            }
+            updateWhatIfSimulation(true);
+            const wf = document.getElementById('abcWhatIfSection');
+            if (wf && typeof wf.scrollIntoView === 'function') {
+                wf.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+
+        // ── STUDENT SELF-VIEW & VOICE IN-PAGE MODAL ───────────────────────────
+        let _activeSvStudent = null;
+
+        function buildEngineStudentRecoveryData(st) {
+            const todayStr = new Date().toLocaleDateString('en-TT', { day: '2-digit', month: 'long', year: 'numeric' });
+            const tierLabel = st.riskScore >= 50
+                ? 'Tier 3 Priority Support and Guidance Intervention'
+                : st.riskScore >= 25
+                    ? 'Tier 2 Targeted Check In and Mentoring'
+                    : 'Tier 1 Healthy Preventive Baseline';
+
+            const attRate = Math.round(st.attendance !== undefined ? st.attendance : 95);
+            const openCount = st.openIncidentsCount || 0;
+            const totalIncs = st.totalIncidentsCount || 0;
+            const gpa = st.gpa || '3.00';
+            const failures = st.courseFailures || 0;
+            const pbisPts = st.participationPoints || 0;
+
+            const attAction = attRate < 95
+                ? `Increase attendance toward 95 percent (each +5 percent lowers risk by 2.25 points)`
+                : 'Maintain current regular attendance above 95 percent';
+            const behAction = openCount > 0
+                ? `Meet with Form Dean to resolve ${openCount} open referral(s) and shift weight from 1.25x to 0.80x`
+                : 'Continue positive conduct record with zero open infractions';
+            const courseAction = (parseFloat(gpa) < 2.5 || failures > 0)
+                ? 'Attend after school tutoring, 1 on 5 Mentoring, or Vocational and Cooperative Learning tracks'
+                : 'Maintain passing grades across all enrolled courses';
+            const pbisAction = pbisPts < 30
+                ? 'Earn +10 PBIS merits via class participation or leadership to remove 4.0 risk points'
+                : 'Continue active participation merits before 30 day decay cycle';
+
+            const recoveryParagraphs = [];
+            if (openCount > 0) {
+                recoveryParagraphs.push(
+                    `First, the student currently has ${openCount} open disciplinary referral(s). Scheduling a restorative conference with the Form Dean or Guidance Counselor to close active cases will immediately reduce incident weighting from 1.25 times to 0.80 times and support steady score recovery.`
+                );
+            }
+            if (attRate < 95) {
+                const gain = Math.round(95 - attRate);
+                recoveryParagraphs.push(
+                    `Second, raising attendance from ${attRate} percent to 95 percent represents a ${gain} percentage point improvement, which reduces the Attendance Penalty by ${(gain * 0.45).toFixed(1)} points over subsequent reporting cycles.`
+                );
+            }
+            if (parseFloat(gpa) < 2.5 || failures > 0) {
+                recoveryParagraphs.push(
+                    `Third, because current academic records show a GPA of ${gpa} and ${failures} course failure(s), the student is eligible for structured 1 on 5 Mentoring, after school academic tutoring, or a Vocational and Trade Course Pivot paired with Cooperative Learning placement.`
+                );
+            }
+            recoveryParagraphs.push(
+                `Finally, consistent classroom participation directly rewards positive behaviour: earning additional Positive Behavioural Interventions and Supports merits offsets up to 25 risk points, helping transition the student smoothly toward Tier 1 standing.`
+            );
+
+            return {
+                todayStr,
+                tierLabel,
+                introText: `This Student Self View and Support Recovery Statement is prepared on ${todayStr} for ${st.name} (Student ID: ${st.studentNumber || st.id}), enrolled in ${st.form} at ${st.school || 'Ministry Registry'}. Based on current attendance, behavioural conduct, coursework performance, and positive participation merits, the student holds an advisory triage score of ${st.riskScore} out of 100 and is currently placed in ${tierLabel}.`,
+                detailText: `The composite score combines an attendance rate of ${attRate} percent (+${(st.attendancePenalty || 0).toFixed(1)} risk points), ${totalIncs} recorded behavioural referral(s) including ${openCount} open case(s) (+${(st.incidentScoreSum || 0).toFixed(1)} risk points), and an academic Grade Point Average of ${gpa} with ${failures} course failure(s) (+${(st.courseFailurePenalty || 0).toFixed(1)} risk points), offset by ${pbisPts} active Positive Behavioural Interventions and Supports merit points (minus ${(st.participationOffset || 0).toFixed(1)} risk points). Earned merits decay by 50 percent every 30 days to encourage steady ongoing participation.`,
+                tableRows: [
+                    ['Factor A: Attendance', `${attRate} percent attended`, `+${(st.attendancePenalty || 0).toFixed(1)} pts`, attAction],
+                    ['Factor B: Behaviour Referrals', `${totalIncs} total (${openCount} open)`, `+${(st.incidentScoreSum || 0).toFixed(1)} pts`, behAction],
+                    ['Factor C: Coursework & GPA', `GPA ${gpa} (${failures} failed)`, `+${(st.courseFailurePenalty || 0).toFixed(1)} pts`, courseAction],
+                    ['PBIS Positive Merit Shield', `${pbisPts} active merits`, `minus ${(st.participationOffset || 0).toFixed(1)} pts`, pbisAction]
+                ],
+                recoveryParagraphs
+            };
+        }
+
+        function openStudentSelfViewModal(studentId = null) {
+            if (typeof document === 'undefined') return;
+            const modal = document.getElementById('studentSelfViewModal');
+            const sel = document.getElementById('svModalStudentSelect');
+            if (sel && evaluatedStudents.length > 0) {
+                sel.innerHTML = evaluatedStudents.map(st => `<option value="${st.id}">${st.name} (${st.form})</option>`).join('');
+            }
+            const targetId = studentId || getActiveStudentId() || (evaluatedStudents[0] && evaluatedStudents[0].id);
+            if (sel && targetId) sel.value = targetId;
+            if (targetId) renderEngineStudentSelfView(targetId);
+            renderEngineConcernsFeed();
+            if (modal) modal.classList.add('is-open');
+            if (document.body) document.body.classList.add('student-sv-open');
+        }
+
+        function closeStudentSelfViewModal() {
+            if (typeof document === 'undefined') return;
+            const modal = document.getElementById('studentSelfViewModal');
+            if (modal) modal.classList.remove('is-open');
+            if (document.body) document.body.classList.remove('student-sv-open');
+        }
+
+        function renderEngineStudentSelfView(studentId) {
+            if (typeof document === 'undefined') return;
+            const st = evaluatedStudents.find(s => s.id === studentId) || evaluatedStudents[0];
+            if (!st) return;
+            _activeSvStudent = st;
+            const d = buildEngineStudentRecoveryData(st);
+            const cleanId = String(st.id).replace(/[^a-zA-Z0-9]/g, '').slice(-4).toUpperCase() || '001';
+
+            const refEl = document.getElementById('engineSvRefNo');
+            const dtEl = document.getElementById('engineSvIssuedDate');
+            const sidEl = document.getElementById('engineSvStudentIdLine');
+            const introEl = document.getElementById('engineSvIntroPara');
+            const detEl = document.getElementById('engineSvDetailPara');
+            const tbodyEl = document.getElementById('engineSvFactorsTableBody');
+            const recEl = document.getElementById('engineSvRecoveryParagraphs');
+
+            if (refEl) refEl.textContent = `Ref No: MOE SSV 2026 ${cleanId}`;
+            if (dtEl) dtEl.textContent = `Issued: ${d.todayStr}`;
+            if (sidEl) sidEl.textContent = `Student ID: ${st.studentNumber || st.id}`;
+            if (introEl) introEl.textContent = d.introText;
+            if (detEl) detEl.textContent = d.detailText;
+            if (tbodyEl) {
+                tbodyEl.innerHTML = d.tableRows.map(r => `<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td></tr>`).join('');
+            }
+            if (recEl) {
+                recEl.innerHTML = d.recoveryParagraphs.map(t => `<p class="guide-para">${t}</p>`).join('');
+            }
+        }
+
+        function printEngineStudentSelfView() {
+            if (typeof window !== 'undefined') {
+                if (typeof window.focus === 'function') window.focus();
+                if (typeof window.print === 'function') window.print();
+            }
+        }
+
+        function downloadEngineStudentSelfViewPdf() {
+            if (!_activeSvStudent || typeof window.downloadCustomDocumentPdf !== 'function') return;
+            const st = _activeSvStudent;
+            const d = buildEngineStudentRecoveryData(st);
+            const cleanId = String(st.id).replace(/[^a-zA-Z0-9]/g, '').slice(-4).toUpperCase() || '001';
+            const safeName = String(st.name || 'Student').replace(/[^a-zA-Z0-9]+/g, '_').replace(/^_|_$/g, '');
+
+            window.downloadCustomDocumentPdf({
+                fileName: `Student_Self_View_${safeName}.pdf`,
+                institutionLine: 'Republic of Trinidad and Tobago, Ministry of Education',
+                title: 'Student Self View and Support Recovery Statement',
+                metaLine: `Ref No: MOE SSV 2026 ${cleanId} | Issued: ${d.todayStr} | Student ID: ${st.studentNumber || st.id}`,
+                blocks: [
+                    { type: 'h2', text: '1. Plain Language Explanation of Support Score' },
+                    { type: 'p', text: d.introText },
+                    { type: 'p', text: d.detailText },
+                    { type: 'h2', text: '2. Summary of Scoring Factors and Recovery Opportunities' },
+                    {
+                        type: 'table',
+                        headers: ['Support Indicator', 'Current Record', 'Score Impact', 'Recovery Opportunity'],
+                        colWidths: [110, 105, 85, 204],
+                        rows: d.tableRows
+                    },
+                    { type: 'h2', text: '3. Guidance Recovery Plan and Next Steps' },
+                    ...d.recoveryParagraphs.map(text => ({ type: 'p', text }))
+                ]
+            });
+        }
+
+        function submitEngineStudentConcern(event) {
+            event.preventDefault();
+            const catEl = document.getElementById('engineConcernCategory');
+            const txtEl = document.getElementById('engineConcernText');
+            const anonEl = document.getElementById('engineConcernAnonymous');
+            const toastEl = document.getElementById('engineConcernStatusToast');
+            const text = (txtEl && txtEl.value || '').trim();
+            if (!text) return;
+
+            const isAnon = anonEl ? Boolean(anonEl.checked) : true;
+            const st = _activeSvStudent || {};
+            const entry = {
+                id: `con_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+                school_id: st.schoolId || 'sch_001',
+                school: st.school || 'Port of Spain North Secondary',
+                category: catEl ? catEl.value : 'General Suggestion or School Climate',
+                concern_text: text,
+                is_anonymous: isAnon,
+                student_id: isAnon ? null : (st.id || null),
+                student_label: isAnon ? 'Anonymous Student' : (st.name || 'Student'),
+                status: 'Open',
+                created_at: new Date().toISOString()
+            };
+
+            let list = [];
+            try {
+                list = JSON.parse(localStorage.getItem('sentinel_student_concerns') || '[]');
+                if (!Array.isArray(list)) list = [];
+            } catch (_) { list = []; }
+            list.unshift(entry);
+            try {
+                localStorage.setItem('sentinel_student_concerns', JSON.stringify(list.slice(0, 100)));
+            } catch (_) {}
+
+            try {
+                const dbPayload = {
+                    id: entry.id,
+                    school_id: entry.school_id,
+                    school: entry.school,
+                    category: entry.category,
+                    concern_text: entry.concern_text,
+                    is_anonymous: entry.is_anonymous,
+                    student_id: entry.student_id,
+                    status: entry.status,
+                    created_at: entry.created_at
+                };
+                fetch(`${SUPABASE_REST_URL}/student_concerns`, {
+                    method: 'POST',
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(dbPayload)
+                }).catch(() => {});
+            } catch (_) {}
+
+            if (txtEl) txtEl.value = '';
+            if (toastEl) {
+                toastEl.style.display = 'block';
+                setTimeout(() => { toastEl.style.display = 'none'; }, 4000);
+            }
+            renderEngineConcernsFeed();
+        }
+
+        function renderEngineConcernsFeed() {
+            const container = document.getElementById('engineConcernsFeedList');
+            if (!container) return;
+            let list = [];
+            try {
+                list = JSON.parse(localStorage.getItem('sentinel_student_concerns') || '[]');
+                if (!Array.isArray(list)) list = [];
+            } catch (_) { list = []; }
+            if (list.length === 0) {
+                container.innerHTML = '<p class="guide-para">No confidential student submissions have been recorded yet in this browser.</p>';
+                return;
+            }
+            container.innerHTML = list.slice(0, 10).map(item => {
+                const when = item.created_at ? new Date(item.created_at).toLocaleString() : 'Current date';
+                const who = item.is_anonymous ? 'Anonymous Student' : (item.student_label || 'Identified Student');
+                const safeText = String(item.concern_text || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                return `<p class="guide-para">Submitted on ${when} by ${who} under category ${item.category}: ${safeText}</p>`;
+            }).join('');
+        }
 
         let evaluatedStudents = [];
         let riskChart = null;
         let selectedStudentId = null;
+        let hoveredStudentId = null;
         let currentPage = 1;
         const pageSize = 10;
+
+        function getActiveStudentId() {
+            return hoveredStudentId || selectedStudentId;
+        }
 
         // ── INITIALIZATION GUARANTEE ──────────────────────────────────────────
         // Execute immediately if DOM is ready, or hook DOMContentLoaded
@@ -715,6 +2055,21 @@
         }
 
         function initDashboard() {
+            const syncBadge = typeof document !== 'undefined' ? document.getElementById('sentinelSyncBadge') : null;
+            if (syncBadge) {
+                syncBadge.style.marginLeft = '1rem';
+                syncBadge.style.marginRight = '0.35rem';
+            }
+            if (typeof window !== 'undefined') {
+                if (typeof window.updateSentinelSyncBadge === 'function') window.updateSentinelSyncBadge();
+                if (typeof window.checkSentinelServerHealth === 'function') window.checkSentinelServerHealth();
+            }
+            if (typeof window !== 'undefined' && 'caches' in window) {
+                caches.keys().then(keys => keys.forEach(k => {
+                    if (k !== 'sentinel-edu-v4') caches.delete(k);
+                })).catch(() => {});
+            }
+
             // 1. Initial calculation from local seed database
             processDatabaseData();
 
@@ -731,6 +2086,22 @@
 
             // 5. Background sync with online Supabase database
             syncLiveDatabase();
+
+            // 6. Re-evaluate and redraw line immediately when values change in localStorage or tab regains focus
+            window.addEventListener('storage', refreshEngineFromChanges);
+            window.addEventListener('focus', refreshEngineFromChanges);
+        }
+
+        function refreshEngineFromChanges() {
+            const prevSelected = selectedStudentId;
+            processDatabaseData();
+            renderFloatingList();
+            if (riskChart) initChart();
+            if (prevSelected && evaluatedStudents.some(s => s.id === prevSelected)) {
+                selectStudent(prevSelected);
+            } else if (evaluatedStudents.length > 0) {
+                selectStudent(evaluatedStudents[0].id);
+            }
         }
 
         function setupChartWithRetry(attempts = 0) {
@@ -741,9 +2112,30 @@
             }
         }
 
-        // ── PROCESS DATA USING CORE RISK ENGINE FORMULA ────────────────────────
-        // Formula: TriageRiskScore_n = Σ(W_level × F_recency) + Baseline_ABC
-        function processDatabaseData(liveStudents = null, liveIncidents = null) {
+        // ── PROCESS DATA USING CORE RISK ENGINE FORMULA (PAST 5 MONTHS) ───────
+        // Formula: TriageRiskScore_n = Σ(W_level × F_recency × M_status) + Baseline_ABC - ParticipationOffset
+        function isExcludedTestStudentEngine(st) {
+            if (!st) return true;
+            const id = String(st.id || '').toLowerCase();
+            const stuNum = String(st.studentNumber || st.student_number || st.studentId || '').toLowerCase();
+            const name = String(st.name || '').trim().toLowerCase();
+            return id === 'stu_test_01' || id === 'stu_1794342607079' || stuNum === 'stu-test-2026' ||
+                name === 'test student' || name === 'test' || name === 'automated test student';
+        }
+
+        function isExcludedTestIncidentEngine(inc) {
+            if (!inc) return true;
+            const id = String(inc.id || '').toLowerCase();
+            const stuId = String(inc.studentId || inc.student_id || '').toLowerCase();
+            const stuName = String(inc.studentName || inc.student_name || inc.student || '').trim().toLowerCase();
+            const desc = String(inc.description || '').toLowerCase();
+            return id === 'inc_test_01' || id === 'inc_test_02' || id === 'inc_test_03' ||
+                stuId === 'stu_test_01' || stuId === 'stu_1794342607079' ||
+                stuName === 'test student' || stuName === 'automated test student' || stuName === 'test' || stuName === 'rarar' ||
+                desc.includes('auditor bot');
+        }
+
+        function processDatabaseData(liveStudents = null, liveIncidents = null, refNow = Date.now()) {
             const userData = typeof getLoggedInUserData === 'function' ? getLoggedInUserData() : null;
             const isPrincipal = userData && userData.role && userData.role.toLowerCase().includes('principal');
             let principalSchoolId = isPrincipal ? (userData.schoolId || userData.school_id) : null;
@@ -761,17 +2153,40 @@
                 }
                 if (!principalSchoolName) principalSchoolName = 'Port of Spain North Secondary';
 
-                const sub = document.querySelector('.page-title-banner .page-subtitle');
+                const sub = typeof document !== 'undefined' ? document.querySelector('.page-title-banner .page-subtitle') : null;
                 if (sub) sub.textContent = `${principalSchoolName} • School Decision Factor Matrix`;
             }
 
-            let studentsSource = (liveStudents && liveStudents.length > 0)
-                ? liveStudents
-                : (window.SENTINEL_SEED_DATA && Array.isArray(window.SENTINEL_SEED_DATA.students) ? window.SENTINEL_SEED_DATA.students : []);
+            let studentsSource = ((liveStudents && liveStudents.length > 0)
+                ? [...liveStudents]
+                : (typeof window !== 'undefined' && window.SENTINEL_SEED_DATA && Array.isArray(window.SENTINEL_SEED_DATA.students) ? [...window.SENTINEL_SEED_DATA.students] : []))
+                .filter(st => !isExcludedTestStudentEngine(st));
 
-            let incidentsSource = (liveIncidents && liveIncidents.length > 0)
-                ? liveIncidents
-                : (window.SENTINEL_SEED_DATA && Array.isArray(window.SENTINEL_SEED_DATA.incidents) ? window.SENTINEL_SEED_DATA.incidents : []);
+            let incidentsSource = ((liveIncidents && liveIncidents.length > 0)
+                ? [...liveIncidents]
+                : (typeof window !== 'undefined' && window.SENTINEL_SEED_DATA && Array.isArray(window.SENTINEL_SEED_DATA.incidents) ? [...window.SENTINEL_SEED_DATA.incidents] : []))
+                .filter(inc => !isExcludedTestIncidentEngine(inc));
+
+            // Merge locally logged incidents and status overrides from localStorage
+            let savedStatuses = {};
+            try {
+                if (typeof localStorage !== 'undefined') {
+                    const localIncs = JSON.parse(localStorage.getItem('sentinel_incidents') || '[]');
+                    localIncs.forEach(inc => {
+                        if (!isExcludedTestIncidentEngine(inc) && !incidentsSource.some(i => i.id === inc.id)) {
+                            incidentsSource.unshift(inc);
+                        }
+                    });
+                    savedStatuses = getSavedIncidentStatuses();
+                    incidentsSource = incidentsSource.map(inc => {
+                        const override = savedStatuses[inc.id] || savedStatuses[inc.incidentId];
+                        if (override && override.status) {
+                            return { ...inc, status: override.status };
+                        }
+                        return inc;
+                    });
+                }
+            } catch (_) {}
 
             if (isPrincipal && principalSchoolId) {
                 studentsSource = studentsSource.filter(st => {
@@ -790,92 +2205,185 @@
                 });
             }
 
-            const now = Date.now();
+            const now = refNow;
             const DAY_MS = 24 * 60 * 60 * 1000;
 
             evaluatedStudents = studentsSource.map((st, idx) => {
+                const rawId = st.id || `stu_${idx}`;
                 const sName = st.name || `Student ${idx + 1}`;
-                const sId = (st.id || `stu_${idx}`).toLowerCase();
-                const sNum = (st.student_number || st.studentNumber || '').toLowerCase();
+                const sId = rawId.toLowerCase();
+                const sNum = (st.student_number || st.studentNumber || st.studentId || '').toLowerCase();
 
                 // Match student incidents from database
                 const studentIncs = incidentsSource.filter(inc => {
                     const incStuId = (inc.student_id || inc.studentId || '').toLowerCase();
                     const incStuName = (inc.student_name || inc.studentName || inc.student || '').toLowerCase();
-                    return (incStuId && (incStuId === sId || incStuId === sNum)) ||
+                    return (incStuId && (incStuId === sId || (sNum && incStuId === sNum))) ||
                            (incStuName && sName && (incStuName.includes(sName.toLowerCase()) || sName.toLowerCase().includes(incStuName)));
                 });
 
-                // Calculate Σ(W_level × F_recency)
+                // Calculate Σ(W_level × F_recency × M_status)
                 let weightedIncidentSum = 0;
                 let hasL5 = false;
                 let suspensionsCount = 0;
 
                 studentIncs.forEach(inc => {
-                    let lvl = inc.level ? parseInt(inc.level) : 1;
-                    if (!inc.level && inc.matrix) {
-                        const m = inc.matrix.toLowerCase();
-                        if (m.includes('5')) lvl = 5;
-                        else if (m.includes('4')) lvl = 4;
-                        else if (m.includes('3')) lvl = 3;
-                        else if (m.includes('2')) lvl = 2;
-                    }
+                    const lvl = getIncidentLevelNumber(inc);
                     if (lvl === 5) hasL5 = true;
-                    if (lvl >= 4 || (inc.status || '').toLowerCase() === 'escalated') suspensionsCount++;
+                    const actLow = String(inc.action || '').toLowerCase();
+                    if (actLow.includes('suspension') || (inc.status || '').toLowerCase() === 'escalated' || lvl >= 4) {
+                        suspensionsCount++;
+                    }
 
-                    const baseW = WEIGHT_MATRIX[lvl] ? WEIGHT_MATRIX[lvl].weight : 1;
+                    const baseW = (inc.weight !== undefined && inc.weight !== null && !isNaN(Number(inc.weight)))
+                        ? Number(inc.weight)
+                        : (WEIGHT_MATRIX[lvl] ? WEIGHT_MATRIX[lvl].weight : 1);
                     let recency = 1.0;
-                    if (inc.created_at || inc.createdAt) {
-                        const days = (now - new Date(inc.created_at || inc.createdAt).getTime()) / DAY_MS;
-                        if (days > 180) recency = 0.50;
-                        else if (days > 90) recency = 0.70;
-                        else if (days > 30) recency = 0.85;
+                    if (inc.created_at || inc.createdAt || inc.date) {
+                        const incTime = new Date(inc.created_at || inc.createdAt || inc.date).getTime();
+                        if (!isNaN(incTime)) {
+                            const days = Math.max(0, (now - incTime) / DAY_MS);
+                            if (days > 180) recency = 0.50;
+                            else if (days > 90) recency = 0.70;
+                            else if (days > 30) recency = 0.85;
+                        }
                     }
                     const statusMult = (inc.status && inc.status.toLowerCase() === 'resolved') ? 0.8 : 1.25;
                     weightedIncidentSum += baseW * recency * statusMult;
                 });
 
-                // Live attendance rate from database
-                const attRate = (st.attendance !== undefined && st.attendance !== null) ? Number(st.attendance) : 95;
+                // Live attendance rate (including teacher updates in localStorage)
+                const attRate = getSavedAttendanceRate(rawId, st.attendance);
                 const absenceRate = Math.max(0, 100 - attRate);
+                const attendancePenalty = absenceRate * 0.45;
 
-                // Baseline_ABC = (Absence Rate * 0.45) + Incident / Behavior Offset
-                const baselineABC = (absenceRate * 0.45) + (studentIncs.length > 0 ? 5 : 0);
+                // Academic GPA & Course Failure Penalty ("C" in ABC Early Warning Model)
+                const rawGpa = getSavedStudentGPA(rawId, st.gpa, absenceRate, studentIncs.length);
+                const gpaNum = Number(rawGpa.toFixed(2));
+                const courseFailures = getSavedCourseFailures(rawId, st.courseFailures, gpaNum);
+                const gpaPenalty = Math.max(0, (2.5 - gpaNum) * 8);
+                const failureCountPenalty = Math.min(20, courseFailures * 4);
+                const courseFailurePenalty = gpaPenalty + failureCountPenalty;
 
-                // Final TriageRiskScore for 2026
-                let finalScore2026 = weightedIncidentSum + baselineABC;
-                if (hasL5) finalScore2026 = Math.max(finalScore2026, 75);
-                const score2026 = Math.min(98, Math.max(4, Math.round(finalScore2026)));
+                // Active participation points (with 1-month decay)
+                const activeParticipationPts = getActiveParticipationPoints(rawId, now);
+                const participationOffset = Math.min(25, activeParticipationPts * 0.4);
 
-                // Deterministic historical trajectory across Years: 2022, 2023, 2024, 2025, 2026
+                // Baseline_ABC = AttendancePenalty + BehaviorOffset + CourseFailurePenalty - ParticipationOffset
+                const behaviorBaseOffset = (studentIncs.length > 0 ? 5 : 0);
+                const baselineABC = attendancePenalty + behaviorBaseOffset + courseFailurePenalty - participationOffset;
+
+                // Current Month Final TriageRiskScore
+                let finalScoreCurrent = weightedIncidentSum + baselineABC;
+                if (hasL5) finalScoreCurrent = Math.max(finalScoreCurrent, 75);
+                const currentScore = Math.min(98, Math.max(4, Math.round(finalScoreCurrent)));
+
+                // Trajectory across the Past 5 Months (incorporating incident timestamps & PBIS history)
                 const seed = (sName.charCodeAt(0) || 10) + idx;
-                const trajectory = YEARS.map((yr, yIdx) => {
-                    if (yIdx === 4) return score2026;
-                    const diff = 4 - yIdx;
-                    const slope = (score2026 > 50) ? 12 : (score2026 > 25 ? 6 : 2);
-                    const past = score2026 - (diff * slope) + (((seed + yIdx * 5) % 7) - 3);
-                    return Math.min(95, Math.max(3, Math.round(past)));
+                const trajectory = MONTHS.map((mLabel, mIdx) => {
+                    if (mIdx === 4) return currentScore;
+                    const monthsAgo = 4 - mIdx;
+                    const checkpointTime = now - (monthsAgo * MONTH_MS);
+                    let incSumAtMonth = 0;
+                    let incCountAtMonth = 0;
+                    let hasL5AtMonth = false;
+                    studentIncs.forEach(inc => {
+                        const rawDate = inc.created_at || inc.createdAt || inc.date;
+                        const incTime = rawDate ? new Date(rawDate).getTime() : NaN;
+                        if (!isNaN(incTime) && incTime > checkpointTime) return;
+                        incCountAtMonth++;
+                        const lv = getIncidentLevelNumber(inc);
+                        if (lv === 5) hasL5AtMonth = true;
+                        const bw = (inc.weight !== undefined && inc.weight !== null && !isNaN(Number(inc.weight)))
+                            ? Number(inc.weight)
+                            : (WEIGHT_MATRIX[lv] ? WEIGHT_MATRIX[lv].weight : 1);
+                        let rec = 1.0;
+                        if (!isNaN(incTime)) {
+                            const d = Math.max(0, (checkpointTime - incTime) / DAY_MS);
+                            if (d > 180) rec = 0.50;
+                            else if (d > 90) rec = 0.70;
+                            else if (d > 30) rec = 0.85;
+                        }
+                        const sm = (inc.status && inc.status.toLowerCase() === 'resolved') ? 0.8 : 1.25;
+                        incSumAtMonth += bw * rec * sm;
+                    });
+                    const behBaseAtMonth = incCountAtMonth > 0 ? 5 : 0;
+                    const ptsAtMonth = getActiveParticipationPoints(rawId, checkpointTime);
+                    const pbisOffAtMonth = Math.min(25, ptsAtMonth * 0.4);
+                    const monthDrift = monthsAgo * ((attendancePenalty > 10 || courseFailurePenalty > 8) ? 2 : 1);
+                    let pastRaw = incSumAtMonth + behBaseAtMonth + attendancePenalty + courseFailurePenalty - pbisOffAtMonth - monthDrift + (((seed + mIdx * 5) % 5) - 2);
+                    if (hasL5AtMonth) pastRaw = Math.max(pastRaw, 75);
+                    return Math.min(95, Math.max(3, Math.round(pastRaw)));
                 });
 
-                // Derived GPA matching standard secondary school metrics
-                const gpaVal = Math.max(1.10, Math.min(3.95, (4.0 - (absenceRate * 0.03) - (studentIncs.length * 0.25)))).toFixed(2);
+                const gpaVal = gpaNum.toFixed(2);
+                const openIncsCount = studentIncs.filter(i => {
+                    const ls = savedStatuses[i.id || i.incidentId] || savedStatuses[i.incidentId];
+                    const stStr = (ls && ls.status ? ls.status : i.status || 'Open').toLowerCase();
+                    return stStr !== 'resolved';
+                }).length;
+                let highestLevel = 0;
+                studentIncs.forEach(i => {
+                    const lv = getIncidentLevelNumber(i);
+                    if (lv > highestLevel) highestLevel = lv;
+                });
+
+                const hasMinorIncs = studentIncs.some(inc => getIncidentLevelNumber(inc) <= 2);
+                const hasMajorIncs = studentIncs.some(inc => getIncidentLevelNumber(inc) >= 3);
+                const trajectoryRise = (trajectory[4] || 0) - (trajectory[0] || 0);
+                const isEscalating = (hasMinorIncs && hasMajorIncs) || trajectoryRise >= 12 || (studentIncs.length >= 2 && highestLevel >= 3);
+
+                const proj1 = applyNaturalMonthlyImprovement(currentScore, 1);
+                const proj2 = applyNaturalMonthlyImprovement(currentScore, 2);
+                if (!sessionWhatIfEditedIds[rawId] || !naturalStudentStatsCache[rawId]) {
+                    naturalStudentStatsCache[rawId] = {
+                        attendance: attRate,
+                        gpa: gpaVal,
+                        courseFailures: courseFailures,
+                        participationPoints: activeParticipationPts,
+                        openIncidentsCount: openIncsCount,
+                        riskScore: currentScore
+                    };
+                }
+
+                const computedTier = (hasL5 || currentScore >= 50) ? 3 : (currentScore >= 25 ? 2 : 1);
 
                 return {
-                    id: st.id || `stu_${idx}`,
+                    id: rawId,
+                    studentNumber: st.studentNumber || st.student_number || st.studentId || rawId,
+                    schoolId: st.schoolId || st.school_id || 'sch_001',
                     name: sName,
                     form: st.form || 'Form 3',
-                    riskScore: score2026,
+                    school: st.school || 'Port of Spain North Secondary',
+                    district: st.district || 'Port of Spain & Environs District',
+                    riskScore: currentScore,
+                    participationPoints: activeParticipationPts,
                     gpa: gpaVal,
+                    courseFailures: courseFailures,
                     attendance: attRate,
                     absenceRate: `${absenceRate.toFixed(1)}%`,
                     suspensions: `${suspensionsCount}.00`,
-                    mobility: String(st.triage_level || st.triageLevel || (score2026 > 50 ? 3 : score2026 > 25 ? 2 : 1)),
-                    trajectory
+                    mobility: `Tier ${computedTier}`,
+                    attendancePenalty: Number(attendancePenalty.toFixed(1)),
+                    incidentScoreSum: Number((weightedIncidentSum + behaviorBaseOffset).toFixed(1)),
+                    courseFailurePenalty: Number(courseFailurePenalty.toFixed(1)),
+                    participationOffset: Number(participationOffset.toFixed(1)),
+                    openIncidentsCount: openIncsCount,
+                    totalIncidentsCount: studentIncs.length,
+                    highestLevel: highestLevel,
+                    incidentsList: studentIncs,
+                    hasL5: hasL5,
+                    isEscalating: isEscalating,
+                    trajectoryRise: trajectoryRise,
+                    trajectory,
+                    fullTrajectory: [...trajectory, proj1, proj2],
+                    naturalStats: naturalStudentStatsCache[rawId]
                 };
             });
 
             // Sort descending by risk score
             evaluatedStudents.sort((a, b) => b.riskScore - a.riskScore);
+            if (typeof window !== 'undefined') window.evaluatedStudents = evaluatedStudents;
         }
 
         // ── RENDER FLOATING STUDENT LIST ──────────────────────────────────────
@@ -931,30 +2439,57 @@
             }
 
             // Build datasets matching dashboard.html curve styling
+            const activeId = getActiveStudentId();
             const datasets = evaluatedStudents.map(st => {
-                const isSelected = st.id === selectedStudentId;
+                const isSelected = st.id === activeId;
                 return {
                     label: st.name,
                     studentId: st.id,
-                    data: st.trajectory,
-                    borderColor: isSelected ? '#dc2626' : 'rgba(203, 213, 225, 0.5)',
+                    data: isSelected ? [...st.trajectory, null, null] : (st.fullTrajectory || [...st.trajectory, null, null]),
+                    borderColor: isSelected ? '#dc2626' : 'rgba(100, 116, 139, 0.6)',
                     backgroundColor: isSelected ? 'rgba(220, 38, 38, 0.08)' : 'transparent',
-                    borderWidth: isSelected ? 3.8 : 1.2,
+                    borderWidth: isSelected ? 3.8 : 1.5,
                     fill: isSelected,
                     tension: 0.35, // Smooth bezier curve identical to dashboard.html
                     pointBackgroundColor: isSelected ? '#dc2626' : 'transparent',
                     pointBorderColor: isSelected ? '#ffffff' : 'transparent',
                     pointBorderWidth: isSelected ? 2 : 0,
                     pointRadius: isSelected ? 5 : 0,
-                    pointHoverRadius: 7,
+                    pointHoverRadius: isSelected ? 7 : 0,
+                    pointHoverBackgroundColor: isSelected ? '#dc2626' : 'transparent',
+                    pointHoverBorderColor: isSelected ? '#ffffff' : 'transparent',
+                    pointHoverBorderWidth: isSelected ? 2 : 0,
+                    segment: {
+                        borderDash: function(ctx) {
+                            return ctx.p0DataIndex >= 4 ? [5, 5] : undefined;
+                        }
+                    },
                     order: isSelected ? 0 : 10
                 };
+            });
+
+            // Append reserved What-If projection series (shown when student selected)
+            datasets.push({
+                label: 'Projected What-If Trajectory',
+                studentId: '__whatif__',
+                data: [],
+                borderColor: '#16a34a',
+                backgroundColor: 'rgba(220, 38, 38, 0.08)',
+                borderWidth: 2.8,
+                borderDash: [5, 5],
+                fill: true,
+                tension: 0.35,
+                pointBackgroundColor: '#16a34a',
+                pointBorderColor: '#ffffff',
+                pointBorderWidth: 2,
+                pointRadius: 4,
+                order: -1
             });
 
             riskChart = new Chart(canvas, {
                 type: 'line',
                 data: {
-                    labels: YEARS,
+                    labels: CHART_LABELS,
                     datasets: datasets
                 },
                 options: {
@@ -971,12 +2506,52 @@
                     },
                     interaction: {
                         mode: 'nearest',
-                        axis: 'x',
+                        axis: 'xy',
                         intersect: false
+                    },
+                    onHover: function(event, activeElements) {
+                        const studentEl = (activeElements || []).find(item => {
+                            const d = riskChart && riskChart.data && riskChart.data.datasets[item.datasetIndex];
+                            return d && d.studentId && d.studentId !== '__whatif__';
+                        });
+                        if (event && event.native && event.native.target) {
+                            event.native.target.style.cursor = studentEl ? 'pointer' : 'default';
+                        }
+                        const scheduleHighlight = (id, isHover) => {
+                            if (typeof requestAnimationFrame === 'function') {
+                                requestAnimationFrame(() => highlightStudent(id, isHover));
+                            } else {
+                                highlightStudent(id, isHover);
+                            }
+                        };
+                        if (studentEl) {
+                            const ds = riskChart.data.datasets[studentEl.datasetIndex];
+                            if (ds && ds.studentId && hoveredStudentId !== ds.studentId) {
+                                scheduleHighlight(ds.studentId, true);
+                            }
+                        } else if (hoveredStudentId !== null) {
+                            scheduleHighlight(selectedStudentId, false);
+                        }
+                    },
+                    onClick: function(event, activeElements) {
+                        if (activeElements && activeElements.length > 0) {
+                            const el = activeElements[0];
+                            const ds = riskChart && riskChart.data && riskChart.data.datasets[el.datasetIndex];
+                            if (ds && ds.studentId && ds.studentId !== '__whatif__') {
+                                selectStudent(ds.studentId);
+                            }
+                        }
                     },
                     plugins: {
                         legend: { display: false },
                         tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                            filter: function(tooltipItem) {
+                                const currentActiveId = getActiveStudentId();
+                                const dsId = tooltipItem.dataset && tooltipItem.dataset.studentId;
+                                return dsId === currentActiveId || dsId === '__whatif__';
+                            },
                             backgroundColor: '#111111',
                             titleFont: { family: "'Google Sans', sans-serif", weight: '600' },
                             bodyFont: { family: "'Google Sans', sans-serif" },
@@ -984,6 +2559,7 @@
                             padding: 10,
                             callbacks: {
                                 label: function(ctx) {
+                                    if (ctx.parsed.y === null || ctx.parsed.y === undefined) return null;
                                     return `${ctx.dataset.label}: ${ctx.parsed.y} pts`;
                                 }
                             }
@@ -998,7 +2574,7 @@
                             },
                             title: {
                                 display: true,
-                                text: 'Year',
+                                text: 'Past 5 Months + 2-Month What-If Projection',
                                 font: { family: "'Google Sans', sans-serif", size: 13, weight: '700' },
                                 color: '#1e293b'
                             }
@@ -1022,31 +2598,55 @@
                     }
                 }
             });
+
+            canvas.onmouseleave = function() {
+                if (hoveredStudentId !== null) {
+                    highlightStudent(selectedStudentId, false);
+                }
+            };
+
+            if (getActiveStudentId()) {
+                updateWhatIfSimulation();
+            }
         }
 
         // ── HIGHLIGHT & SELECTION HANDLERS ────────────────────────────────────
         function highlightStudent(studentId, isHover) {
-            const targetId = isHover ? studentId : selectedStudentId;
+            hoveredStudentId = isHover ? studentId : null;
+            const targetId = getActiveStudentId();
+
+            if (typeof document !== 'undefined') {
+                document.querySelectorAll('.fsc-item').forEach(el => el.classList.remove('active'));
+                const activeEl = document.getElementById(`fsc_item_${targetId}`);
+                if (activeEl) activeEl.classList.add('active');
+            }
+
             applyChartHighlight(targetId);
             const targetStudent = evaluatedStudents.find(s => s.id === targetId);
             if (targetStudent) {
                 updateReportCardTiles(targetStudent);
+                updateDecisionStudio(targetStudent);
             }
         }
 
         function selectStudent(studentId) {
             selectedStudentId = studentId;
+            hoveredStudentId = null;
 
             // Highlight in floating list
-            document.querySelectorAll('.fsc-item').forEach(el => el.classList.remove('active'));
-            const activeEl = document.getElementById(`fsc_item_${studentId}`);
-            if (activeEl) activeEl.classList.add('active');
+            if (typeof document !== 'undefined') {
+                document.querySelectorAll('.fsc-item').forEach(el => el.classList.remove('active'));
+                const activeEl = document.getElementById(`fsc_item_${studentId}`);
+                if (activeEl) activeEl.classList.add('active');
+            }
 
             applyChartHighlight(studentId);
 
             const student = evaluatedStudents.find(s => s.id === studentId);
             if (student) {
                 updateReportCardTiles(student);
+                updateDecisionStudio(student);
+                updateMatrixStudentCounts(student);
             }
         }
 
@@ -1054,27 +2654,42 @@
             if (!riskChart) return;
 
             riskChart.data.datasets.forEach(ds => {
+                if (ds.studentId === '__whatif__') return;
+                const st = evaluatedStudents.find(s => s.id === ds.studentId);
                 const isSelected = ds.studentId === targetId;
                 if (isSelected) {
+                    if (st) ds.data = [...st.trajectory, null, null];
                     ds.borderColor = '#dc2626';
                     ds.backgroundColor = 'rgba(220, 38, 38, 0.08)';
                     ds.borderWidth = 3.8;
                     ds.fill = true;
                     ds.pointRadius = 5;
+                    ds.pointHoverRadius = 7;
                     ds.pointBackgroundColor = '#dc2626';
                     ds.pointBorderColor = '#ffffff';
                     ds.pointBorderWidth = 2;
+                    ds.pointHoverBackgroundColor = '#dc2626';
+                    ds.pointHoverBorderColor = '#ffffff';
+                    ds.pointHoverBorderWidth = 2;
                     ds.order = 0;
                 } else {
-                    ds.borderColor = 'rgba(203, 213, 225, 0.5)';
+                    if (st) ds.data = st.fullTrajectory || [...st.trajectory, null, null];
+                    ds.borderColor = 'rgba(100, 116, 139, 0.6)';
                     ds.backgroundColor = 'transparent';
-                    ds.borderWidth = 1.2;
+                    ds.borderWidth = 1.5;
                     ds.fill = false;
+                    ds.pointBackgroundColor = 'transparent';
+                    ds.pointBorderColor = 'transparent';
+                    ds.pointBorderWidth = 0;
                     ds.pointRadius = 0;
+                    ds.pointHoverRadius = 0;
+                    ds.pointHoverBackgroundColor = 'transparent';
+                    ds.pointHoverBorderColor = 'transparent';
+                    ds.pointHoverBorderWidth = 0;
                     ds.order = 10;
                 }
             });
-            riskChart.update('none');
+            riskChart.update();
         }
 
         function updateReportCardTiles(st) {
@@ -1096,7 +2711,7 @@
             }
             if (absEl) {
                 absEl.textContent = st.absenceRate;
-                absEl.className = 'rc-tile-box ' + (parseFloat(st.absenceRate) > 10 ? 'box-red' : 'box-neutral');
+                absEl.className = 'rc-tile-box ' + (parseFloat(st.absenceRate) > 10 ? 'box-green' : 'box-neutral');
             }
             if (suspEl) {
                 suspEl.textContent = st.suspensions;
@@ -1105,6 +2720,282 @@
             if (mobEl) {
                 mobEl.textContent = st.mobility;
                 mobEl.className = 'rc-tile-box box-pink';
+            }
+        }
+
+        function exportSelectedStudentReport(mode) {
+            const activeId = getActiveStudentId();
+            const stu = evaluatedStudents.find(s => s.id === activeId) || evaluatedStudents[0];
+            if (stu && typeof window.openStatementOfConductModal === 'function') {
+                window.openStatementOfConductModal(stu, mode);
+            }
+        }
+
+        function updateDecisionStudio(st) {
+            if (!st || typeof document === 'undefined') return;
+            const subEl = document.getElementById('breakdownSubtitle');
+            const attEl = document.getElementById('bdAttPenalty');
+            const behEl = document.getElementById('bdBehPenalty');
+            const crsEl = document.getElementById('bdCoursePenalty');
+            const pbisEl = document.getElementById('bdPbisOffset');
+            const totEl = document.getElementById('bdTotalScore');
+            const rulesEl = document.getElementById('rulesRecommendations');
+
+            if (subEl) subEl.textContent = `${st.name} • ${st.form} • ${st.school || 'Ministry Registry'}`;
+            if (attEl) attEl.textContent = `+${(st.attendancePenalty || 0).toFixed(1)} pts (${st.attendance}% att.)`;
+            if (behEl) behEl.textContent = `+${(st.incidentScoreSum || 0).toFixed(1)} pts (${st.openIncidentsCount || 0} open)`;
+            if (crsEl) crsEl.textContent = `+${(st.courseFailurePenalty || 0).toFixed(1)} pts (GPA ${st.gpa})`;
+            if (pbisEl) pbisEl.textContent = `−${(st.participationOffset || 0).toFixed(1)} pts (${st.participationPoints || 0} pts)`;
+            if (totEl) totEl.textContent = `${st.riskScore} / 100 (${st.riskScore >= 50 ? 'High' : st.riskScore >= 25 ? 'Moderate' : 'Low'})`;
+
+            if (rulesEl) {
+                const rules = [];
+                if (st.hasL5 || st.highestLevel >= 5) {
+                    rules.push('Level 5 Protocol: Immediate suspension hearing & emergency SSSD referral.');
+                } else if (st.highestLevel === 4) {
+                    rules.push('Level 4 Escalation: Dean tribunal, suspension review & SSSD referral.');
+                }
+                if (st.riskScore >= 50) {
+                    rules.push('Tier 3 (>=50 pts): Assign Guidance Counselor & parent conference.');
+                } else if (st.riskScore >= 25) {
+                    rules.push('Tier 2 (25–49 pts): Bi-weekly Dean & Guidance check-in.');
+                } else {
+                    rules.push('Tier 1 (<25 pts): Healthy baseline; continue PBIS merits.');
+                }
+                if (st.attendance < 85) {
+                    rules.push(`Attendance (<85%): Welfare Officer outreach (${st.attendance}%).`);
+                }
+                if (st.isEscalating) {
+                    const startPt = Array.isArray(st.trajectory) ? st.trajectory[0] : st.riskScore;
+                    const endPt = Array.isArray(st.trajectory) ? st.trajectory[st.trajectory.length - 1] : st.riskScore;
+                    rules.push(`Escalating Trajectory Alert: Severity/trend rising (${startPt} → ${endPt} pts); initiate restorative de-escalation.`);
+                }
+                if (parseFloat(st.gpa) < 2.0 || (st.courseFailures || 0) >= 2) {
+                    rules.push(`Academic Warning: After-school tutoring (GPA ${st.gpa}, ${st.courseFailures || 0} failed).`);
+                    if ((st.totalIncidentsCount || 0) > 0) {
+                        rules.push('Vocational & Trade Course Pivot: Recommend practical/vocational curriculum track & Cooperative Learning placement.');
+                    }
+                }
+                if (st.riskScore >= 25 || (st.openIncidentsCount || 0) >= 2) {
+                    rules.push('1-on-5 Mentoring Program: Assign student to structured 1-on-5 staff/peer mentoring group.');
+                }
+                rulesEl.innerHTML = rules.map(r => `<div class="rule-item">• ${r}</div>`).join('');
+            }
+
+            syncWhatIfSlidersToStudent(st);
+        }
+
+        function syncWhatIfSlidersToStudent(st) {
+            const nat = st.naturalStats || st;
+            const subEl = document.getElementById('whatIfStudentSub');
+            if (subEl && st) {
+                subEl.textContent = `${st.name} (${st.form}) — Current Risk: ${st.riskScore}/100 • Auto-applies on edit (1%/mo natural improvement)`;
+            }
+
+            const lblAtt = document.getElementById('simAttLabel');
+            const lblGpa = document.getElementById('simGpaLabel');
+            const lblFail = document.getElementById('simFailuresLabel');
+            const lblPbis = document.getElementById('simBonusPbisLabel');
+            if (lblAtt) lblAtt.textContent = `Natural: ${Math.round(nat.attendance !== undefined ? nat.attendance : 95)}%`;
+            if (lblPbis) lblPbis.textContent = `Natural: ${nat.participationPoints || 0} pts • ${nat.openIncidentsCount || 0} open`;
+            if (lblGpa) lblGpa.textContent = Number(nat.gpa || 3.00).toFixed(2);
+            if (lblFail) lblFail.textContent = String(nat.courseFailures || 0);
+
+            const sAtt = document.getElementById('simAtt');
+            const sGpa = document.getElementById('simGpa');
+            const sFail = document.getElementById('simFailures');
+            const sPbis = document.getElementById('simBonusPbis');
+            const sAddInc = document.getElementById('simAddIncidentPts');
+            const sRes = document.getElementById('simResolveOpen');
+            if (!sAtt || !sGpa || !sFail || !sPbis) return;
+
+            sAtt.value = Math.round(st.attendance !== undefined ? st.attendance : 95);
+            sGpa.value = parseFloat(st.gpa || 3.00).toFixed(2);
+            sFail.value = st.courseFailures || 0;
+            sPbis.value = 0;
+            if (sAddInc) sAddInc.value = 0;
+            if (sRes) sRes.checked = false;
+
+            updateWhatIfSimulation(false);
+        }
+
+        function resetWhatIfSliders() {
+            const st = evaluatedStudents.find(s => s.id === getActiveStudentId());
+            if (!st) return;
+            const nat = st.naturalStats || st;
+            delete sessionWhatIfEditedIds[st.id];
+
+            const natAtt = Number(nat.attendance !== undefined ? nat.attendance : 95);
+            const natGpa = Number(nat.gpa || 3.00);
+            const natFailures = Number(nat.courseFailures || 0);
+
+            try {
+                if (typeof localStorage !== 'undefined') {
+                    localStorage.setItem(`sentinel_att_rate_${st.id}`, String(Math.round(natAtt)));
+                    localStorage.setItem(`sentinel_gpa_${st.id}`, natGpa.toFixed(2));
+                    localStorage.setItem(`sentinel_failures_${st.id}`, String(natFailures));
+                }
+            } catch (_) {}
+
+            st.attendance = natAtt;
+            st.absenceRate = `${Math.max(0, 100 - natAtt).toFixed(1)}%`;
+            st.gpa = natGpa.toFixed(2);
+            st.courseFailures = natFailures;
+            if (nat.riskScore !== undefined) st.riskScore = nat.riskScore;
+
+            updateReportCardTiles(st);
+            syncWhatIfSlidersToStudent(st);
+        }
+
+        function formatDriverPill(label, delta) {
+            const rounded = Number(delta.toFixed(1));
+            const color = rounded < -0.05 ? '#15803d' : rounded > 0.05 ? '#b91c1c' : '#64748b';
+            const sign = rounded > 0 ? '+' : '';
+            const deltaText = Math.abs(rounded) < 0.05 ? '0.0' : `${sign}${rounded.toFixed(1)}`;
+            return `<span><strong>${label}:</strong> <span style="font-weight:700; color:${color};">${deltaText} pts</span></span>`;
+        }
+
+        function updateWhatIfSimulation(fromUserInput = false) {
+            const st = evaluatedStudents.find(s => s.id === getActiveStudentId());
+            if (!st) return;
+
+            const sAtt = document.getElementById('simAtt');
+            const sGpa = document.getElementById('simGpa');
+            const sFail = document.getElementById('simFailures');
+            const sPbis = document.getElementById('simBonusPbis');
+            const sAddInc = document.getElementById('simAddIncidentPts');
+            const sRes = document.getElementById('simResolveOpen');
+            if (!sAtt || !sGpa || !sFail || !sPbis) return;
+
+            const rawAtt = parseFloat(sAtt.value);
+            const rawGpa = parseFloat(sGpa.value);
+            const rawFail = parseInt(sFail.value, 10);
+            const rawPbis = parseFloat(sPbis.value);
+            const rawAddInc = sAddInc ? parseFloat(sAddInc.value) : 0;
+
+            const baseAtt = Math.round(st.attendance !== undefined ? st.attendance : 95);
+            const baseGpa = parseFloat(st.gpa || 3.00);
+            const baseFail = st.courseFailures || 0;
+
+            const simAtt = isNaN(rawAtt) ? baseAtt : Math.max(0, Math.min(100, rawAtt));
+            const simGpa = isNaN(rawGpa) ? baseGpa : Math.max(0, Math.min(4.0, rawGpa));
+            const simFailures = isNaN(rawFail) ? baseFail : Math.max(0, Math.min(10, rawFail));
+            const simBonusPbis = isNaN(rawPbis) ? 0 : Math.max(0, Math.min(100, rawPbis));
+            const simAddIncPts = isNaN(rawAddInc) ? 0 : Math.max(0, Math.min(100, rawAddInc));
+            const resolveOpen = Boolean(sRes && sRes.checked);
+
+            // Recompute simulated score using exact parity with processDatabaseData()
+            const simAttPenalty = Math.max(0, 100 - simAtt) * 0.45;
+            const simGpaPenalty = Math.max(0, (2.5 - simGpa) * 8);
+            const simFailurePenalty = Math.min(20, simFailures * 4);
+            const simCoursePenalty = simGpaPenalty + simFailurePenalty;
+            const simPbisOffset = Math.min(25, ((st.participationPoints || 0) + simBonusPbis) * 0.4);
+
+            const DAY_MS = 24 * 60 * 60 * 1000;
+            const now = Date.now();
+            let simIncidentWeight = simAddIncPts * (resolveOpen ? 0.8 : 1.25);
+            let stillHasL5 = (!resolveOpen && (Boolean(st.hasL5) || simAddIncPts >= 20));
+            const savedStatuses = getSavedIncidentStatuses();
+            (st.incidentsList || []).forEach(inc => {
+                const lvl = getIncidentLevelNumber(inc);
+                const w = (inc.weight !== undefined && inc.weight !== null && !isNaN(Number(inc.weight)))
+                    ? Number(inc.weight)
+                    : ((WEIGHT_MATRIX[lvl] && WEIGHT_MATRIX[lvl].weight) || 1);
+                let recency = 1.0;
+                if (inc.created_at || inc.createdAt || inc.date) {
+                    const incTime = new Date(inc.created_at || inc.createdAt || inc.date).getTime();
+                    if (!isNaN(incTime)) {
+                        const days = Math.max(0, (now - incTime) / DAY_MS);
+                        if (days > 180) recency = 0.50;
+                        else if (days > 90) recency = 0.70;
+                        else if (days > 30) recency = 0.85;
+                    }
+                }
+                const ls = savedStatuses[inc.id || inc.incidentId] || savedStatuses[inc.incidentId];
+                const rawSt = (ls && ls.status ? ls.status : inc.status || 'Open').toLowerCase();
+                const isResolved = resolveOpen ? true : (rawSt === 'resolved');
+                if (!isResolved && lvl === 5) stillHasL5 = true;
+                const statusMult = isResolved ? 0.8 : 1.25;
+                simIncidentWeight += w * recency * statusMult;
+            });
+            const behBase = (st.totalIncidentsCount > 0 || simAddIncPts > 0) ? 5 : 0;
+
+            let simRaw = simIncidentWeight + behBase + simAttPenalty + simCoursePenalty - simPbisOffset;
+            if (stillHasL5) simRaw = Math.max(simRaw, 75);
+            const simBaseScore = Math.min(98, Math.max(4, Math.round(simRaw)));
+
+            // Apply +1 overall per month projection across the 2 future projected months (+1 Month +1, +2 Month +2)
+            const curr = (st.trajectory && st.trajectory.length >= 5) ? st.trajectory[4] : st.riskScore;
+            const month1Score = Math.min(100, Math.max(3, Math.round(((curr + simBaseScore) / 2) + 1)));
+            const simScore = Math.min(100, Math.max(3, Math.round(simBaseScore + 2)));
+            const delta = simScore - curr;
+
+            const scoreEl = document.getElementById('simProjectedScore');
+            const deltaEl = document.getElementById('simDeltaLabel');
+            if (scoreEl) scoreEl.textContent = `${simScore} / 100 (${simScore >= 50 ? 'High' : simScore >= 25 ? 'Moderate' : 'Low'})`;
+            if (deltaEl) {
+                deltaEl.textContent = delta >= 0 ? `+${delta} pts (+1%/mo Projection)` : `${delta} pts (Adjusted)`;
+                deltaEl.style.color = '#15803d';
+            }
+
+            // Populate live factor deltas relative to natural baseline
+            const driversEl = document.getElementById('whatIfDriversList');
+            const nat = st.naturalStats || st;
+            if (driversEl) {
+                const natAttPen = Math.max(0, 100 - (nat.attendance !== undefined ? nat.attendance : 95)) * 0.45;
+                const natGpaPen = Math.max(0, (2.5 - parseFloat(nat.gpa || 3.00)) * 8);
+                const natFailPen = Math.min(20, (nat.courseFailures || 0) * 4);
+                const natPbisOff = Math.min(25, (nat.participationPoints || 0) * 0.4);
+                const natBehPen = st.incidentScoreSum || 0;
+
+                const attDelta = simAttPenalty - natAttPen;
+                const gpaDelta = simGpaPenalty - natGpaPen;
+                const failDelta = simFailurePenalty - natFailPen;
+                const pbisDelta = -(simPbisOffset - natPbisOff);
+                const incDelta = (simIncidentWeight + behBase) - natBehPen;
+
+                driversEl.innerHTML = [
+                    formatDriverPill('A (Attendance)', attDelta),
+                    formatDriverPill('B (PBIS / Incidents)', pbisDelta + incDelta),
+                    formatDriverPill('C (GPA / Failures)', gpaDelta + failDelta)
+                ].join('');
+            }
+
+            // Auto-apply edited A, B, C values to localStorage and Report Card
+            if (fromUserInput) {
+                sessionWhatIfEditedIds[st.id] = true;
+                try {
+                    if (typeof localStorage !== 'undefined') {
+                        localStorage.setItem(`sentinel_att_rate_${st.id}`, String(Math.round(simAtt)));
+                        localStorage.setItem(`sentinel_gpa_${st.id}`, simGpa.toFixed(2));
+                        localStorage.setItem(`sentinel_failures_${st.id}`, String(simFailures));
+                    }
+                } catch (_) {}
+
+                st.attendance = simAtt;
+                st.absenceRate = `${Math.max(0, 100 - simAtt).toFixed(1)}%`;
+                st.gpa = simGpa.toFixed(2);
+                st.courseFailures = simFailures;
+                updateReportCardTiles(st);
+
+                const rcScoreEl = document.getElementById('rcScore');
+                if (rcScoreEl) {
+                    rcScoreEl.textContent = simBaseScore;
+                    rcScoreEl.className = 'rc-tile-box ' + (simBaseScore >= 50 ? 'box-red' : simBaseScore >= 25 ? 'box-pink' : 'box-neutral');
+                }
+                const rcMobEl = document.getElementById('rcMobility');
+                if (rcMobEl) {
+                    const simTier = (stillHasL5 || simBaseScore >= 50) ? 3 : (simBaseScore >= 25 ? 2 : 1);
+                    rcMobEl.textContent = `Tier ${simTier}`;
+                }
+            }
+
+            if (riskChart) {
+                const simDs = riskChart.data.datasets.find(d => d.studentId === '__whatif__');
+                if (simDs) {
+                    simDs.data = [null, null, null, null, curr, month1Score, simScore];
+                    riskChart.update();
+                }
             }
         }
 

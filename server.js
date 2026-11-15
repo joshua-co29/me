@@ -54,7 +54,8 @@ function loadDb() {
         students:       [],
         users:          [],
         incidents:      [],
-        attendanceLogs: []
+        attendanceLogs: [],
+        interventions:  []
     };
     fs.writeFileSync(DB_FILE, JSON.stringify(scaffold, null, 2), 'utf8');
     return scaffold;
@@ -80,13 +81,15 @@ async function refreshFromSupabase() {
             { data: classes, error: errCls },
             { data: users, error: errUsr },
             { data: students, error: errStu },
-            { data: incidents, error: errInc }
+            { data: incidents, error: errInc },
+            { data: interventions, error: errInt }
         ] = await Promise.all([
             supabase.from('schools').select('*'),
             supabase.from('classes').select('*'),
             supabase.from('users').select('*'),
             supabase.from('students').select('*'),
-            supabase.from('incidents').select('*')
+            supabase.from('incidents').select('*'),
+            supabase.from('interventions').select('*')
         ]);
 
         if (!errSch && schools) {
@@ -140,7 +143,9 @@ async function refreshFromSupabase() {
                 form: st.form,
                 incidentCount: st.incident_count || 0,
                 triageLevel: st.triage_level || 0,
-                attendance: st.attendance || 95,
+                attendance: st.attendance !== undefined && st.attendance !== null ? st.attendance : 95,
+                gpa: (st.gpa !== undefined && st.gpa !== null) ? Number(st.gpa) : null,
+                courseFailures: (st.course_failures !== undefined && st.course_failures !== null) ? parseInt(st.course_failures) : null,
                 status: st.status || 'Active'
             }));
         }
@@ -169,8 +174,26 @@ async function refreshFromSupabase() {
             }));
         }
 
+        if (!errInt && Array.isArray(interventions)) {
+            db.interventions = interventions.map(iv => ({
+                id: iv.id,
+                studentId: iv.student_id,
+                studentName: iv.student_name,
+                schoolId: iv.school_id,
+                school: iv.school,
+                type: iv.type,
+                counselorName: iv.counselor_name,
+                riskScoreAtEntry: parseInt(iv.risk_score_at_entry || 0),
+                targetRiskScore: parseInt(iv.target_risk_score || 0),
+                outcome: iv.outcome || 'In Progress',
+                notes: iv.notes || '',
+                followUpDate: iv.follow_up_date || '',
+                createdAt: iv.created_at
+            }));
+        }
+
         saveDb();
-        console.log(`[Supabase Live Pull] Hydrated ${db.schools.length} schools, ${db.classes.length} classes, ${db.users.length} users, ${db.students.length} students, ${db.incidents.length} incidents.`);
+        console.log(`[Supabase Live Pull] Hydrated ${db.schools.length} schools, ${db.classes.length} classes, ${db.users.length} users, ${db.students.length} students, ${db.incidents.length} incidents, ${(db.interventions || []).length} interventions.`);
     } catch (err) {
         console.warn('[Supabase Live Pull] Notice:', err.message);
     }
@@ -180,7 +203,7 @@ async function refreshFromSupabase() {
 refreshFromSupabase();
 
 // Ensure all expected collections exist (backwards-compat guard)
-['schools', 'classes', 'students', 'users', 'incidents'].forEach(col => {
+['schools', 'classes', 'students', 'users', 'incidents', 'interventions'].forEach(col => {
     if (!Array.isArray(db[col])) db[col] = [];
 });
 
@@ -537,6 +560,23 @@ app.post('/api/incidents', async (req, res) => {
         const normStatus = rawStatus.toLowerCase() === 'resolved' ? 'Resolved' :
                            rawStatus.toLowerCase() === 'escalated' ? 'Escalated' : 'Open';
 
+        const mLower = (matrix || '').toLowerCase();
+        const parsedLevel = parseInt(level || (
+            mLower.includes('5') || mLower.includes('critical') ? 5 :
+            mLower.includes('4') || mLower.includes('serious')  ? 4 :
+            mLower.includes('3') || mLower.includes('severe')   ? 3 :
+            mLower.includes('2') || mLower.includes('moderate') ? 2 : 1
+        ), 10) || 1;
+        const clampedLevel = Math.max(1, Math.min(5, parsedLevel));
+
+        const loggerUser = db.users.find(u => u.id === resolvedLogger);
+        const actorRole = (req.body.loggedByRole || (loggerUser && loggerUser.role) || '').toLowerCase();
+        if (actorRole === 'teacher' && clampedLevel > 2) {
+            return res.status(403).json({
+                error: 'RBAC Restriction: Classroom Teachers may only log Level 1 and Level 2 infractions. Escalate Level 3–5 incidents to the Dean of Discipline or Principal.'
+            });
+        }
+
         const newInc = {
             id:         'inc_' + Date.now(),
             incidentId: incidentId || `#INC-${new Date().getFullYear()}-${Math.floor(100 + Math.random() * 900)}`,
@@ -547,8 +587,8 @@ app.post('/api/incidents', async (req, res) => {
             schoolId:    resolvedSchool,
             school:      school     || '',
             district:    district   || '',
-            matrix:      matrix     || 'Level 1 Matrix',
-            level:       parseInt(level || (matrix && matrix.includes('3') ? 3 : matrix && matrix.includes('2') ? 2 : 1)),
+            matrix:      matrix     || `Level ${clampedLevel} Matrix`,
+            level:       clampedLevel,
             action:      action     || 'Under Review',
             description: description || '',
             status:      normStatus,
@@ -820,7 +860,9 @@ app.get('/api/students', async (req, res) => {
                     form: st.form,
                     incidentCount: st.incident_count || 0,
                     triageLevel: st.triage_level || 0,
-                    attendance: st.attendance || 95,
+                    attendance: st.attendance !== undefined && st.attendance !== null ? st.attendance : 95,
+                    gpa: (st.gpa !== undefined && st.gpa !== null) ? Number(st.gpa) : null,
+                    courseFailures: (st.course_failures !== undefined && st.course_failures !== null) ? parseInt(st.course_failures) : null,
                     status: st.status || 'Active'
                 }));
                 saveDb();
@@ -834,6 +876,8 @@ app.get('/api/students', async (req, res) => {
         const sch = (db.schools || []).find(s => s.id === stu.schoolId);
         return {
             ...stu,
+            gpa: stu.gpa !== undefined && stu.gpa !== null ? Number(stu.gpa) : null,
+            courseFailures: stu.courseFailures !== undefined && stu.courseFailures !== null ? parseInt(stu.courseFailures) : null,
             studentId: stu.studentId || stu.id,
             school: stu.school || (sch ? sch.name : 'Port of Spain North Secondary'),
             district: stu.district || (sch ? sch.district : 'St. George East District')
@@ -874,7 +918,9 @@ app.post('/api/students', async (req, res) => {
             form: student.form || 'General',
             incidentCount: student.incidentCount || 0,
             triageLevel: student.triageLevel !== undefined ? student.triageLevel : 0,
-            attendance: student.attendance !== undefined ? student.attendance : 95,
+            attendance: student.attendance !== undefined ? parseInt(student.attendance) : 95,
+            gpa: student.gpa !== undefined ? Number(parseFloat(student.gpa).toFixed(2)) : 3.00,
+            courseFailures: student.courseFailures !== undefined ? parseInt(student.courseFailures) : 0,
             status: student.status || 'Active'
         };
 
@@ -932,6 +978,8 @@ app.put('/api/students/:id', async (req, res) => {
         if (updates.triageLevel !== undefined) student.triageLevel = parseInt(updates.triageLevel);
         if (updates.incidentCount !== undefined) student.incidentCount = parseInt(updates.incidentCount);
         if (updates.attendance !== undefined) student.attendance = parseInt(updates.attendance);
+        if (updates.gpa !== undefined) student.gpa = Number(Math.max(0, Math.min(4.0, parseFloat(updates.gpa))).toFixed(2));
+        if (updates.courseFailures !== undefined) student.courseFailures = Math.max(0, parseInt(updates.courseFailures) || 0);
         if (updates.lastReview !== undefined) student.lastReview = updates.lastReview;
         student.updatedAt = new Date().toISOString();
 
@@ -939,14 +987,27 @@ app.put('/api/students/:id', async (req, res) => {
 
         if (supabase) {
             try {
-                const { error: sErr } = await supabase.from('students').update({
+                let { error: sErr } = await supabase.from('students').update({
                     name: student.name,
                     form: student.form,
                     school: student.school,
                     district: student.district,
                     triage_level: student.triageLevel,
-                    incident_count: student.incidentCount
+                    incident_count: student.incidentCount,
+                    attendance: student.attendance,
+                    gpa: student.gpa,
+                    course_failures: student.courseFailures
                 }).eq('id', student.id);
+                if (sErr) {
+                    const fallback = await supabase.from('students').update({
+                        name: student.name,
+                        form: student.form,
+                        triage_level: student.triageLevel,
+                        incident_count: student.incidentCount,
+                        attendance: student.attendance
+                    }).eq('id', student.id);
+                    sErr = fallback.error;
+                }
                 if (sErr) console.warn('[Supabase Student Update] Sync notice:', sErr.message);
                 else console.log(`[Supabase Student Update] Updated ${student.name} in online database ✓`);
             } catch (sErr) {
@@ -1270,13 +1331,129 @@ app.delete('/api/schools/:schoolId/teachers/:teacherId', async (req, res) => {
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
+// 10B. CLINICAL INTERVENTIONS & SSSD CASE ROUTES
+// ─────────────────────────────────────────────────────────────────────────────
+
+app.get('/api/interventions', async (req, res) => {
+    if (supabase) {
+        try {
+            const { data, error } = await supabase.from('interventions').select('*').order('created_at', { ascending: false });
+            if (!error && Array.isArray(data)) {
+                db.interventions = data.map(iv => ({
+                    id: iv.id,
+                    studentId: iv.student_id,
+                    studentName: iv.student_name,
+                    schoolId: iv.school_id,
+                    school: iv.school,
+                    type: iv.type,
+                    counselorName: iv.counselor_name,
+                    riskScoreAtEntry: parseInt(iv.risk_score_at_entry || 0),
+                    targetRiskScore: parseInt(iv.target_risk_score || 0),
+                    outcome: iv.outcome || 'In Progress',
+                    notes: iv.notes || '',
+                    followUpDate: iv.follow_up_date || '',
+                    createdAt: iv.created_at
+                }));
+                saveDb();
+            }
+        } catch (err) {
+            console.warn('[Supabase Interventions Pull Notice]:', err.message);
+        }
+    }
+    res.json(db.interventions || []);
+});
+
+app.post('/api/interventions', async (req, res) => {
+    try {
+        const body = req.body || {};
+        if (!body.studentName || !body.type) {
+            return res.status(400).json({ error: 'studentName and intervention type are required.' });
+        }
+        const entry = {
+            id: body.id || ('int_' + Date.now()),
+            studentId: body.studentId || null,
+            studentName: body.studentName,
+            schoolId: body.schoolId || 'sch_001',
+            school: body.school || '',
+            type: body.type,
+            counselorName: body.counselorName || 'Guidance Officer',
+            riskScoreAtEntry: parseInt(body.riskScoreAtEntry || 0),
+            targetRiskScore: parseInt(body.targetRiskScore || 0),
+            outcome: body.outcome || 'In Progress',
+            notes: body.notes || '',
+            followUpDate: body.followUpDate || '',
+            createdAt: body.createdAt || new Date().toISOString()
+        };
+        if (!Array.isArray(db.interventions)) db.interventions = [];
+        db.interventions.unshift(entry);
+        saveDb();
+
+        if (supabase) {
+            try {
+                await supabase.from('interventions').upsert({
+                    id: entry.id,
+                    student_id: entry.studentId || 'unknown',
+                    student_name: entry.studentName,
+                    school_id: entry.schoolId,
+                    school: entry.school,
+                    type: entry.type,
+                    counselor_name: entry.counselorName,
+                    risk_score_at_entry: entry.riskScoreAtEntry,
+                    target_risk_score: entry.targetRiskScore,
+                    outcome: entry.outcome,
+                    notes: entry.notes,
+                    follow_up_date: entry.followUpDate
+                });
+            } catch (sErr) {
+                console.warn('[Supabase Intervention Insert] Notice:', sErr.message);
+            }
+        }
+        res.status(201).json({ success: true, intervention: entry });
+    } catch (err) {
+        res.status(500).json({ error: 'Failed to log intervention: ' + err.message });
+    }
+});
+
+app.put('/api/interventions/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const updates = req.body || {};
+        const idx = (db.interventions || []).findIndex(iv => iv.id === id);
+        if (idx === -1) return res.status(404).json({ error: 'Intervention record not found' });
+
+        const iv = db.interventions[idx];
+        if (updates.outcome !== undefined) iv.outcome = updates.outcome;
+        if (updates.notes !== undefined) iv.notes = updates.notes;
+        if (updates.followUpDate !== undefined) iv.followUpDate = updates.followUpDate;
+        if (updates.targetRiskScore !== undefined) iv.targetRiskScore = parseInt(updates.targetRiskScore || 0);
+        saveDb();
+
+        if (supabase) {
+            try {
+                await supabase.from('interventions').update({
+                    outcome: iv.outcome,
+                    notes: iv.notes,
+                    follow_up_date: iv.followUpDate,
+                    target_risk_score: iv.targetRiskScore
+                }).eq('id', iv.id);
+            } catch (sErr) {
+                console.warn('[Supabase Intervention Update] Notice:', sErr.message);
+            }
+        }
+        res.json({ success: true, intervention: iv });
+    } catch (err) {
+        res.status(500).json({ error: 'Failed to update intervention: ' + err.message });
+    }
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
 // 11. STATS ROUTES
 // ─────────────────────────────────────────────────────────────────────────────
 
 // Helper – compute level counts for a given incident array
 function computeLevelCounts(incidents) {
     let open = 0, resolved = 0, escalated = 0;
-    let level1 = 0, level2 = 0, level3 = 0;
+    let level1 = 0, level2 = 0, level3 = 0, level4 = 0, level5 = 0;
 
     (incidents || []).forEach(inc => {
         const status = (inc.status || '').toLowerCase().trim();
@@ -1286,13 +1463,15 @@ function computeLevelCounts(incidents) {
 
         const m = (inc.matrix || '').toLowerCase();
         const lvl = parseInt(inc.level);
-        if      (lvl === 3 || m.includes('level 3') || m.includes('severe')) level3++;
+        if      (lvl === 5 || m.includes('level 5') || m.includes('critical')) level5++;
+        else if (lvl === 4 || m.includes('level 4') || m.includes('serious'))  level4++;
+        else if (lvl === 3 || m.includes('level 3') || m.includes('severe'))   level3++;
         else if (lvl === 2 || m.includes('level 2') || m.includes('moderate')) level2++;
-        else if (lvl === 1 || m.includes('level 1') || m.includes('minor')) level1++;
+        else if (lvl === 1 || m.includes('level 1') || m.includes('minor'))    level1++;
         else level1++;
     });
 
-    return { open, resolved, escalated, level1, level2, level3 };
+    return { open, resolved, escalated, level1, level2, level3, level4, level5 };
 }
 
 // GET national stats (Ministry view)
@@ -1342,7 +1521,9 @@ app.get('/api/stats', async (req, res) => {
                     form: st.form,
                     incidentCount: st.incident_count || 0,
                     triageLevel: st.triage_level || 0,
-                    attendance: st.attendance || 95,
+                    attendance: st.attendance !== undefined && st.attendance !== null ? st.attendance : 95,
+                    gpa: (st.gpa !== undefined && st.gpa !== null) ? Number(st.gpa) : null,
+                    courseFailures: (st.course_failures !== undefined && st.course_failures !== null) ? parseInt(st.course_failures) : null,
                     status: st.status || 'Active'
                 }));
             }
@@ -1362,10 +1543,14 @@ app.get('/api/stats', async (req, res) => {
         resolvedCases:   counts.resolved,
         escalatedCases:  counts.escalated,
         level3Count:     counts.level3,
+        level4Count:     counts.level4,
+        level5Count:     counts.level5,
         levelCounts: {
             level1: counts.level1,
             level2: counts.level2,
-            level3: counts.level3
+            level3: counts.level3,
+            level4: counts.level4,
+            level5: counts.level5
         },
         schoolCount:     db.schools.length,
         studentCount:    db.students.length,
@@ -1421,10 +1606,14 @@ app.get('/api/stats/school/:schoolId', (req, res) => {
         resolvedCases:  counts.resolved,
         escalatedCases: counts.escalated,
         level3Count:    counts.level3,
+        level4Count:    counts.level4,
+        level5Count:    counts.level5,
         levelCounts: {
             level1: counts.level1,
             level2: counts.level2,
-            level3: counts.level3
+            level3: counts.level3,
+            level4: counts.level4,
+            level5: counts.level5
         },
         studentCount:   schoolStudents.length,
         staffCount:     schoolStaff.length,

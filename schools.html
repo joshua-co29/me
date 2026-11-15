@@ -695,6 +695,23 @@
             </div>
         </section>
 
+        <!-- UNICEF DMS Positive Deviance & SSSD Regional Allocation Analytics -->
+        <section id="dmsAnalyticsSection" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:1.25rem; margin-bottom:1.75rem;">
+            <div style="background:#ffffff; border:1px solid #e4e4e7; padding:1.35rem 1.5rem;">
+                <div style="font-size:0.72rem; font-weight:800; text-transform:uppercase; letter-spacing:0.06em; color:#15803d; margin-bottom:0.25rem;">UNICEF Data Must Speak (DMS) Methodology</div>
+                <h2 style="margin:0 0 0.35rem; font-size:1.05rem; font-weight:700; color:#111111;">"Positive Deviance" Resilience Leaders</h2>
+                <p style="font-size:0.8rem; color:#6b7280; margin:0 0 0.9rem;">High-performing institutions achieving strong attendance &amp; incident resolution relative to enrollment, across Government and Denominational Boards.</p>
+                <div id="dmsLeadersList" style="font-size:0.84rem; color:#374151;">Calculating national resilience benchmarks…</div>
+                <div id="boardComparisonSummary" style="margin-top:0.85rem; padding-top:0.75rem; border-top:1px solid #f1f5f9; font-size:0.78rem; color:#4b5563;"></div>
+            </div>
+            <div style="background:#ffffff; border:1px solid #e4e4e7; padding:1.35rem 1.5rem;">
+                <div style="font-size:0.72rem; font-weight:800; text-transform:uppercase; letter-spacing:0.06em; color:#991b1b; margin-bottom:0.25rem;">Ministry SSSD Resource Allocation</div>
+                <h2 style="margin:0 0 0.35rem; font-size:1.05rem; font-weight:700; color:#111111;">Regional SSSD Deployment Priority</h2>
+                <p style="font-size:0.8rem; color:#6b7280; margin:0 0 0.9rem;">Districts ranked by active high-severity misconduct load (Levels 3–5) &amp; attendance deficit for targeted SSSD Social Worker staffing.</p>
+                <div id="sssdPriorityList" style="font-size:0.84rem; color:#374151;">Evaluating district severity loads…</div>
+            </div>
+        </section>
+
         <!-- Search and Filter Bar -->
         <section class="controls-card">
             <div class="controls-left">
@@ -722,6 +739,12 @@
                     <option value="primary">Primary Schools</option>
                 </select>
 
+                <select id="boardFilter" class="filter-select" onchange="filterSchools()">
+                    <option value="">All School Boards</option>
+                    <option value="government">Government (State)</option>
+                    <option value="denominational">Government-Assisted (Denominational)</option>
+                </select>
+
                 <button type="button" class="btn-reset-filters" onclick="resetFilters()">Reset</button>
             </div>
 
@@ -735,18 +758,19 @@
             <table class="directory-table">
                 <thead>
                     <tr>
-                        <th style="width: 32%;">School &amp; Address</th>
-                        <th style="width: 14%;">Type</th>
-                        <th style="width: 20%;">Educational District</th>
-                        <th style="width: 16%;">Principal / Head</th>
-                        <th style="width: 9%; text-align: center;">Students</th>
-                        <th style="width: 9%; text-align: center;">Teachers</th>
-                        <th style="width: 10%; text-align: right;">Action</th>
+                        <th style="width: 28%;">School &amp; Address</th>
+                        <th style="width: 11%;">Type</th>
+                        <th style="width: 17%;">Governance Board &amp; DMS</th>
+                        <th style="width: 16%;">Educational District</th>
+                        <th style="width: 12%;">Principal / Head</th>
+                        <th style="width: 7%; text-align: center;">Students</th>
+                        <th style="width: 7%; text-align: center;">Teachers</th>
+                        <th style="width: 12%; text-align: right;">Action</th>
                     </tr>
                 </thead>
                 <tbody id="schoolsTableBody">
                     <tr>
-                        <td colspan="7" style="text-align: center; padding: 2.5rem; color: #71717a;">Loading schools directory…</td>
+                        <td colspan="8" style="text-align: center; padding: 2.5rem; color: #71717a;">Loading schools directory…</td>
                     </tr>
                 </tbody>
             </table>
@@ -872,7 +896,119 @@
         let allSchools = [];
         let allStudents = [];
         let allTeachers = [];
+        let allIncidents = [];
         let activeSchool = null;
+
+        function getSchoolBoard(sch) {
+            if (!sch) return 'government';
+            if (sch.board) {
+                return sch.board.toLowerCase().includes('denominational') || sch.board.toLowerCase().includes('assisted')
+                    ? 'denominational' : 'government';
+            }
+            const name = (sch.name || '').toLowerCase();
+            const denomTerms = ['anglican', 'catholic', 'rc ', 'r.c.', 'presbyterian', 'sdms', 'hindu', 'asja', 'muslim', 'methodist', 'moravian', 'baptist', 'vedic', 'convent', 'presentation', 'naparima', 'bishop', 'fatima', 'hillview', 'trinity', 'st. '];
+            return denomTerms.some(t => name.includes(t)) ? 'denominational' : 'government';
+        }
+
+        function computeSchoolDMSMetrics(sch) {
+            const schStudents = allStudents.filter(s =>
+                (s.schoolId && s.schoolId === sch.id) ||
+                (s.school && sch.name && s.school.toLowerCase().trim() === sch.name.toLowerCase().trim())
+            );
+            const schIncidents = allIncidents.filter(inc =>
+                (inc.schoolId && inc.schoolId === sch.id) ||
+                (inc.school && sch.name && inc.school.toLowerCase().trim() === sch.name.toLowerCase().trim())
+            );
+            const denom = Math.max(schStudents.length, 5);
+            const avgAtt = schStudents.length > 0
+                ? schStudents.reduce((sum, s) => sum + (Number(s.attendance) || 90), 0) / schStudents.length
+                : 92;
+            const resolvedCnt = schIncidents.filter(i => (i.status || '').toLowerCase() === 'resolved').length;
+            const resRate = schIncidents.length > 0 ? (resolvedCnt / schIncidents.length) * 100 : 100;
+            const highSevCnt = schIncidents.filter(i => (parseInt(i.level || 1, 10) >= 3) && (i.status || '').toLowerCase() !== 'resolved').length;
+            const incPerCap = schIncidents.length / denom;
+
+            const rawDms = (avgAtt * 0.65) + (resRate * 0.25) - (incPerCap * 18) - (highSevCnt * 4) + 10;
+            const dmsScore = Math.max(15, Math.min(99, Math.round(rawDms)));
+            return {
+                enrolledCount: schStudents.length,
+                avgAtt: Math.round(avgAtt),
+                incidentCount: schIncidents.length,
+                highSevCnt,
+                dmsScore,
+                isPositiveDeviant: dmsScore >= 82
+            };
+        }
+
+        function renderDMSAndSSSDAnalytics() {
+            const leadersEl = document.getElementById('dmsLeadersList');
+            const boardEl = document.getElementById('boardComparisonSummary');
+            const sssdEl = document.getElementById('sssdPriorityList');
+            if (!leadersEl || !sssdEl) return;
+
+            const evaluated = allSchools.map(sch => ({
+                school: sch,
+                board: getSchoolBoard(sch),
+                ...computeSchoolDMSMetrics(sch)
+            })).sort((a, b) => b.dmsScore - a.dmsScore);
+
+            if (evaluated.length === 0) {
+                leadersEl.textContent = 'No school analytics available yet.';
+                sssdEl.textContent = 'No district severity records available.';
+                return;
+            }
+
+            leadersEl.innerHTML = evaluated.slice(0, 4).map((item, idx) => `
+                <div style="display:flex; justify-content:space-between; align-items:center; padding:0.45rem 0; border-bottom:1px solid #f1f5f9;">
+                    <div>
+                        <strong>#${idx + 1} ${item.school.name}</strong>
+                        <span style="display:block; font-size:0.74rem; color:#6b7280;">${item.board === 'denominational' ? 'Government-Assisted (Denominational)' : 'Government (State)'} • ${item.avgAtt}% Att.</span>
+                    </div>
+                    <span style="padding:0.2rem 0.55rem; font-size:0.76rem; font-weight:800; background:${item.isPositiveDeviant ? '#dcfce7' : '#f4f4f5'}; color:${item.isPositiveDeviant ? '#166534' : '#111111'};">
+                        DMS ${item.dmsScore}/100 ${item.isPositiveDeviant ? '★ Model' : ''}
+                    </span>
+                </div>
+            `).join('');
+
+            const govSchools = evaluated.filter(e => e.board === 'government');
+            const denSchools = evaluated.filter(e => e.board === 'denominational');
+            const govAvg = govSchools.length ? Math.round(govSchools.reduce((a, b) => a + b.dmsScore, 0) / govSchools.length) : 0;
+            const denAvg = denSchools.length ? Math.round(denSchools.reduce((a, b) => a + b.dmsScore, 0) / denSchools.length) : 0;
+            if (boardEl) {
+                boardEl.innerHTML = `<strong>Board Benchmark Parity:</strong> Government State Avg: <strong>${govAvg}/100</strong> (${govSchools.length} schools) &nbsp;|&nbsp; Gov.-Assisted Denominational Avg: <strong>${denAvg}/100</strong> (${denSchools.length} schools)`;
+            }
+
+            // District SSSD Deployment Priority
+            const distMap = {};
+            evaluated.forEach(item => {
+                const d = item.school.district || 'Unassigned District';
+                if (!distMap[d]) distMap[d] = { district: d, highSev: 0, totalInc: 0, dmsSum: 0, count: 0 };
+                distMap[d].highSev += item.highSevCnt;
+                distMap[d].totalInc += item.incidentCount;
+                distMap[d].dmsSum += item.dmsScore;
+                distMap[d].count++;
+            });
+            const districts = Object.values(distMap).map(d => ({
+                ...d,
+                avgDms: Math.round(d.dmsSum / Math.max(1, d.count)),
+                priorityScore: (d.highSev * 15) + d.totalInc + (100 - Math.round(d.dmsSum / Math.max(1, d.count)))
+            })).sort((a, b) => b.priorityScore - a.priorityScore);
+
+            sssdEl.innerHTML = districts.slice(0, 4).map(d => {
+                const urgent = d.highSev >= 2 || d.avgDms < 72;
+                return `
+                    <div style="display:flex; justify-content:space-between; align-items:center; padding:0.45rem 0; border-bottom:1px solid #f1f5f9;">
+                        <div>
+                            <strong>${d.district}</strong>
+                            <span style="display:block; font-size:0.74rem; color:#6b7280;">${d.highSev} Open L3–L5 Critical Cases • Avg DMS ${d.avgDms}</span>
+                        </div>
+                        <span style="padding:0.2rem 0.55rem; font-size:0.74rem; font-weight:700; text-transform:uppercase; background:${urgent ? '#fee2e2' : '#fef3c7'}; color:${urgent ? '#991b1b' : '#92400e'};">
+                            ${urgent ? 'Deploy SSSD Team' : 'Routine Support'}
+                        </span>
+                    </div>
+                `;
+            }).join('');
+        }
 
         document.addEventListener('DOMContentLoaded', initSchoolsPage);
 
@@ -881,10 +1017,16 @@
             if (window.SENTINEL_SEED_DATA) {
                 allSchools = Array.isArray(window.SENTINEL_SEED_DATA.schools) ? [...window.SENTINEL_SEED_DATA.schools] : [];
                 allStudents = Array.isArray(window.SENTINEL_SEED_DATA.students) ? [...window.SENTINEL_SEED_DATA.students] : [];
+                allIncidents = Array.isArray(window.SENTINEL_SEED_DATA.incidents) ? [...window.SENTINEL_SEED_DATA.incidents] : [];
                 allTeachers = Array.isArray(window.SENTINEL_SEED_DATA.users)
                     ? window.SENTINEL_SEED_DATA.users.filter(u => (u.role || '').toLowerCase().includes('teacher'))
                     : [];
             }
+
+            try {
+                const lsInc = JSON.parse(localStorage.getItem('sentinel_incidents') || '[]');
+                if (Array.isArray(lsInc)) allIncidents = [...lsInc, ...allIncidents];
+            } catch (_) {}
 
             // Include any locally created custom users
             const customUsers = (typeof getCustomUsers === 'function') ? getCustomUsers() : [];
@@ -896,6 +1038,7 @@
 
             renderSchoolsTable(allSchools);
             updateOverviewStats();
+            renderDMSAndSSSDAnalytics();
 
             // 2. Fetch live data from backend API or Supabase
             await syncLiveData();
@@ -905,10 +1048,11 @@
             try {
                 // Try backend API first
                 const apiBase = (typeof API_BASE !== 'undefined' ? API_BASE : 'http://localhost:5000');
-                const [schRes, stuRes, usrRes] = await Promise.all([
+                const [schRes, stuRes, usrRes, incRes] = await Promise.all([
                     fetch(`${apiBase}/api/schools`).catch(() => null),
                     fetch(`${apiBase}/api/students`).catch(() => null),
-                    fetch(`${apiBase}/api/teachers`).catch(() => null)
+                    fetch(`${apiBase}/api/teachers`).catch(() => null),
+                    fetch(`${apiBase}/api/incidents`).catch(() => null)
                 ]);
 
                 if (schRes && schRes.ok) {
@@ -922,6 +1066,10 @@
                 if (usrRes && usrRes.ok) {
                     const data = await usrRes.json();
                     if (Array.isArray(data) && data.length > 0) allTeachers = data;
+                }
+                if (incRes && incRes.ok) {
+                    const data = await incRes.json();
+                    if (Array.isArray(data) && data.length > 0) allIncidents = data;
                 }
             } catch (_) {
                 // Fallback direct to Supabase
@@ -959,6 +1107,7 @@
 
             renderSchoolsTable(allSchools);
             updateOverviewStats();
+            renderDMSAndSSSDAnalytics();
         }
 
         function updateOverviewStats() {
@@ -981,7 +1130,7 @@
             if (!tbody) return;
 
             if (schools.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 2.5rem; color: #71717a;">No schools found matching the selected filters.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; padding: 2.5rem; color: #71717a;">No schools found matching the selected filters.</td></tr>`;
                 if (counter) counter.textContent = 'Showing 0 schools';
                 return;
             }
@@ -990,10 +1139,9 @@
 
             tbody.innerHTML = schools.map(sch => {
                 // Count students enrolled at this school
-                const enrolledCount = allStudents.filter(s =>
-                    (s.schoolId && s.schoolId === sch.id) ||
-                    (s.school && sch.name && s.school.toLowerCase().trim() === sch.name.toLowerCase().trim())
-                ).length;
+                const dms = computeSchoolDMSMetrics(sch);
+                const enrolledCount = dms.enrolledCount;
+                const board = getSchoolBoard(sch);
 
                 // Count teachers assigned to this school
                 const teacherCount = allTeachers.filter(t =>
@@ -1014,6 +1162,14 @@
                         <td>
                             <span class="type-badge ${isSecondary ? 'type-secondary' : 'type-primary'}">
                                 ${isSecondary ? 'Secondary' : 'Primary'}
+                            </span>
+                        </td>
+                        <td>
+                            <div style="font-size:0.8rem; font-weight:700; color:#111111;">
+                                ${board === 'denominational' ? 'Gov.-Assisted (Denom.)' : 'Government (State)'}
+                            </div>
+                            <span style="display:inline-block; margin-top:3px; font-size:0.74rem; font-weight:700; padding:1px 6px; background:${dms.isPositiveDeviant ? '#dcfce7' : '#f4f4f5'}; color:${dms.isPositiveDeviant ? '#166534' : '#374151'};">
+                                DMS Resilience: ${dms.dmsScore}/100${dms.isPositiveDeviant ? ' ★' : ''}
                             </span>
                         </td>
                         <td style="font-weight: 500; color: #3f3f46;">
@@ -1042,6 +1198,7 @@
             const query = (document.getElementById('schoolSearchInput').value || '').toLowerCase().trim();
             const district = document.getElementById('districtFilter').value;
             const type = document.getElementById('typeFilter').value;
+            const board = (document.getElementById('boardFilter') ? document.getElementById('boardFilter').value : '');
 
             const filtered = allSchools.filter(sch => {
                 const name = (sch.name || '').toLowerCase();
@@ -1049,7 +1206,8 @@
                 const matchQuery = !query || name.includes(query) || address.includes(query);
                 const matchDistrict = !district || sch.district === district;
                 const matchType = !type || (sch.type || '').toLowerCase() === type.toLowerCase();
-                return matchQuery && matchDistrict && matchType;
+                const matchBoard = !board || getSchoolBoard(sch) === board;
+                return matchQuery && matchDistrict && matchType && matchBoard;
             });
 
             renderSchoolsTable(filtered);
@@ -1059,6 +1217,7 @@
             document.getElementById('schoolSearchInput').value = '';
             document.getElementById('districtFilter').value = '';
             document.getElementById('typeFilter').value = '';
+            if (document.getElementById('boardFilter')) document.getElementById('boardFilter').value = '';
             renderSchoolsTable(allSchools);
         }
 

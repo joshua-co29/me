@@ -1,0 +1,11 @@
+{
+  "name": "Sentinel Edu — National School Triage & Early Warning System",
+  "short_name": "Sentinel Edu",
+  "description": "Centralized Behavioral Analytics and Triage-Based Decision Support System for the Ministry of Education",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#111111",
+  "orientation": "any"
+}
+

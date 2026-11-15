@@ -336,9 +336,11 @@
             letter-spacing: 0.03em;
         }
 
-        .status-level-1 { background: transparent; color: #b45309; border: none; } /* Level 1: Soft Amber / Muted Yellow */
+        .status-level-1 { background: transparent; color: #b45309; border: none; } /* Level 1: Soft Amber */
         .status-level-2 { background: transparent; color: #ea580c; border: none; } /* Level 2: Warm Orange */
-        .status-level-3 { background: transparent; color: #991b1b; border: none; } /* Level 3: Deep Red / Crimson */
+        .status-level-3 { background: transparent; color: #dc2626; border: none; } /* Level 3: Crimson */
+        .status-level-4 { background: transparent; color: #991b1b; border: none; } /* Level 4: Serious */
+        .status-level-5 { background: transparent; color: #450a0a; border: none; font-weight: 800; } /* Level 5: Critical */
 
         .action-badge {
             font-size: 0.88rem;
@@ -644,25 +646,29 @@
                         <label for="incMatrix">Discipline Matrix Level</label>
                         <select id="incMatrix" class="form-control" required onchange="handleMatrixLevelChange(this.value)">
                             <option value="">Select level…</option>
-                            <option value="Level 1 Matrix">Level 1 — Minor Infraction</option>
-                            <option value="Level 2 Matrix">Level 2 — Moderate Infraction</option>
-                            <option value="Level 3 Matrix">Level 3 — Severe Infraction</option>
+                            <option value="Level 1 Matrix">Level 1 — Minor Infraction (1 pt)</option>
+                            <option value="Level 2 Matrix">Level 2 — Minor-Moderate Infraction (3 pts)</option>
+                            <option value="Level 3 Matrix">Level 3 — Moderate-Serious Infraction (7 pts)</option>
+                            <option value="Level 4 Matrix">Level 4 — Serious Infraction (12 pts)</option>
+                            <option value="Level 5 Matrix">Level 5 — Critical Misconduct / Criminal (25 pts)</option>
                         </select>
+                        <small id="incMatrixRbacHint" style="display:none; font-size:0.74rem; color:#92400e; margin-top:0.2rem;"></small>
                     </div>
                     <div class="form-group">
                         <label for="incAction">Initial Action Taken</label>
-                        <select id="incAction" class="form-control" required onchange="clearIncFormError()">
+                        <select id="incAction" class="form-control" required onchange="handleActionSelectionChange(this.value)">
                             <option value="">Select action…</option>
-                            <option value="Classroom Privileges Review / Reflection Log">Classroom Privileges Review / Reflection Log</option>
-                            <option value="Teacher Warning & Conference">Teacher Warning & Conference</option>
-                            <option value="Guidance Counseling Referral">Guidance Counseling Referral</option>
-                            <option value="Peer Mediation Protocol">Peer Mediation Protocol</option>
-                            <option value="Parent Conference Logged">Parent Conference Logged</option>
-                            <option value="Dean Formal Review">Dean Formal Review</option>
-                            <option value="Administrative Suspension">Administrative Suspension</option>
-                            <option value="Ministry Escalated Review">Ministry Escalated Review</option>
-                            <option value="External Support Assigned">External Support Assigned</option>
+                            <option value="Classroom Privileges Review / Reflection Log">Classroom Privileges Review / Reflection Log (1 pt)</option>
+                            <option value="Teacher Warning & Conference">Teacher Warning & Conference (1 pt)</option>
+                            <option value="Peer Mediation Protocol">Peer Mediation Protocol (2 pts)</option>
+                            <option value="Guidance Counseling Referral">Guidance Counseling Referral (2 pts)</option>
+                            <option value="Parent Conference Logged">Parent Conference Logged (3 pts)</option>
+                            <option value="Dean Formal Review">Dean Formal Review (7 pts)</option>
+                            <option value="External Support Assigned">External Support Assigned (8 pts)</option>
+                            <option value="Administrative Suspension">Administrative Suspension (14 pts)</option>
+                            <option value="Ministry Escalated Review">Ministry Escalated Review (25 pts)</option>
                         </select>
+                        <small id="incAutoScoreBadge" style="display:none; font-size:0.76rem; color:#1e40af; font-weight:600; margin-top:0.25rem;"></small>
                     </div>
                     <div class="form-group full-width">
                         <label for="incDescription">Incident Description <span style="font-weight:400; text-transform:none; color:#64748b;">(Detailed factual summary)</span></label>
@@ -691,6 +697,8 @@
                 <option value="level-1">Level 1</option>
                 <option value="level-2">Level 2</option>
                 <option value="level-3">Level 3</option>
+                <option value="level-4">Level 4</option>
+                <option value="level-5">Level 5</option>
             </select>
 
             <button class="btn-filter" onclick="resetIncFilters()">Reset</button>
@@ -761,9 +769,11 @@
                 <div class="modal-form-group">
                     <label for="editMatrix">Discipline Matrix</label>
                     <select id="editMatrix">
-                        <option value="Level 1 Matrix">Level 1 Matrix (Minor Infraction)</option>
-                        <option value="Level 2 Matrix">Level 2 Matrix (Moderate Violation)</option>
-                        <option value="Level 3 Matrix">Level 3 Matrix (Severe / Criminal)</option>
+                        <option value="Level 1 Matrix">Level 1 Matrix — Minor Infraction</option>
+                        <option value="Level 2 Matrix">Level 2 Matrix — Minor-Moderate</option>
+                        <option value="Level 3 Matrix">Level 3 Matrix — Moderate-Serious</option>
+                        <option value="Level 4 Matrix">Level 4 Matrix — Serious Infraction</option>
+                        <option value="Level 5 Matrix">Level 5 Matrix — Critical / Criminal</option>
                     </select>
                 </div>
                 <div class="modal-form-group">
@@ -812,7 +822,13 @@
     <script>
         // ── GLOBALS (must be declared before DOMContentLoaded runs) ──────────
         let allIncidents = (window.SENTINEL_SEED_DATA && Array.isArray(window.SENTINEL_SEED_DATA.incidents))
-            ? [...window.SENTINEL_SEED_DATA.incidents]
+            ? window.SENTINEL_SEED_DATA.incidents.filter(inc => {
+                const sid = String(inc.studentId || inc.student_id || '').toLowerCase();
+                const sname = String(inc.studentName || inc.student_name || '').trim().toLowerCase();
+                return !String(inc.id || '').toLowerCase().startsWith('inc_test_') &&
+                    sid !== 'stu_test_01' && sid !== 'stu_1794342607079' &&
+                    sname !== 'test student' && sname !== 'automated test student' && sname !== 'test' && sname !== 'rarar';
+            })
             : [];
         let isMinistryUser = false;
         let isDeanUser = false;
@@ -837,6 +853,19 @@
                 const r = (userData.role || '').toLowerCase();
                 isMinistryUser = r.includes('ministry') || r.includes('officer');
                 isDeanUser = r.includes('dean');
+                if (r.includes('teacher')) {
+                    const matSel = document.getElementById('incMatrix');
+                    const hintEl = document.getElementById('incMatrixRbacHint');
+                    if (matSel) {
+                        Array.from(matSel.options).forEach(opt => {
+                            if (/level\s*[345]/i.test(opt.value)) opt.remove();
+                        });
+                    }
+                    if (hintEl) {
+                        hintEl.textContent = 'Teacher RBAC: Teachers log Levels 1–2 only. Refer Level 3–5 incidents to your Dean of Discipline.';
+                        hintEl.style.display = 'block';
+                    }
+                }
             }
         })();
 
@@ -863,6 +892,19 @@
                 const r = (userData.role || '').toLowerCase();
                 isMinistryUser = r.includes('ministry') || r.includes('officer');
                 isDeanUser = r.includes('dean');
+                if (r.includes('teacher')) {
+                    const matSel = document.getElementById('incMatrix');
+                    const hintEl = document.getElementById('incMatrixRbacHint');
+                    if (matSel) {
+                        Array.from(matSel.options).forEach(opt => {
+                            if (/level\s*[345]/i.test(opt.value)) opt.remove();
+                        });
+                    }
+                    if (hintEl) {
+                        hintEl.textContent = 'Teacher RBAC: Teachers log Levels 1–2 only. Refer Level 3–5 incidents to your Dean of Discipline.';
+                        hintEl.style.display = 'block';
+                    }
+                }
                 if (r.includes('principal')) {
                     isPrincipalUser = true;
                     principalSchoolId = userData.schoolId || userData.school_id;
@@ -1011,17 +1053,93 @@
             }
         }
 
+        const ACTION_SCORE_CONFIG = {
+            "Classroom Privileges Review / Reflection Log": { level: 1, matrix: "Level 1 Matrix", defaultWeight: 1, min: 1, max: 2 },
+            "Teacher Warning & Conference": { level: 1, matrix: "Level 1 Matrix", defaultWeight: 1, min: 1, max: 2 },
+            "Peer Mediation Protocol": { level: 1, matrix: "Level 1 Matrix", defaultWeight: 2, min: 1, max: 3 },
+            "Guidance Counseling Referral": { level: 1, matrix: "Level 1 Matrix", defaultWeight: 2, min: 1, max: 3 },
+            "Parent Conference Logged": { level: 2, matrix: "Level 2 Matrix", defaultWeight: 3, min: 2, max: 3 },
+            "Dean Formal Review": { level: 3, matrix: "Level 3 Matrix", defaultWeight: 7, min: 5, max: 8 },
+            "External Support Assigned": { level: 3, matrix: "Level 3 Matrix", defaultWeight: 8, min: 5, max: 8 },
+            "Administrative Suspension": { level: 4, matrix: "Level 4 Matrix", defaultWeight: 14, min: 10, max: 15 },
+            "Ministry Escalated Review": { level: 5, matrix: "Level 5 Matrix", defaultWeight: 25, min: 20, max: 25 }
+        };
+
+        const LEVEL_DEFAULT_WEIGHT = { 1: 1, 2: 3, 3: 7, 4: 12, 5: 25 };
+
+        function computeIncidentAutoWeight(levelNum, actionVal) {
+            const lvl = Math.min(5, Math.max(1, parseInt(levelNum || 1, 10) || 1));
+            const cfg = ACTION_SCORE_CONFIG[actionVal];
+            if (cfg) {
+                const lvlDefaults = LEVEL_DEFAULT_WEIGHT[lvl] || 1;
+                if (cfg.level === lvl) return cfg.defaultWeight;
+                const ranges = { 1: [1, 2], 2: [2, 3], 3: [5, 8], 4: [10, 15], 5: [20, 25] };
+                const [rMin, rMax] = ranges[lvl] || [1, 25];
+                return Math.min(rMax, Math.max(rMin, cfg.defaultWeight));
+            }
+            return LEVEL_DEFAULT_WEIGHT[lvl] || 1;
+        }
+
+        function updateAutoScoreBadge() {
+            const badge = document.getElementById('incAutoScoreBadge');
+            const matrixEl = document.getElementById('incMatrix');
+            const actionEl = document.getElementById('incAction');
+            if (!badge || !matrixEl || !actionEl) return;
+            const matVal = matrixEl.value || '';
+            const actVal = actionEl.value || '';
+            if (!matVal && !actVal) {
+                badge.style.display = 'none';
+                return;
+            }
+            const lvlNum = matVal.includes('5') ? 5 : matVal.includes('4') ? 4 : matVal.includes('3') ? 3 : matVal.includes('2') ? 2 : 1;
+            const pts = computeIncidentAutoWeight(lvlNum, actVal);
+            badge.textContent = `Auto-Assigned Decision Score: +${pts} pt${pts === 1 ? '' : 's'} (Level ${lvlNum} Matrix)`;
+            badge.style.display = 'block';
+        }
+
         function handleMatrixLevelChange(lvl) {
             clearIncFormError();
             const actionSelect = document.getElementById('incAction');
-            if (!actionSelect) return;
-
-            // Suggest appropriate protocol when Level 3 is selected
-            if (lvl.toLowerCase().includes('level 3')) {
-                if (!actionSelect.value || actionSelect.value.includes('Teacher') || actionSelect.value.includes('Classroom')) {
-                    actionSelect.value = 'Dean Formal Review';
+            if (actionSelect) {
+                const low = (lvl || '').toLowerCase();
+                if (low.includes('level 5')) {
+                    actionSelect.value = 'Ministry Escalated Review';
+                } else if (low.includes('level 4')) {
+                    actionSelect.value = 'Administrative Suspension';
+                } else if (low.includes('level 3')) {
+                    if (!actionSelect.value || actionSelect.value.includes('Teacher') || actionSelect.value.includes('Classroom') || actionSelect.value.includes('Warning')) {
+                        actionSelect.value = 'Dean Formal Review';
+                    }
+                } else if (low.includes('level 2')) {
+                    if (!actionSelect.value || actionSelect.value.includes('Teacher')) {
+                        actionSelect.value = 'Parent Conference Logged';
+                    }
+                } else if (low.includes('level 1')) {
+                    if (!actionSelect.value || actionSelect.value === 'Ministry Escalated Review' || actionSelect.value === 'Administrative Suspension') {
+                        actionSelect.value = 'Teacher Warning & Conference';
+                    }
                 }
             }
+            updateAutoScoreBadge();
+        }
+
+        function handleActionSelectionChange(actionVal) {
+            clearIncFormError();
+            const matrixEl = document.getElementById('incMatrix');
+            const cfg = ACTION_SCORE_CONFIG[actionVal];
+            if (matrixEl && cfg && !matrixEl.disabled) {
+                const currentVal = matrixEl.value || '';
+                const curLvl = currentVal.includes('5') ? 5 : currentVal.includes('4') ? 4 : currentVal.includes('3') ? 3 : currentVal.includes('2') ? 2 : currentVal.includes('1') ? 1 : 0;
+                // Automatically set appropriate Matrix level if unset or mismatched with higher-severity actions
+                if (!curLvl || cfg.level >= 3 || Math.abs(cfg.level - curLvl) > 1) {
+                    const targetVal = cfg.matrix;
+                    const opt = Array.from(matrixEl.options).find(o => o.value === targetVal);
+                    if (opt && !opt.disabled) {
+                        matrixEl.value = targetVal;
+                    }
+                }
+            }
+            updateAutoScoreBadge();
         }
 
         function showIncFormError(msg) {
@@ -1038,18 +1156,32 @@
             if (errBox) errBox.style.display = 'none';
         }
 
-        const FALLBACK_INCIDENTS = [
-            { id: "inc_001", incidentId: "#INC-2026-089", date: "28 Oct 2026", studentName: "Marcus J. Williams", form: "Form 4-B", school: "Port of Spain North Secondary", district: "St. George East District", matrix: "Level 2 Matrix", level: 2, action: "Dean Formal Review", status: "Open" },
-            { id: "inc_002", incidentId: "#INC-2026-088", date: "28 Oct 2026", studentName: "Denzil T. Mohammed", form: "Form 5-C", school: "Chaguanas Senior Comprehensive", district: "Caroni Educational District", matrix: "Level 3 Matrix", level: 3, action: "Ministry Escalated Review", status: "Escalated" },
-            { id: "inc_003", incidentId: "#INC-2026-087", date: "27 Oct 2026", studentName: "Alicia M. Rampersad", form: "Form 2-A", school: "San Fernando East Technical", district: "Victoria Educational District", matrix: "Level 1 Matrix", level: 1, action: "Peer Mediation Protocol", status: "Resolved" },
-            { id: "inc_004", incidentId: "#INC-2026-086", date: "27 Oct 2026", studentName: "Kezia N. Baptiste", form: "Form 4-A", school: "Princes Town West Secondary", district: "Victoria Educational District", matrix: "Level 3 Matrix", level: 3, action: "External Support Assigned", status: "Open" },
-            { id: "inc_005", incidentId: "#INC-2026-085", date: "26 Oct 2026", studentName: "Priya S. Singh", form: "Form 3-D", school: "Arima Central Secondary", district: "St. George East District", matrix: "Level 2 Matrix", level: 2, action: "Parent Conference Logged", status: "Open" },
-            { id: "inc_006", incidentId: "#INC-2026-084", date: "26 Oct 2026", studentName: "Jonah A. Clarke", form: "Form 1-C", school: "Scarborough Secondary School", district: "Tobago Educational District", matrix: "Level 1 Matrix", level: 1, action: "Guidance Counselor Referral", status: "Resolved" },
-            { id: "inc_007", incidentId: "#INC-2026-083", date: "25 Oct 2026", studentName: "Ryan O. Phillip", form: "Form 2-C", school: "Siparia Regional Secondary", district: "St. Patrick Educational District", matrix: "Level 1 Matrix", level: 1, action: "Detention Assigned", status: "Resolved" },
-            { id: "inc_008", incidentId: "#INC-2026-082", date: "25 Oct 2026", studentName: "Isaiah K. Thomas", form: "Form 4-D", school: "St. George's College Secondary", district: "St. George East District", matrix: "Level 3 Matrix", level: 3, action: "Ministry Escalated Review", status: "Escalated" },
-            { id: "inc_009", incidentId: "#INC-2026-081", date: "24 Oct 2026", studentName: "Devon I. Charles", form: "Form 5-B", school: "Belmont Secondary School", district: "St. George East District", matrix: "Level 2 Matrix", level: 2, action: "Dean Formal Review", status: "Open" },
-            { id: "inc_010", incidentId: "#INC-2026-080", date: "24 Oct 2026", studentName: "Sophia L. Hernandez", form: "Form 1-A", school: "Rio Claro Secondary", district: "Nariva/Mayaro District", matrix: "Level 1 Matrix", level: 1, action: "Warning Issued", status: "Resolved" }
-        ];
+        function formatDynamicIncidentDate(rawDate, createdAt) {
+            if (rawDate && String(rawDate).trim()) return String(rawDate).trim();
+            const dt = createdAt ? new Date(createdAt) : new Date();
+            if (!isNaN(dt.getTime())) {
+                return dt.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+            }
+            return new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+        }
+
+        function isExcludedTestIncident(inc) {
+            if (!inc) return true;
+            const id = String(inc.id || '').toLowerCase();
+            const stuId = String(inc.studentId || inc.student_id || '').toLowerCase();
+            const stuName = String(inc.studentName || inc.student_name || '').trim().toLowerCase();
+            const desc = String(inc.description || '').toLowerCase();
+            return id.startsWith('inc_test_') || stuId === 'stu_test_01' || stuId === 'stu_1794342607079' ||
+                stuName === 'test student' || stuName === 'automated test student' || stuName === 'test' || stuName === 'rarar' ||
+                desc.includes('auditor bot');
+        }
+
+        function getSeedIncidentsList() {
+            const raw = (window.SENTINEL_SEED_DATA && Array.isArray(window.SENTINEL_SEED_DATA.incidents))
+                ? window.SENTINEL_SEED_DATA.incidents
+                : [];
+            return raw.filter(inc => !isExcludedTestIncident(inc));
+        }
 
         const SUPABASE_REST_URL = "https://wrumedevccqkopguaxdi.supabase.co/rest/v1";
         const SUPABASE_ANON_KEY = "sb_publishable_zpd_lzgRqghcN-0X7qw7SA_I2hAZHXH";
@@ -1096,13 +1228,14 @@
                                 district: inc.district || 'St. George East District',
                                 matrix: inc.matrix || 'Level 1 Matrix',
                                 level: parseInt(inc.level || 1),
+                                weight: inc.weight !== undefined && inc.weight !== null ? Number(inc.weight) : undefined,
                                 action: inc.action || 'Under Review',
                                 description: inc.description || '',
                                 status: (inc.status && inc.status.toLowerCase() === 'resolved') ? 'Resolved' :
                                         (inc.status && inc.status.toLowerCase() === 'escalated') ? 'Escalated' : 'Open',
                                 loggedById: inc.logged_by_id,
                                 loggedBy: inc.logged_by || 'Staff Member',
-                                date: inc.date || 'Oct 2026',
+                                date: formatDynamicIncidentDate(inc.date, inc.created_at),
                                 createdAt: inc.created_at
                             }));
                         }
@@ -1112,22 +1245,25 @@
                 }
             }
 
+            loaded = (Array.isArray(loaded) ? loaded : []).filter(inc => !isExcludedTestIncident(inc));
+
             // 3. Fallback to seed data or disk
             if (loaded.length === 0) {
-                if (window.SENTINEL_SEED_DATA && Array.isArray(window.SENTINEL_SEED_DATA.incidents) && window.SENTINEL_SEED_DATA.incidents.length > 0) {
-                    loaded = [...window.SENTINEL_SEED_DATA.incidents];
+                const seeded = getSeedIncidentsList();
+                if (seeded.length > 0) {
+                    loaded = seeded;
                 } else {
                     try {
                         const res = await fetch('data/database.json');
                         if (res.ok) {
                             const db = await res.json();
-                            if (db && Array.isArray(db.incidents)) loaded = db.incidents;
+                            if (db && Array.isArray(db.incidents)) {
+                                loaded = db.incidents.filter(inc => !isExcludedTestIncident(inc));
+                            }
                         }
                     } catch (_) {}
                 }
             }
-
-            if (loaded.length === 0) loaded = FALLBACK_INCIDENTS;
 
             if (isPrincipalUser && principalSchoolId) {
                 loaded = loaded.filter(inc => {
@@ -1166,8 +1302,9 @@
             }
 
             tbody.innerHTML = incidents.map(inc => {
-                const matrixText = inc.matrix || 'Level 1 Matrix';
-                const levelNum = inc.level || (matrixText.includes('3') ? 3 : matrixText.includes('2') ? 2 : 1);
+                const matrixText = inc.matrix || `Level ${inc.level || 1} Matrix`;
+                const mLow = matrixText.toLowerCase();
+                const levelNum = parseInt(inc.level || (mLow.includes('5') ? 5 : mLow.includes('4') ? 4 : mLow.includes('3') ? 3 : mLow.includes('2') ? 2 : 1), 10) || 1;
                 const badgeClass = `status-level-${levelNum}`;
                 const dataLevel = `level-${levelNum}`;
                 const statusText = inc.status || 'Open';
@@ -1191,7 +1328,7 @@
                 return `
                     <tr data-level="${dataLevel}" id="inc-row-${inc.id}">
                         <td><span class="incident-id">${inc.incidentId || inc.id}</span></td>
-                        <td class="date-text">${inc.date || 'Oct 2026'}</td>
+                        <td class="date-text">${formatDynamicIncidentDate(inc.date, inc.createdAt || inc.created_at)}</td>
                         <td>${inc.studentName || inc.student || 'Unknown'}<br><small style="color:#717682;">${inc.form || ''}</small></td>
                         <td>
                             <span class="school-name">${inc.school || 'Unassigned'}</span>
@@ -1222,9 +1359,11 @@
             document.getElementById('editStatus').value = inc.status || 'Open';
             document.getElementById('editDescription').value = inc.description || '';
 
-            const matrixVal = inc.matrix || 'Level 1 Matrix';
-            if (matrixVal.includes('3')) document.getElementById('editMatrix').value = 'Level 3 Matrix';
-            else if (matrixVal.includes('2')) document.getElementById('editMatrix').value = 'Level 2 Matrix';
+            const matrixVal = inc.matrix || `Level ${inc.level || 1} Matrix`;
+            if (matrixVal.includes('5') || inc.level == 5) document.getElementById('editMatrix').value = 'Level 5 Matrix';
+            else if (matrixVal.includes('4') || inc.level == 4) document.getElementById('editMatrix').value = 'Level 4 Matrix';
+            else if (matrixVal.includes('3') || inc.level == 3) document.getElementById('editMatrix').value = 'Level 3 Matrix';
+            else if (matrixVal.includes('2') || inc.level == 2) document.getElementById('editMatrix').value = 'Level 2 Matrix';
             else document.getElementById('editMatrix').value = 'Level 1 Matrix';
 
             // Dean-only enforcement: Only status is editable
@@ -1329,9 +1468,8 @@
             const school = document.getElementById('editSchool').value.trim();
             const district = document.getElementById('editDistrict').value.trim();
             const matrix = document.getElementById('editMatrix').value;
-            const level = matrix.includes('3') ? 3 : matrix.includes('2') ? 2 : 1;
+            const level = matrix.includes('5') ? 5 : matrix.includes('4') ? 4 : matrix.includes('3') ? 3 : matrix.includes('2') ? 2 : 1;
             const action = document.getElementById('editAction').value.trim();
-            const status = document.getElementById('editStatus').value;
             const description = document.getElementById('editDescription').value.trim();
 
             // ── EDIT VALIDATION 1: Student Name ──
@@ -1363,10 +1501,10 @@
             }
 
             // ── EDIT VALIDATION 5: Policy Safeguard (Matrix vs Action) ──
-            if (level === 3) {
+            if (level >= 3) {
                 const lowerAction = action.toLowerCase();
                 if (lowerAction.includes('privilege') || lowerAction.includes('warning') || lowerAction.includes('reflection')) {
-                    showEditIncFormError('Policy Safeguard: Level 3 infractions represent severe misconduct and require an escalated intervention protocol (Dean Formal Review, Suspension, or Ministry Escalated Review).');
+                    showEditIncFormError(`Policy Safeguard: Level ${level} infractions require an escalated intervention protocol (Dean Formal Review, Suspension, or Ministry Escalated Review).`);
                     document.getElementById('editAction').focus();
                     return;
                 }
@@ -1516,8 +1654,17 @@
             const descEl      = document.getElementById('incDescription');
             const description = descEl ? descEl.value.trim() : '';
 
-            const matrixLevel = matrix.toLowerCase().includes('level 3') ? 3 :
-                                matrix.toLowerCase().includes('level 2') ? 2 : 1;
+            const mLower = matrix.toLowerCase();
+            const matrixLevel = mLower.includes('level 5') ? 5 :
+                                mLower.includes('level 4') ? 4 :
+                                mLower.includes('level 3') ? 3 :
+                                mLower.includes('level 2') ? 2 : 1;
+
+            const activeUser = typeof getLoggedInUserData === 'function' ? getLoggedInUserData() : null;
+            if (activeUser && (activeUser.role || '').toLowerCase().includes('teacher') && matrixLevel > 2) {
+                showIncFormError('RBAC Restriction: Classroom Teachers may only log Level 1 and Level 2 infractions. Refer Level 3–5 incidents to your Dean of Discipline.');
+                return;
+            }
 
             // ── VALIDATION 1: Student Name / ID ──
             if (!rawStudent || rawStudent.length < 3) {
@@ -1575,10 +1722,10 @@
             }
 
             // ── VALIDATION 7: Policy Safeguard (Matrix Level vs Protocol) ──
-            if (matrixLevel === 3) {
+            if (matrixLevel >= 3) {
                 const lowerAction = action.toLowerCase();
                 if (lowerAction.includes('privilege') || lowerAction.includes('warning') || lowerAction.includes('reflection')) {
-                    showIncFormError('Policy Safeguard: Level 3 infractions represent severe misconduct and require an escalated intervention protocol (Dean Formal Review, Suspension, or Ministry Escalated Review).');
+                    showIncFormError(`Policy Safeguard: Level ${matrixLevel} infractions require an escalated intervention protocol (Dean Formal Review, Suspension, or Ministry Escalated Review).`);
                     document.getElementById('incAction').focus();
                     return;
                 }
@@ -1621,6 +1768,8 @@
                 if (matchedStu.classId) studentClassId = matchedStu.classId;
             }
 
+            const autoWeight = computeIncidentAutoWeight(matrixLevel, action);
+
             const incidentObj = {
                 id: uniqueDbId,
                 incidentId: newIncidentCode,
@@ -1634,11 +1783,13 @@
                 location: location,
                 matrix: matrix,
                 level: matrixLevel,
+                weight: autoWeight,
                 action: action,
                 description: description,
                 status: 'Open',
                 loggedById: currentUser ? currentUser.id : 'usr_teacher_01',
                 loggedBy: currentUser ? currentUser.name : 'Staff Member',
+                loggedByRole: currentUser ? (currentUser.role || '') : '',
                 date: dateStr,
                 createdAt: new Date().toISOString()
             };
@@ -1680,6 +1831,7 @@
                     district: incidentObj.district,
                     matrix: incidentObj.matrix,
                     level: incidentObj.level,
+                    weight: incidentObj.weight,
                     action: incidentObj.action,
                     description: incidentObj.description,
                     status: incidentObj.status,
@@ -1722,6 +1874,8 @@
             // Reset dynamic validation UI states
             const badge = document.getElementById('stuVerifiedBadge');
             if (badge) badge.style.display = 'none';
+            const autoBadge = document.getElementById('incAutoScoreBadge');
+            if (autoBadge) autoBadge.style.display = 'none';
             const countEl = document.getElementById('descCharCount');
             if (countEl) {
                 countEl.textContent = 'Minimum 25 characters (0 / 25)';
