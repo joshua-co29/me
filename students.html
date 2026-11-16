@@ -410,7 +410,8 @@
             align-items: center;
             justify-content: center;
             z-index: 9999;
-            padding: 1rem;
+            padding: 1.25rem 1rem;
+            overflow-y: auto;
         }
 
         .modal-overlay.is-active {
@@ -420,10 +421,36 @@
         .modal-card {
             background: #ffffff;
             width: 100%;
-            max-width: 520px;
-            padding: 2rem;
+            max-width: 650px;
+            max-height: calc(100vh - 2.5rem);
+            overflow-y: auto;
+            padding: 1.5rem 1.75rem;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
             border: 1px solid rgba(0, 0, 0, 0.1);
+            margin: auto;
+        }
+
+        .modal-form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.85rem 1rem;
+        }
+
+        .modal-form-grid .modal-form-group {
+            margin-bottom: 0;
+        }
+
+        .modal-form-grid .modal-span-2 {
+            grid-column: 1 / -1;
+        }
+
+        @media (max-width: 600px) {
+            .modal-form-grid {
+                grid-template-columns: 1fr;
+            }
+            .modal-form-grid .modal-span-2 {
+                grid-column: auto;
+            }
         }
 
         .modal-card h3 {
@@ -803,81 +830,105 @@
                 <input type="hidden" id="editStudentId">
                 <div id="stuFormError" style="display:none; color:#991b1b; background:#fee2e2; border:1px solid #f87171; padding:0.65rem 0.85rem; border-radius:4px; font-size:0.85rem; margin-bottom:1rem; font-weight:600;"></div>
                 
-                <div class="modal-form-group">
-                    <label for="editStuName">Full Name</label>
-                    <input type="text" id="editStuName" required minlength="3" placeholder="e.g. Marcus Aurelius" autocomplete="off" oninput="clearStuFormError()">
-                </div>
-                <div class="modal-form-group">
-                    <label for="editStuForm">Form / Grade</label>
-                    <input type="text" id="editStuForm" list="stuFormOptions" placeholder="Select or type Form (e.g. Form 3-A)" required autocomplete="off" oninput="clearStuFormError()">
-                    <datalist id="stuFormOptions">
-                        <option value="Form 1">
-                        <option value="Form 1-A">
-                        <option value="Form 1-B">
-                        <option value="Form 2">
-                        <option value="Form 2-A">
-                        <option value="Form 2-B">
-                        <option value="Form 3">
-                        <option value="Form 3-A">
-                        <option value="Form 3-B">
-                        <option value="Form 4">
-                        <option value="Form 4-A">
-                        <option value="Form 4-B">
-                        <option value="Form 5">
-                        <option value="Form 5-A">
-                        <option value="Form 5-B">
-                        <option value="Lower 6">
-                        <option value="Upper 6">
-                    </datalist>
-                </div>
-                <div class="modal-form-group">
-                    <label for="editStuSchool">Institution / School</label>
-                    <input type="text" id="editStuSchool" required minlength="3" placeholder="e.g. Port of Spain North Secondary" oninput="clearStuFormError()">
-                </div>
-                <div class="modal-form-group">
-                    <label for="editStuDistrict">District</label>
-                    <select id="editStuDistrict" required onchange="clearStuFormError()">
-                        <option value="">Select Ministry District…</option>
-                        <option value="St. George East District">St. George East District</option>
-                        <option value="Victoria Educational District">Victoria Educational District</option>
-                        <option value="Caroni Educational District">Caroni Educational District</option>
-                        <option value="Tobago Educational District">Tobago Educational District</option>
-                        <option value="St. Patrick Educational District">St. Patrick Educational District</option>
-                        <option value="Port of Spain & Environs District">Port of Spain & Environs District</option>
-                        <option value="North Eastern Educational District">North Eastern Educational District</option>
-                    </select>
-                </div>
-                <div class="modal-form-group">
-                    <label for="editStuTriage">Triage Level</label>
-                    <select id="editStuTriage">
-                        <option value="0">Level 0 (No Active Case)</option>
-                        <option value="1">Level 1 (Guidance / Low Risk)</option>
-                        <option value="2">Level 2 (Dean Escalation)</option>
-                        <option value="3">Level 3 (High Priority / Intervention)</option>
-                    </select>
-                </div>
-                <div class="modal-form-group">
-                    <label for="editStuIncidents">Active Incidents Count</label>
-                    <input type="number" id="editStuIncidents" min="0" step="1" value="0" required oninput="clearStuFormError()">
-                </div>
-                <div class="modal-form-group">
-                    <label for="editStuAttendance">Attendance Rate (%)</label>
-                    <input type="number" id="editStuAttendance" min="0" max="100" step="1" value="95" required oninput="clearStuFormError()">
-                    <small style="font-size:0.75rem; color:#64748b;">Valid range: 0% to 100% (ABC "A" Factor)</small>
-                </div>
-                <div class="modal-form-group">
-                    <label for="editStuGPA">Academic GPA (Coursework)</label>
-                    <input type="number" id="editStuGPA" min="0" max="4.0" step="0.01" value="3.00" required oninput="clearStuFormError()">
-                    <small style="font-size:0.75rem; color:#64748b;">Valid range: 0.00 to 4.00 (ABC "C" Factor)</small>
-                </div>
-                <div class="modal-form-group">
-                    <label for="editStuFailures">Failed Courses Count</label>
-                    <input type="number" id="editStuFailures" min="0" max="15" step="1" value="0" required oninput="clearStuFormError()">
-                    <small style="font-size:0.75rem; color:#64748b;">Active failing core subjects this term (0–15)</small>
+                <div class="modal-form-grid">
+                    <div class="modal-form-group modal-span-2">
+                        <label for="editStuName">Full Name</label>
+                        <input type="text" id="editStuName" required minlength="3" placeholder="e.g. Marcus Aurelius" autocomplete="off" oninput="clearStuFormError()">
+                    </div>
+                    <div class="modal-form-group">
+                        <label for="editStuSchool">Institution / School</label>
+                        <input type="text" id="editStuSchool" required minlength="3" placeholder="e.g. Port of Spain North Secondary" oninput="clearStuFormError(); populateClassDropdownForSchool(this.value);">
+                    </div>
+                    <div class="modal-form-group">
+                        <label for="editStuDistrict">District</label>
+                        <select id="editStuDistrict" required onchange="clearStuFormError()">
+                            <option value="">Select Ministry District…</option>
+                            <option value="St. George East District">St. George East District</option>
+                            <option value="Victoria Educational District">Victoria Educational District</option>
+                            <option value="Caroni Educational District">Caroni Educational District</option>
+                            <option value="Tobago Educational District">Tobago Educational District</option>
+                            <option value="St. Patrick Educational District">St. Patrick Educational District</option>
+                            <option value="Port of Spain & Environs District">Port of Spain & Environs District</option>
+                            <option value="North Eastern Educational District">North Eastern Educational District</option>
+                        </select>
+                    </div>
+                    <div class="modal-form-group">
+                        <label for="editStuForm">Form / Grade</label>
+                        <input type="text" id="editStuForm" list="stuFormOptions" placeholder="Select or type Form (e.g. Form 3-A)" required autocomplete="off" oninput="clearStuFormError()">
+                        <datalist id="stuFormOptions">
+                            <option value="Form 1">
+                            <option value="Form 1-A">
+                            <option value="Form 1-B">
+                            <option value="Form 2">
+                            <option value="Form 2-A">
+                            <option value="Form 2-B">
+                            <option value="Form 3">
+                            <option value="Form 3-A">
+                            <option value="Form 3-B">
+                            <option value="Form 4">
+                            <option value="Form 4-A">
+                            <option value="Form 4-B">
+                            <option value="Form 5">
+                            <option value="Form 5-A">
+                            <option value="Form 5-B">
+                            <option value="Lower 6">
+                            <option value="Upper 6">
+                        </datalist>
+                    </div>
+                    <div class="modal-form-group">
+                        <label for="editStuTriage">Triage Level</label>
+                        <select id="editStuTriage">
+                            <option value="0">Level 0 (No Active Case)</option>
+                            <option value="1">Level 1 (Guidance / Low Risk)</option>
+                            <option value="2">Level 2 (Dean Escalation)</option>
+                            <option value="3">Level 3 (High Priority / Intervention)</option>
+                        </select>
+                    </div>
+                    <div class="modal-form-group">
+                        <label for="editStuIncidents">Active Incidents Count</label>
+                        <input type="number" id="editStuIncidents" min="0" step="1" value="0" required oninput="clearStuFormError()">
+                    </div>
+                    <div class="modal-form-group">
+                        <label for="editStuAttendance">Attendance Rate (%)</label>
+                        <input type="number" id="editStuAttendance" min="0" max="100" step="1" value="95" required oninput="clearStuFormError()">
+                        <small style="font-size:0.74rem; color:#64748b;">0–100% (fills past 5 months attendance)</small>
+                    </div>
+                    <div class="modal-form-group">
+                        <label for="editStuGPA">Academic GPA (Coursework)</label>
+                        <input type="number" id="editStuGPA" min="0" max="4.0" step="0.01" value="3.00" required oninput="clearStuFormError()">
+                        <small style="font-size:0.74rem; color:#64748b;">Valid range: 0.00 to 4.00 (ABC "C" Factor)</small>
+                    </div>
+                    <div class="modal-form-group">
+                        <label for="editStuFailures">Failed Courses Count</label>
+                        <input type="number" id="editStuFailures" min="0" max="15" step="1" value="0" required oninput="clearStuFormError()">
+                        <small style="font-size:0.74rem; color:#64748b;">Active failing core subjects this term (0–15)</small>
+                    </div>
                 </div>
                 <div class="modal-actions">
                     <button type="button" class="btn-modal-cancel" onclick="closeStudentModal()">Cancel</button>
                     <button type="submit" class="btn-modal-save">Save Student Record</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal for Editing Assigned Classes -->
+    <div class="modal-overlay" id="assignClassModal">
+        <div class="modal-card" style="max-width: 520px;">
+            <h3 id="assignClassTitle">Assigned Classes</h3>
+            <p class="modal-sub" id="assignClassSub">Select a class and view its assigned teacher</p>
+            <form id="assignClassForm" onsubmit="saveAssignedClass(event)">
+                <input type="hidden" id="assignClassStudentId">
+                <div class="modal-form-group">
+                    <label for="assignClassSelect">Available Classes &amp; Teachers</label>
+                    <select id="assignClassSelect" required onchange="updateAssignClassTeacherNote(this.value)">
+                        <option value="">Select a class…</option>
+                    </select>
+                    <small id="assignClassTeacherNote" style="font-size:0.78rem; color:#4f46e5; font-weight:600; margin-top:0.25rem;"></small>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-modal-cancel" onclick="closeAssignClassModal()">Cancel</button>
+                    <button type="submit" class="btn-modal-save">Save Assigned Class</button>
                 </div>
             </form>
         </div>
@@ -922,8 +973,15 @@
         let allIncidents = (window.SENTINEL_SEED_DATA && Array.isArray(window.SENTINEL_SEED_DATA.incidents))
             ? [...window.SENTINEL_SEED_DATA.incidents]
             : [];
-        let allAttendanceLogs = (window.SENTINEL_SEED_DATA && Array.isArray(window.SENTINEL_SEED_DATA.attendanceLogs))
-            ? [...window.SENTINEL_SEED_DATA.attendanceLogs]
+        let allAttendanceLogs = [];
+        let allClasses = (window.SENTINEL_SEED_DATA && Array.isArray(window.SENTINEL_SEED_DATA.classes))
+            ? [...window.SENTINEL_SEED_DATA.classes]
+            : [];
+        let allSchools = (window.SENTINEL_SEED_DATA && Array.isArray(window.SENTINEL_SEED_DATA.schools))
+            ? [...window.SENTINEL_SEED_DATA.schools]
+            : [];
+        let allUsers = (window.SENTINEL_SEED_DATA && Array.isArray(window.SENTINEL_SEED_DATA.users))
+            ? [...window.SENTINEL_SEED_DATA.users]
             : [];
         let isMinistryUser = false;
         let expandedStudentId = null;
@@ -1014,13 +1072,28 @@
                 const p = document.querySelector('.page-header p');
                 if (p) p.textContent = `Enrolled students at ${principalSchoolName}`;
             }
+            try {
+                const sQ = sessionStorage.getItem('sentinel_students_search');
+                const sD = sessionStorage.getItem('sentinel_students_district');
+                const sT = sessionStorage.getItem('sentinel_students_triage');
+                if (sQ !== null && document.getElementById('searchStudent')) document.getElementById('searchStudent').value = sQ;
+                if (sD !== null && document.getElementById('filterDistrict')) document.getElementById('filterDistrict').value = sD;
+                if (sT !== null && document.getElementById('filterTriage')) document.getElementById('filterTriage').value = sT;
+            } catch (_) {}
             renderStudentsTable(allStudents);
             updateStudentStats();
             loadStudentsData();
-            window.addEventListener('focus', () => {
-                if (Date.now() - lastMutationTime < 5000) return;
-                loadStudentsData();
-            });
+            if (typeof sentinelOnLiveSync === 'function') {
+                sentinelOnLiveSync(() => {
+                    if (Date.now() - lastMutationTime < 3000) return;
+                    loadStudentsData();
+                }, { intervalMs: 8000 });
+            } else {
+                window.addEventListener('focus', () => {
+                    if (Date.now() - lastMutationTime < 5000) return;
+                    loadStudentsData();
+                });
+            }
         });
 
         const SUPABASE_REST_URL = "https://wrumedevccqkopguaxdi.supabase.co/rest/v1";
@@ -1120,7 +1193,41 @@
         }
 
         async function fetchAttendanceLive() {
-            let list = [];
+            // 1. Fetch directly from Supabase attendance_logs (paginated)
+            try {
+                const supaLogs = [];
+                let offset = 0;
+                const pageSize = 1000;
+                while (true) {
+                    const res = await fetch(`${SUPABASE_REST_URL}/attendance_logs?select=*&order=date.asc&offset=${offset}&limit=${pageSize}`, {
+                        headers: {
+                            'apikey': SUPABASE_ANON_KEY,
+                            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+                        }
+                    });
+                    if (!res.ok) break;
+                    const rows = await res.json();
+                    if (!Array.isArray(rows) || rows.length === 0) break;
+                    rows.forEach(r => supaLogs.push({
+                        id: r.id,
+                        studentId: r.student_id || r.studentId,
+                        studentNumber: r.student_number || r.studentNumber,
+                        studentName: r.student_name || r.studentName,
+                        form: r.form,
+                        classId: r.class_id || r.classId,
+                        schoolId: r.school_id || r.schoolId,
+                        date: r.date,
+                        status: r.status,
+                        period: r.period || 'Full Day',
+                        remarks: r.remarks || ''
+                    }));
+                    if (rows.length < pageSize) break;
+                    offset += pageSize;
+                }
+                if (supaLogs.length > 0) return supaLogs;
+            } catch (_) {}
+
+            // 2. Fallback to backend API (which hydrates from Supabase)
             const endpoints = ['http://localhost:5000/api/attendance', '/api/attendance'];
             for (const ep of endpoints) {
                 try {
@@ -1128,16 +1235,12 @@
                     if (res.ok) {
                         const data = await res.json();
                         if (Array.isArray(data) && data.length > 0) {
-                            list = data;
-                            break;
+                            return data;
                         }
                     }
                 } catch (_) {}
             }
-            if (list.length === 0 && window.SENTINEL_SEED_DATA && Array.isArray(window.SENTINEL_SEED_DATA.attendanceLogs)) {
-                list = window.SENTINEL_SEED_DATA.attendanceLogs;
-            }
-            return list;
+            return [];
         }
 
         async function loadStudentsData() {
@@ -1168,14 +1271,31 @@
                     });
                 }
 
+                const prevExpanded = expandedStudentId;
+                const changed = typeof sentinelHasChanged !== 'function' || sentinelHasChanged('students_page', {
+                    s: loadedStudents.map(x => `${x.id}|${x.classId}|${x.form}|${x.attendance}|${x.triageLevel}|${x.incidentCount}|${x.gpa}|${x.courseFailures}|${x.name}`),
+                    i: loadedIncidents.map(x => `${x.id}|${x.status}|${x.matrix}|${x.weight}`),
+                    a: Array.isArray(atts) ? atts.length : 0
+                });
+
                 allStudents = loadedStudents;
                 allIncidents = loadedIncidents;
                 if (Array.isArray(atts) && atts.length > 0) {
                     allAttendanceLogs = atts;
                 }
 
-                renderStudentsTable(allStudents);
+                if (!changed) return;
+
+                if (typeof filterStudents === 'function') {
+                    filterStudents();
+                } else {
+                    renderStudentsTable(allStudents);
+                }
                 updateStudentStats();
+                if (prevExpanded && document.getElementById(`stu-row-${prevExpanded}`)) {
+                    expandedStudentId = null;
+                    toggleStudentDetail(prevExpanded);
+                }
             } catch (err) {
                 console.warn('Live students pull notice, falling back:', err);
                 let fallback = getSeedStudentsList();
@@ -1257,6 +1377,12 @@
             }).join('');
 
             document.getElementById('recordCount').textContent = `Showing ${students.length} record${students.length !== 1 ? 's' : ''}`;
+            if (typeof filterTable === 'function') {
+                const hasFilter = (document.getElementById('searchStudent')?.value || '').trim() !== '' ||
+                                  (document.getElementById('filterDistrict')?.value || '') !== '' ||
+                                  (document.getElementById('filterTriage')?.value || '') !== '';
+                if (hasFilter) filterTable(true);
+            }
         }
 
         function toggleStudentDetail(id) {
@@ -1363,6 +1489,13 @@
                                     <span class="detail-field-value">${student.district || 'Unassigned District'}</span>
                                 </div>
                                 <div class="detail-field">
+                                    <span class="detail-field-label">Assigned Class &amp; Teacher</span>
+                                    <span class="detail-field-value">${(() => {
+                                        const info = getClassAndTeacherInfo(student.classId);
+                                        return info ? `${info.label} (${info.teacherName})` : 'No Assigned Class';
+                                    })()}</span>
+                                </div>
+                                <div class="detail-field">
                                     <span class="detail-field-label">Triage Level</span>
                                     <span class="detail-field-value"><span class="triage-badge ${triageClass}">${triageText}</span></span>
                                 </div>
@@ -1387,6 +1520,29 @@
                                     <span class="detail-field-value">${student.lastReview || 'Oct 2026'}</span>
                                 </div>
                             </div>
+
+                            ${(() => {
+                                const monthStats = getFiveMonthAttendanceSummary(student);
+                                return `
+                                    <div style="margin-bottom: 1.25rem; padding: 0.9rem 1rem; background: #ffffff; border: 1px solid rgba(0,0,0,0.08);">
+                                        <div style="font-size: 0.74rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #4b5162; margin-bottom: 0.65rem;">
+                                            Past 5 Months Attendance Record
+                                        </div>
+                                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(115px, 1fr)); gap: 0.6rem;">
+                                            ${monthStats.map(m => {
+                                                const pctColor = m.total === 0 ? '#6b7280' : (m.pct >= 90 ? '#15803d' : m.pct >= 80 ? '#b45309' : '#b91c1c');
+                                                return `
+                                                    <div style="padding: 0.55rem 0.7rem; background: #f9fafb; border: 1px solid rgba(0,0,0,0.08);">
+                                                        <div style="font-size: 0.74rem; font-weight: 700; color: #374151;">${m.label}</div>
+                                                        <div style="font-size: 1.05rem; font-weight: 800; color: ${pctColor}; margin: 0.15rem 0;">${m.total > 0 ? m.pct + '%' : '—'}</div>
+                                                        <div style="font-size: 0.72rem; color: #6b7280;">${m.total > 0 ? `${m.present}/${m.total} days` : 'No logs'}</div>
+                                                    </div>
+                                                `;
+                                            }).join('')}
+                                        </div>
+                                    </div>
+                                `;
+                            })()}
 
                             <div class="detail-incidents-section">
                                 <h5>Disciplinary Incident History (${studentIncidents.length})</h5>
@@ -1417,6 +1573,7 @@
                                 <button type="button" class="btn-detail-edit" style="background:#7f1d1d; color:#ffffff; border-color:#7f1d1d;" onclick="if (typeof openStatementOfConductModal === 'function') openStatementOfConductModal('${id}', 'sssd')">SSSD Case Package</button>
                                 ${isMinistryUser ? `<button type="button" class="btn-stu-delete" style="padding: 0.45rem 1rem; font-size: 0.85rem;" onclick="deleteStudentFile('${id}', '${student.name.replace(/'/g, "\\'")}')">Delete Student File</button>` : ''}
                                 <button type="button" class="btn-modal-cancel" onclick="toggleStudentDetail('${id}')">Close</button>
+                                <button type="button" class="btn-detail-edit" style="background:#ffffff; color:#111111; border-color:#111111;" onclick="openAssignClassModal('${id}')">Assigned Classes</button>
                             </div>
                         </div>
                     </td>
@@ -1426,13 +1583,291 @@
             targetRow.insertAdjacentHTML('afterend', detailHtml);
         }
 
+        function resolveSchoolIdByName(schoolName) {
+            const clean = (schoolName || '').trim().toLowerCase();
+            if (!clean) return principalSchoolId || 'sch_001';
+            const match = allSchools.find(s => (s.name || '').trim().toLowerCase() === clean)
+                || allSchools.find(s => (s.name || '').toLowerCase().includes(clean) || clean.includes((s.name || '').toLowerCase()));
+            return match ? match.id : (principalSchoolId || 'sch_001');
+        }
+
+        function getClassAndTeacherInfo(classId) {
+            if (!classId) return null;
+            const cls = allClasses.find(c => c.id === classId);
+            if (!cls) return null;
+            const teacher = allUsers.find(u => u.id === cls.teacherId);
+            return {
+                id: cls.id,
+                label: cls.label || cls.form || cls.id,
+                form: cls.form || '',
+                schoolId: cls.schoolId,
+                teacherId: cls.teacherId || '',
+                teacherName: cls.teacherName || (teacher ? teacher.name : 'Unassigned Teacher')
+            };
+        }
+
+        function openAssignClassModal(studentId) {
+            const student = allStudents.find(s => s.id === studentId || s.studentId === studentId);
+            if (!student) return;
+
+            document.getElementById('assignClassStudentId').value = student.id;
+            document.getElementById('assignClassTitle').textContent = `Assigned Classes — ${student.name}`;
+            document.getElementById('assignClassSub').textContent = `${student.school || 'Unassigned School'} · Current Form: ${student.form || 'N/A'}`;
+
+            const sel = document.getElementById('assignClassSelect');
+            const schoolId = student.schoolId || resolveSchoolIdByName(student.school || '');
+            let matchingClasses = allClasses.filter(c => !schoolId || c.schoolId === schoolId);
+            if (matchingClasses.length === 0) matchingClasses = allClasses;
+
+            sel.innerHTML = '<option value="">Select available class…</option>' + matchingClasses.map(c => {
+                const teacher = allUsers.find(u => u.id === c.teacherId);
+                const tName = c.teacherName || (teacher ? teacher.name : 'Unassigned Teacher');
+                const label = c.label || c.form || c.id;
+                const selected = (student.classId && student.classId === c.id) ? 'selected' : '';
+                return `<option value="${c.id}" ${selected}>${label} (${c.form || 'General'}) — Teacher: ${tName}</option>`;
+            }).join('');
+
+            if (student.classId && matchingClasses.some(c => c.id === student.classId)) {
+                sel.value = student.classId;
+            }
+            updateAssignClassTeacherNote(sel.value);
+            document.getElementById('assignClassModal').classList.add('is-active');
+        }
+
+        function updateAssignClassTeacherNote(classId) {
+            const noteEl = document.getElementById('assignClassTeacherNote');
+            const info = getClassAndTeacherInfo(classId);
+            if (noteEl) {
+                noteEl.textContent = info
+                    ? `Teacher: ${info.teacherName} · Class: ${info.label} (${info.form})`
+                    : 'Select a class to view the teacher who teaches it.';
+            }
+        }
+
+        function closeAssignClassModal() {
+            document.getElementById('assignClassModal').classList.remove('is-active');
+        }
+
+        async function saveAssignedClass(e) {
+            e.preventDefault();
+            const studentId = document.getElementById('assignClassStudentId').value;
+            const classId = document.getElementById('assignClassSelect').value;
+            if (!studentId || !classId) return;
+
+            const info = getClassAndTeacherInfo(classId);
+            const idx = allStudents.findIndex(s => s.id === studentId || s.studentId === studentId);
+            if (idx === -1) return;
+
+            const newForm = (info && info.form) ? info.form : allStudents[idx].form;
+            lastMutationTime = Date.now();
+            allStudents[idx] = {
+                ...allStudents[idx],
+                classId,
+                form: newForm
+            };
+            if (window.SENTINEL_SEED_DATA && Array.isArray(window.SENTINEL_SEED_DATA.students)) {
+                const seedIdx = window.SENTINEL_SEED_DATA.students.findIndex(s => s.id === studentId || s.studentId === studentId);
+                if (seedIdx !== -1) {
+                    window.SENTINEL_SEED_DATA.students[seedIdx] = {
+                        ...window.SENTINEL_SEED_DATA.students[seedIdx],
+                        classId,
+                        form: newForm
+                    };
+                }
+            }
+
+            // Update Supabase
+            try {
+                await fetch(`${SUPABASE_REST_URL}/students?id=eq.${encodeURIComponent(studentId)}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ class_id: classId, form: newForm })
+                });
+            } catch (_) {}
+
+            // Update backend API if running
+            try {
+                await fetch(getApiUrl(`/api/students/${studentId}`), {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ classId, form: newForm })
+                });
+            } catch (_) {}
+
+            const wasExpanded = (expandedStudentId === studentId);
+            closeAssignClassModal();
+            if (typeof filterStudents === 'function') {
+                filterStudents();
+            } else {
+                renderStudentsTable(allStudents);
+            }
+            if (wasExpanded) {
+                expandedStudentId = null;
+                toggleStudentDetail(studentId);
+            }
+            if (typeof sentinelBroadcastUpdate === 'function') {
+                sentinelBroadcastUpdate('students', { studentId, classId });
+            }
+            showToast(`✓ Assigned ${allStudents[idx].name} to ${info ? info.label : classId} (${info ? info.teacherName : 'Teacher'})`);
+        }
+
+        function getPast5MonthKeys() {
+            const monthShort = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            const now = new Date();
+            const result = [];
+            for (let offset = 4; offset >= 0; offset--) {
+                const d = new Date(now.getFullYear(), now.getMonth() - offset, 1);
+                const ym = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+                result.push({ ym, year: d.getFullYear(), month: d.getMonth() + 1, label: `${monthShort[d.getMonth()]} ${d.getFullYear()}` });
+            }
+            return result;
+        }
+
+        function generateFiveMonthAttendanceLogs(student, attRate) {
+            const months = getPast5MonthKeys();
+            const now = new Date();
+            const schoolDates = [];
+            months.forEach((m, mIdx) => {
+                const isCurrentMonth = (mIdx === months.length - 1);
+                const maxDay = isCurrentMonth ? Math.min(now.getDate(), 28) : 28;
+                const collected = [];
+                const d = new Date(m.year, m.month - 1, 1);
+                while (d.getMonth() === m.month - 1 && d.getDate() <= maxDay) {
+                    const dow = d.getDay();
+                    if (dow !== 0 && dow !== 6) {
+                        collected.push(`${m.ym}-${String(d.getDate()).padStart(2, '0')}`);
+                    }
+                    d.setDate(d.getDate() + 1);
+                }
+                schoolDates.push(...(isCurrentMonth ? collected : collected.slice(0, 20)));
+            });
+
+            const totalDays = schoolDates.length || 1;
+            const clampedRate = Math.max(0, Math.min(100, Number(attRate) || 0));
+            const targetPresent = Math.round((clampedRate / 100) * totalDays);
+            const absentNeeded = Math.max(0, totalDays - targetPresent);
+
+            const absentIndices = new Set();
+            for (let k = 0; k < absentNeeded; k++) {
+                let slot = Math.floor(((k + 0.5) * totalDays) / absentNeeded) % totalDays;
+                while (absentIndices.has(slot)) slot = (slot + 1) % totalDays;
+                absentIndices.add(slot);
+            }
+
+            return schoolDates.map((dateStr, idx) => {
+                const isAbsent = absentIndices.has(idx);
+                const isLate = !isAbsent && (idx % 23 === 0) && clampedRate < 98;
+                return {
+                    id: `att_${student.id}_${dateStr}`,
+                    studentId: student.id,
+                    studentNumber: student.studentNumber || student.studentId || student.id,
+                    studentName: student.name,
+                    form: student.form || 'General',
+                    classId: student.classId || 'cls_1A',
+                    schoolId: student.schoolId || 'sch_001',
+                    date: dateStr,
+                    status: isAbsent ? 'Absent' : (isLate ? 'Late' : 'Present'),
+                    period: 'Full Day',
+                    remarks: isAbsent ? 'Unexcused absence' : (isLate ? 'Arrived late' : 'Present on time')
+                };
+            });
+        }
+
+        async function saveStudentFiveMonthLogs(student, attRate) {
+            const newLogs = generateFiveMonthAttendanceLogs(student, attRate);
+            const sidLower = (student.id || '').toLowerCase();
+            const snumLower = (student.studentNumber || student.studentId || '').toLowerCase();
+
+            const keepLogs = (arr) => (arr || []).filter(l => {
+                const lid = (l.studentId || '').toLowerCase();
+                const lnum = (l.studentNumber || '').toLowerCase();
+                return !(lid && (lid === sidLower || (snumLower && lid === snumLower))) &&
+                       !(lnum && (lnum === sidLower || (snumLower && lnum === snumLower)));
+            });
+
+            allAttendanceLogs = [...keepLogs(allAttendanceLogs), ...newLogs];
+
+            // Sync directly to Supabase attendance_logs table (database-only, no local storage)
+            try {
+                await fetch(`${SUPABASE_REST_URL}/attendance_logs?student_id=eq.${encodeURIComponent(student.id)}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+                    }
+                });
+                const rows = newLogs.map(l => ({
+                    id: l.id,
+                    student_id: l.studentId,
+                    student_number: l.studentNumber,
+                    student_name: l.studentName,
+                    form: l.form,
+                    class_id: l.classId,
+                    school_id: l.schoolId,
+                    date: l.date,
+                    status: l.status,
+                    period: l.period,
+                    remarks: l.remarks
+                }));
+                await fetch(`${SUPABASE_REST_URL}/attendance_logs`, {
+                    method: 'POST',
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                        'Content-Type': 'application/json',
+                        'Prefer': 'resolution=merge-duplicates,return=minimal'
+                    },
+                    body: JSON.stringify(rows)
+                });
+            } catch (_) {}
+
+            // Also notify backend API if running
+            fetch(getApiUrl('/api/attendance/bulk'), {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ studentId: student.id, logs: newLogs, replaceExisting: true })
+            }).catch(() => {});
+        }
+
+        function getFiveMonthAttendanceSummary(student) {
+            const months = getPast5MonthKeys();
+            const sId = (student.id || '').toLowerCase();
+            const sNum = (student.studentNumber || student.studentId || '').toLowerCase();
+            const sName = (student.name || '').toLowerCase();
+            const stuLogs = (allAttendanceLogs || []).filter(l =>
+                (l.studentId && (l.studentId.toLowerCase() === sId || (sNum && l.studentId.toLowerCase() === sNum))) ||
+                (l.studentNumber && (l.studentNumber.toLowerCase() === sId || (sNum && l.studentNumber.toLowerCase() === sNum))) ||
+                (l.studentName && sName && l.studentName.toLowerCase() === sName)
+            );
+            return months.map(m => {
+                const mLogs = stuLogs.filter(l => (l.date || '').startsWith(m.ym));
+                const summaryRow = mLogs.find(l => l.status === 'Monthly Summary' && /^\d+\/\d+$/.test(l.period || ''));
+                if (summaryRow) {
+                    const [pStr, tStr] = summaryRow.period.split('/');
+                    const present = parseInt(pStr, 10) || 0;
+                    const total = parseInt(tStr, 10) || 0;
+                    const pct = total > 0 ? Math.round((present / total) * 100) : 0;
+                    return { label: m.label, total, present, pct };
+                }
+                const total = mLogs.length;
+                const present = mLogs.filter(l => l.status === 'Present' || l.status === 'Late').length;
+                const pct = total > 0 ? Math.round((present / total) * 100) : 0;
+                return { label: m.label, total, present, pct };
+            });
+        }
+
         function openAddStudentModal() {
             document.getElementById('editStudentId').value = '';
             document.getElementById('modalStudentTitle').textContent = 'Add New Student Record';
             document.getElementById('editStuName').value = '';
-            document.getElementById('editStuForm').value = 'Form 1';
-            document.getElementById('editStuSchool').value = 'Port of Spain North Secondary';
+            const defaultSchool = (isPrincipalUser && principalSchoolName) ? principalSchoolName : 'Port of Spain North Secondary';
+            document.getElementById('editStuSchool').value = defaultSchool;
             document.getElementById('editStuDistrict').value = 'St. George East District';
+            document.getElementById('editStuForm').value = 'Form 1';
             document.getElementById('editStuTriage').value = '0';
             document.getElementById('editStuIncidents').value = '0';
             const attEl = document.getElementById('editStuAttendance');
@@ -1584,9 +2019,13 @@
                 }
             }
 
+            const existingForClass = id ? allStudents.find(s => s.id === id) : null;
+            const resolvedSchoolId = resolveSchoolIdByName(school);
+            const classId = (existingForClass && existingForClass.classId) ? existingForClass.classId : null;
+
             // ── VALIDATION 8: Policy Consistency Warning ──
             if (attVal < 60 && triageLevel === 0) {
-                _pendingPolicyPayload = { name, form, school, district, triageLevel, incidentCount, attVal, gpaVal, failuresVal, id };
+                _pendingPolicyPayload = { name, form, school, district, classId, triageLevel, incidentCount, attVal, gpaVal, failuresVal, id };
                 const msgEl = document.getElementById('policyWarnMsg');
                 if (msgEl) msgEl.textContent = `Attendance is flagged as critically low (${attVal}%). Under Ministry protocol, students below 60% attendance typically require at least Level 1 (Guidance Referral) review. Saving as Level 0 (No Active Case) may not reflect accurate risk status.`;
                 const overlay = document.getElementById('policyWarnOverlay');
@@ -1594,14 +2033,17 @@
                 return;
             }
 
-            await _commitStudentSave({ name, form, school, district, triageLevel, incidentCount, attVal, gpaVal, failuresVal, id });
+            await _commitStudentSave({ name, form, school, district, classId, triageLevel, incidentCount, attVal, gpaVal, failuresVal, id });
         }
 
-        async function _commitStudentSave({ name, form, school, district, triageLevel, incidentCount, attVal, gpaVal, failuresVal, id }) {
+        async function _commitStudentSave({ name, form, school, district, classId, triageLevel, incidentCount, attVal, gpaVal, failuresVal, id }) {
+            const resolvedSchoolId = resolveSchoolIdByName(school);
             const payload = {
                 name: name,
                 form: form,
                 school: school,
+                schoolId: resolvedSchoolId,
+                classId: classId || null,
                 district: district,
                 triageLevel: triageLevel,
                 incidentCount: incidentCount,
@@ -1622,8 +2064,8 @@
                     name: payload.name,
                     firstName: payload.name.split(' ')[0],
                     lastName: payload.name.split(' ').slice(1).join(' ') || '',
-                    classId: 'cls_1A',
-                    schoolId: 'sch_001',
+                    classId: payload.classId,
+                    schoolId: payload.schoolId,
                     school: payload.school,
                     district: payload.district,
                     form: payload.form,
@@ -1640,6 +2082,7 @@
                     localStorage.setItem(`sentinel_gpa_${newId}`, payload.gpa.toFixed(2));
                     localStorage.setItem(`sentinel_failures_${newId}`, String(payload.courseFailures));
                 } catch (_) {}
+                saveStudentFiveMonthLogs(newStudent, payload.attendance);
 
                 // Add to local state & seed
                 allStudents.unshift(newStudent);
@@ -1651,9 +2094,9 @@
                 closeStudentModal();
                 showToast(`✓ Added new student record for ${newStudent.name}`);
 
-                // Insert into Supabase online database directly
+                // Insert into Supabase online database directly (using exact Supabase students schema)
                 try {
-                    await fetch(`${SUPABASE_REST_URL}/students`, {
+                    const supaRes = await fetch(`${SUPABASE_REST_URL}/students`, {
                         method: 'POST',
                         headers: {
                             'apikey': SUPABASE_ANON_KEY,
@@ -1669,8 +2112,6 @@
                             last_name: newStudent.lastName,
                             class_id: newStudent.classId,
                             school_id: newStudent.schoolId,
-                            school: newStudent.school,
-                            district: newStudent.district,
                             form: newStudent.form,
                             triage_level: newStudent.triageLevel,
                             incident_count: newStudent.incidentCount,
@@ -1678,25 +2119,31 @@
                             status: newStudent.status
                         })
                     });
+                    if (!supaRes.ok) {
+                        const errTxt = await supaRes.text().catch(() => '');
+                        console.warn('Supabase online insert notice:', supaRes.status, errTxt);
+                    }
                 } catch (supaErr) {
                     console.warn('Supabase online insert notice:', supaErr);
                 }
 
-                // Call local backend API if active
-                try {
-                    await fetch('/api/students', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(newStudent)
-                    });
-                } catch (_) {
+                // Call local backend API if active (only if classId is assigned so un-restarted local servers don't default null -> cls_1A)
+                if (newStudent.classId) {
                     try {
-                        await fetch(getApiUrl('/api/students'), {
+                        await fetch('/api/students', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify(newStudent)
                         });
-                    } catch (_) {}
+                    } catch (_) {
+                        try {
+                            await fetch(getApiUrl('/api/students'), {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify(newStudent)
+                            });
+                        } catch (_) {}
+                    }
                 }
                 return;
             }
@@ -1708,6 +2155,8 @@
                 localStorage.setItem(`sentinel_gpa_${id}`, payload.gpa.toFixed(2));
                 localStorage.setItem(`sentinel_failures_${id}`, String(payload.courseFailures));
             } catch (_) {}
+            const existingStuObj = allStudents.find(s => s.id === id) || { id, name: payload.name, form: payload.form, classId: payload.classId, schoolId: payload.schoolId };
+            saveStudentFiveMonthLogs({ ...existingStuObj, ...payload, id }, payload.attendance);
 
             // Sync directly to Supabase online database
             try {
@@ -1721,13 +2170,11 @@
                     body: JSON.stringify({
                         name: payload.name,
                         form: payload.form,
-                        school: payload.school,
-                        district: payload.district,
+                        class_id: payload.classId,
+                        school_id: payload.schoolId,
                         triage_level: payload.triageLevel,
                         incident_count: payload.incidentCount,
-                        attendance: payload.attendance,
-                        gpa: payload.gpa,
-                        course_failures: payload.courseFailures
+                        attendance: payload.attendance
                     })
                 });
                 if (!sRes.ok) {
@@ -1741,6 +2188,7 @@
                         body: JSON.stringify({
                             name: payload.name,
                             form: payload.form,
+                            class_id: payload.classId,
                             triage_level: payload.triageLevel,
                             incident_count: payload.incidentCount,
                             attendance: payload.attendance
@@ -1997,16 +2445,25 @@
             }
         }
 
-        function filterTable() {
-            if (expandedStudentId) {
+        function filterTable(preserveExpanded = false) {
+            if (!preserveExpanded && expandedStudentId) {
                 const openDetail = document.getElementById(`detail-row-${expandedStudentId}`);
                 if (openDetail) openDetail.remove();
                 expandedStudentId = null;
             }
 
-            const searchVal = document.getElementById('searchStudent').value.toLowerCase();
-            const districtVal = document.getElementById('filterDistrict').value.toLowerCase();
-            const triageVal = document.getElementById('filterTriage').value;
+            const rawSearch = document.getElementById('searchStudent').value;
+            const rawDistrict = document.getElementById('filterDistrict').value;
+            const rawTriage = document.getElementById('filterTriage').value;
+            try {
+                sessionStorage.setItem('sentinel_students_search', rawSearch);
+                sessionStorage.setItem('sentinel_students_district', rawDistrict);
+                sessionStorage.setItem('sentinel_students_triage', rawTriage);
+            } catch (_) {}
+
+            const searchVal = rawSearch.toLowerCase();
+            const districtVal = rawDistrict.toLowerCase();
+            const triageVal = rawTriage;
             const rows = document.querySelectorAll('#studentsBody tr:not(.student-detail-row)');
             let visibleCount = 0;
 
@@ -2034,6 +2491,11 @@
             document.getElementById('searchStudent').value = '';
             document.getElementById('filterDistrict').value = '';
             document.getElementById('filterTriage').value = '';
+            try {
+                sessionStorage.removeItem('sentinel_students_search');
+                sessionStorage.removeItem('sentinel_students_district');
+                sessionStorage.removeItem('sentinel_students_triage');
+            } catch (_) {}
             filterTable();
         }
     </script>

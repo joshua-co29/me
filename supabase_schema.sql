@@ -150,6 +150,32 @@ CREATE TABLE IF NOT EXISTS public.student_concerns (
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- 10. Attendance Logs Table (Partitioned by Month on `date`)
+DROP TABLE IF EXISTS public.attendance_logs CASCADE;
+CREATE TABLE public.attendance_logs (
+    id TEXT NOT NULL,
+    student_id TEXT NOT NULL,
+    student_number TEXT,
+    student_name TEXT,
+    form TEXT,
+    class_id TEXT,
+    school_id TEXT,
+    date TEXT NOT NULL,
+    status TEXT NOT NULL DEFAULT 'Present',
+    period TEXT DEFAULT 'Full Day',
+    remarks TEXT,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    PRIMARY KEY (id, date)
+) PARTITION BY RANGE (date);
+
+CREATE TABLE IF NOT EXISTS public.attendance_logs_2026_07 PARTITION OF public.attendance_logs FOR VALUES FROM ('2026-07-01') TO ('2026-08-01');
+CREATE TABLE IF NOT EXISTS public.attendance_logs_2026_08 PARTITION OF public.attendance_logs FOR VALUES FROM ('2026-08-01') TO ('2026-09-01');
+CREATE TABLE IF NOT EXISTS public.attendance_logs_2026_09 PARTITION OF public.attendance_logs FOR VALUES FROM ('2026-09-01') TO ('2026-10-01');
+CREATE TABLE IF NOT EXISTS public.attendance_logs_2026_10 PARTITION OF public.attendance_logs FOR VALUES FROM ('2026-10-01') TO ('2026-11-01');
+CREATE TABLE IF NOT EXISTS public.attendance_logs_2026_11 PARTITION OF public.attendance_logs FOR VALUES FROM ('2026-11-01') TO ('2026-12-01');
+CREATE TABLE IF NOT EXISTS public.attendance_logs_2026_12 PARTITION OF public.attendance_logs FOR VALUES FROM ('2026-12-01') TO ('2027-01-01');
+CREATE TABLE IF NOT EXISTS public.attendance_logs_default PARTITION OF public.attendance_logs DEFAULT;
+
 -- Enable Row Level Security (RLS) & Allow public anon access for demo/testing
 ALTER TABLE public.schools ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.classes ENABLE ROW LEVEL SECURITY;
@@ -160,6 +186,7 @@ ALTER TABLE public.interventions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.triage_scores ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.pbis_rewards ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.student_concerns ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.attendance_logs ENABLE ROW LEVEL SECURITY;
 
 -- Development policies (allow all read/write via anon publishable key)
 DO $$
@@ -188,12 +215,31 @@ BEGIN
     DROP POLICY IF EXISTS "Allow anon all on pbis_rewards" ON public.pbis_rewards;
     CREATE POLICY "Allow anon all on pbis_rewards" ON public.pbis_rewards FOR ALL USING (true) WITH CHECK (true);
 
+    DROP POLICY IF EXISTS "Allow anon all on attendance_logs" ON public.attendance_logs;
+    CREATE POLICY "Allow anon all on attendance_logs" ON public.attendance_logs FOR ALL USING (true) WITH CHECK (true);
+
     DROP POLICY IF EXISTS "Allow anon all on student_concerns" ON public.student_concerns;
     CREATE POLICY "Allow anon all on student_concerns" ON public.student_concerns FOR ALL USING (true) WITH CHECK (true);
 END $$;
 
 -- Ensure dynamic incident point weighting column exists
 ALTER TABLE public.incidents ADD COLUMN IF NOT EXISTS weight INTEGER;
+
+-- Enable Supabase Realtime push broadcasts on core tables
+DO $$
+DECLARE
+    tbl TEXT;
+BEGIN
+    FOREACH tbl IN ARRAY ARRAY['students', 'incidents', 'attendance_logs', 'classes', 'interventions', 'pbis_rewards', 'student_concerns']
+    LOOP
+        IF to_regclass(format('public.%I', tbl)) IS NOT NULL AND NOT EXISTS (
+            SELECT 1 FROM pg_publication_tables
+            WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = tbl
+        ) THEN
+            EXECUTE format('ALTER PUBLICATION supabase_realtime ADD TABLE public.%I', tbl);
+        END IF;
+    END LOOP;
+END $$;
 
 -- 10. Database Cleanup: Remove hardcoded/synthetic test students & test incidents
 DELETE FROM public.triage_scores WHERE student_id IN ('stu_test_01', 'stu_1794342607079');

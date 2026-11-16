@@ -286,6 +286,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     await Promise.all([loadIncidents(), loadInterventions()]);
 
+    if (typeof sentinelOnLiveSync === 'function') {
+        sentinelOnLiveSync(() => Promise.all([loadIncidents(), loadInterventions()]), { intervalMs: 8000 });
+    }
+
     if (window.location.hash) {
         const target = document.querySelector(window.location.hash);
         if (target) {
@@ -317,11 +321,20 @@ async function loadIncidents() {
         return true;
     });
 
+    const changed = typeof sentinelHasChanged !== 'function' || sentinelHasChanged('counselor_incs',
+        allIncidents.map(x => `${x.id}|${x.status}|${x.matrix}|${x.weight}`)
+    );
+    if (!changed) return;
+
     populateStudentDatalist();
     updateMetrics();
     renderWelfareCards();
     renderLevelChart();
-    renderTable(allIncidents);
+    if (typeof searchTable === 'function') {
+        searchTable();
+    } else {
+        renderTable(allIncidents);
+    }
 }
 
 function populateStudentDatalist() {

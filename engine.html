@@ -946,6 +946,9 @@
                     <span class="fsc-menu-icon" title="Menu">&#9776;</span>
                 </div>
                 <div class="fsc-subtitle">(sorted by risk score)</div>
+                <div style="margin: 6px 0 6px;">
+                    <input type="text" id="fscSearchInput" placeholder="Search student..." oninput="filterEngineStudents()" style="width:100%; box-sizing:border-box; padding:4px 8px; font-size:0.75rem; border:1px solid #cbd5e1; border-radius:4px; outline:none; font-family:inherit; background:#f8fafc; color:#0f172a;">
+                </div>
                 <div class="fsc-list" id="floatingStudentList">
                     <div class="fsc-item">
                         <span class="fsc-dash">—</span>
@@ -1573,6 +1576,8 @@
 
         // Participation points with 1-month (30-day) half-life decay
         function getActiveParticipationPoints(studentId, referenceTime = Date.now()) {
+            let localPts = null;
+            let localLatestTs = 0;
             try {
                 const logRaw = typeof localStorage !== 'undefined' ? localStorage.getItem(`sentinel_points_log_${studentId}`) : null;
                 if (logRaw) {
@@ -1582,32 +1587,61 @@
                         log.forEach(entry => {
                             const amt = Number(entry.amount) || 0;
                             const ts = entry.timestamp ? new Date(entry.timestamp).getTime() : referenceTime;
+                            if (ts > localLatestTs) localLatestTs = ts;
                             if (ts > referenceTime) return; // Not yet awarded at that point in time
                             const ageMs = Math.max(0, referenceTime - ts);
                             const monthsElapsed = Math.floor(ageMs / MONTH_MS);
                             const factor = monthsElapsed <= 0 ? 1.0 : Math.pow(0.5, monthsElapsed);
                             decayedTotal += amt * factor;
                         });
-                        return Math.round(decayedTotal);
+                        localPts = Math.max(0, Math.round(decayedTotal));
                     }
                 }
 
-                const val = typeof localStorage !== 'undefined' ? localStorage.getItem(`sentinel_points_${studentId}`) : null;
-                if (val !== null) {
-                    const rawPts = parseInt(val, 10) || 0;
-                    const tsRaw = localStorage.getItem(`sentinel_points_ts_${studentId}`);
-                    if (tsRaw) {
-                        const ts = Number(tsRaw);
-                        if (ts > referenceTime) return 0;
-                        const ageMs = Math.max(0, referenceTime - ts);
-                        const monthsElapsed = Math.floor(ageMs / MONTH_MS);
-                        if (monthsElapsed > 0) {
-                            return Math.round(rawPts * Math.pow(0.5, monthsElapsed));
+                if (localPts === null) {
+                    const val = typeof localStorage !== 'undefined' ? localStorage.getItem(`sentinel_points_${studentId}`) : null;
+                    if (val !== null) {
+                        const rawPts = parseInt(val, 10) || 0;
+                        const tsRaw = localStorage.getItem(`sentinel_points_ts_${studentId}`);
+                        if (tsRaw) {
+                            const ts = Number(tsRaw);
+                            if (ts > localLatestTs) localLatestTs = ts;
+                            if (ts > referenceTime) return 0;
+                            const ageMs = Math.max(0, referenceTime - ts);
+                            const monthsElapsed = Math.floor(ageMs / MONTH_MS);
+                            if (monthsElapsed > 0) {
+                                localPts = Math.max(0, Math.round(rawPts * Math.pow(0.5, monthsElapsed)));
+                            }
                         }
+                        if (localPts === null) localPts = Math.max(0, rawPts);
                     }
-                    return rawPts;
                 }
             } catch (_) {}
+
+            let supaPts = null;
+            let supaLatestTs = 0;
+            if (livePbisRewardsMap && Array.isArray(livePbisRewardsMap[studentId]) && livePbisRewardsMap[studentId].length > 0) {
+                let hash = 0;
+                const str = String(studentId || 'stu');
+                for (let i = 0; i < str.length; i++) hash = (hash << 5) - hash + str.charCodeAt(i);
+                let total = Math.abs(hash % 20) + 5;
+                livePbisRewardsMap[studentId].forEach(r => {
+                    const amt = Number(r.points) || 0;
+                    const ts = r.created_at ? new Date(r.created_at).getTime() : referenceTime;
+                    if (ts > supaLatestTs) supaLatestTs = ts;
+                    if (ts > referenceTime) return;
+                    const ageMs = Math.max(0, referenceTime - ts);
+                    const monthsElapsed = Math.floor(ageMs / MONTH_MS);
+                    const factor = monthsElapsed <= 0 ? 1.0 : Math.pow(0.5, monthsElapsed);
+                    total += amt * factor;
+                });
+                supaPts = Math.max(0, Math.round(total));
+            }
+
+            if (supaPts !== null && (localPts === null || supaLatestTs > localLatestTs)) {
+                return supaPts;
+            }
+            if (localPts !== null) return localPts;
 
             let hash = 0;
             const idStr = String(studentId || 'stu');
@@ -2087,20 +2121,29 @@
             // 5. Background sync with online Supabase database
             syncLiveDatabase();
 
-            // 6. Re-evaluate and redraw line immediately when values change in localStorage or tab regains focus
-            window.addEventListener('storage', refreshEngineFromChanges);
-            window.addEventListener('focus', refreshEngineFromChanges);
+            // 6. Re-evaluate and redraw line immediately when localStorage updates
+            window.addEventListener('storage', (e) => {
+                if (e && e.key && (e.key.startsWith('sentinel_') || e.key === 'sentinel_last_sync_event')) {
+                    refreshEngineFromChanges();
+                }
+            });
         }
+
+        let lastLiveStus = null;
+        let lastLiveIncs = null;
+        let livePbisRewardsMap = {};
 
         function refreshEngineFromChanges() {
             const prevSelected = selectedStudentId;
-            processDatabaseData();
+            processDatabaseData(lastLiveStus, lastLiveIncs);
             renderFloatingList();
-            if (riskChart) initChart();
-            if (prevSelected && evaluatedStudents.some(s => s.id === prevSelected)) {
-                selectStudent(prevSelected);
-            } else if (evaluatedStudents.length > 0) {
-                selectStudent(evaluatedStudents[0].id);
+            const targetId = (prevSelected && evaluatedStudents.some(s => s.id === prevSelected))
+                ? prevSelected
+                : (evaluatedStudents[0] ? evaluatedStudents[0].id : null);
+            if (targetId) {
+                selectStudent(targetId);
+            } else if (riskChart) {
+                applyChartHighlight(getActiveStudentId());
             }
         }
 
@@ -2386,7 +2429,30 @@
             if (typeof window !== 'undefined') window.evaluatedStudents = evaluatedStudents;
         }
 
-        // ── RENDER FLOATING STUDENT LIST ──────────────────────────────────────
+        // ── RENDER FLOATING STUDENT LIST & SEARCH FILTER ─────────────────────
+        function getFilteredEngineStudents() {
+            const searchEl = document.getElementById('fscSearchInput');
+            const q = (searchEl ? searchEl.value : '').toLowerCase().trim();
+            if (!q) return evaluatedStudents;
+            return evaluatedStudents.filter(st => {
+                const name = (st.name || '').toLowerCase();
+                const id = (st.id || '').toLowerCase();
+                const form = (st.form || '').toLowerCase();
+                return name.includes(q) || id.includes(q) || form.includes(q);
+            });
+        }
+
+        function filterEngineStudents() {
+            currentPage = 1;
+            const filtered = getFilteredEngineStudents();
+            renderFloatingList();
+            if (filtered.length > 0 && !filtered.some(s => s.id === selectedStudentId)) {
+                selectStudent(filtered[0].id);
+            } else {
+                applyChartHighlight(getActiveStudentId());
+            }
+        }
+
         function renderFloatingList() {
             const listEl = document.getElementById('floatingStudentList');
             const pageInd = document.getElementById('fscPageIndicator');
@@ -2397,14 +2463,21 @@
                 return;
             }
 
-            const totalPages = Math.ceil(evaluatedStudents.length / pageSize) || 1;
+            const visibleStudents = getFilteredEngineStudents();
+            if (visibleStudents.length === 0) {
+                if (pageInd) pageInd.textContent = '0/0';
+                listEl.innerHTML = '<div style="padding: 10px; color: #94a3b8; font-size: 0.75rem;">No matching students</div>';
+                return;
+            }
+
+            const totalPages = Math.ceil(visibleStudents.length / pageSize) || 1;
             if (currentPage > totalPages) currentPage = totalPages;
             if (currentPage < 1) currentPage = 1;
 
             if (pageInd) pageInd.textContent = `${currentPage}/${totalPages}`;
 
             const startIdx = (currentPage - 1) * pageSize;
-            const pageItems = evaluatedStudents.slice(startIdx, startIdx + pageSize);
+            const pageItems = visibleStudents.slice(startIdx, startIdx + pageSize);
 
             listEl.innerHTML = pageItems.map(st => {
                 const isActive = st.id === selectedStudentId;
@@ -2422,7 +2495,8 @@
         }
 
         function changeStudentPage(delta) {
-            const totalPages = Math.ceil(evaluatedStudents.length / pageSize) || 1;
+            const visibleStudents = getFilteredEngineStudents();
+            const totalPages = Math.ceil(visibleStudents.length / pageSize) || 1;
             currentPage += delta;
             if (currentPage > totalPages) currentPage = 1;
             if (currentPage < 1) currentPage = totalPages;
@@ -2439,12 +2513,16 @@
             }
 
             // Build datasets matching dashboard.html curve styling
+            const searchEl = document.getElementById('fscSearchInput');
+            const hasSearch = !!(searchEl && searchEl.value.trim());
+            const filteredIds = hasSearch ? new Set(getFilteredEngineStudents().map(s => s.id)) : null;
             const activeId = getActiveStudentId();
             const datasets = evaluatedStudents.map(st => {
                 const isSelected = st.id === activeId;
                 return {
                     label: st.name,
                     studentId: st.id,
+                    hidden: hasSearch ? !filteredIds.has(st.id) : false,
                     data: isSelected ? [...st.trajectory, null, null] : (st.fullTrajectory || [...st.trajectory, null, null]),
                     borderColor: isSelected ? '#dc2626' : 'rgba(100, 116, 139, 0.6)',
                     backgroundColor: isSelected ? 'rgba(220, 38, 38, 0.08)' : 'transparent',
@@ -2510,27 +2588,27 @@
                         intersect: false
                     },
                     onHover: function(event, activeElements) {
-                        const studentEl = (activeElements || []).find(item => {
+                        const visibleEls = (activeElements || []).filter(item => {
                             const d = riskChart && riskChart.data && riskChart.data.datasets[item.datasetIndex];
-                            return d && d.studentId && d.studentId !== '__whatif__';
+                            return d && !d.hidden && d.studentId && d.studentId !== '__whatif__';
                         });
                         if (event && event.native && event.native.target) {
-                            event.native.target.style.cursor = studentEl ? 'pointer' : 'default';
+                            event.native.target.style.cursor = visibleEls.length > 0 ? 'pointer' : 'default';
                         }
-                        const scheduleHighlight = (id, isHover) => {
-                            if (typeof requestAnimationFrame === 'function') {
-                                requestAnimationFrame(() => highlightStudent(id, isHover));
-                            } else {
-                                highlightStudent(id, isHover);
-                            }
-                        };
-                        if (studentEl) {
-                            const ds = riskChart.data.datasets[studentEl.datasetIndex];
-                            if (ds && ds.studentId && hoveredStudentId !== ds.studentId) {
-                                scheduleHighlight(ds.studentId, true);
+                        if (visibleEls.length > 0) {
+                            // Prevent ping-ponging when two lines overlap (keep current hoveredStudentId if still under cursor)
+                            const stillHoveringSame = hoveredStudentId && visibleEls.some(item => {
+                                const d = riskChart.data.datasets[item.datasetIndex];
+                                return d && d.studentId === hoveredStudentId;
+                            });
+                            if (!stillHoveringSame) {
+                                const ds = riskChart.data.datasets[visibleEls[0].datasetIndex];
+                                if (ds && ds.studentId && hoveredStudentId !== ds.studentId) {
+                                    highlightStudent(ds.studentId, true);
+                                }
                             }
                         } else if (hoveredStudentId !== null) {
-                            scheduleHighlight(selectedStudentId, false);
+                            highlightStudent(selectedStudentId, false);
                         }
                     },
                     onClick: function(event, activeElements) {
@@ -2653,9 +2731,25 @@
         function applyChartHighlight(targetId) {
             if (!riskChart) return;
 
-            riskChart.data.datasets.forEach(ds => {
-                if (ds.studentId === '__whatif__') return;
+            const searchEl = document.getElementById('fscSearchInput');
+            const hasSearch = !!(searchEl && searchEl.value.trim());
+            const filteredIds = hasSearch ? new Set(getFilteredEngineStudents().map(s => s.id)) : null;
+
+            riskChart.data.datasets.forEach((ds, idx) => {
+                if (ds.studentId === '__whatif__') {
+                    const showWhatIf = !(hasSearch && (!targetId || !filteredIds.has(targetId)));
+                    ds.hidden = !showWhatIf;
+                    if (typeof riskChart.setDatasetVisibility === 'function') {
+                        riskChart.setDatasetVisibility(idx, showWhatIf);
+                    }
+                    return;
+                }
                 const st = evaluatedStudents.find(s => s.id === ds.studentId);
+                const isVisible = hasSearch ? filteredIds.has(ds.studentId) : true;
+                ds.hidden = !isVisible;
+                if (typeof riskChart.setDatasetVisibility === 'function') {
+                    riskChart.setDatasetVisibility(idx, isVisible);
+                }
                 const isSelected = ds.studentId === targetId;
                 if (isSelected) {
                     if (st) ds.data = [...st.trajectory, null, null];
@@ -2674,22 +2768,23 @@
                     ds.order = 0;
                 } else {
                     if (st) ds.data = st.fullTrajectory || [...st.trajectory, null, null];
-                    ds.borderColor = 'rgba(100, 116, 139, 0.6)';
+                    ds.borderColor = hasSearch ? '#475569' : 'rgba(100, 116, 139, 0.6)';
                     ds.backgroundColor = 'transparent';
-                    ds.borderWidth = 1.5;
+                    ds.borderWidth = hasSearch ? 2.2 : 1.5;
+                    ds.borderDash = hasSearch ? [4, 3] : undefined;
                     ds.fill = false;
-                    ds.pointBackgroundColor = 'transparent';
-                    ds.pointBorderColor = 'transparent';
-                    ds.pointBorderWidth = 0;
-                    ds.pointRadius = 0;
-                    ds.pointHoverRadius = 0;
-                    ds.pointHoverBackgroundColor = 'transparent';
-                    ds.pointHoverBorderColor = 'transparent';
-                    ds.pointHoverBorderWidth = 0;
+                    ds.pointBackgroundColor = hasSearch ? '#475569' : 'transparent';
+                    ds.pointBorderColor = hasSearch ? '#ffffff' : 'transparent';
+                    ds.pointBorderWidth = hasSearch ? 1 : 0;
+                    ds.pointRadius = hasSearch ? 3.5 : 0;
+                    ds.pointHoverRadius = hasSearch ? 5 : 0;
+                    ds.pointHoverBackgroundColor = hasSearch ? '#475569' : 'transparent';
+                    ds.pointHoverBorderColor = hasSearch ? '#ffffff' : 'transparent';
+                    ds.pointHoverBorderWidth = hasSearch ? 1 : 0;
                     ds.order = 10;
                 }
             });
-            riskChart.update();
+            riskChart.update('none');
         }
 
         function updateReportCardTiles(st) {
@@ -3002,30 +3097,74 @@
         // ── ASYNC SYNC WITH ONLINE SUPABASE / LOCAL SERVER ────────────────────
         async function syncLiveDatabase() {
             try {
-                const [stuRes, incRes] = await Promise.all([
+                const [stuRes, incRes, pbisRes] = await Promise.all([
                     fetch(`${SUPABASE_REST_URL}/students?select=*&order=name.asc`, {
                         headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` }
                     }),
                     fetch(`${SUPABASE_REST_URL}/incidents?select=*&order=created_at.desc`, {
                         headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` }
-                    })
+                    }),
+                    fetch(`${SUPABASE_REST_URL}/pbis_rewards?select=*&order=created_at.asc`, {
+                        headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` }
+                    }).catch(() => null)
                 ]);
 
                 if (stuRes.ok && incRes.ok) {
                     const liveStus = await stuRes.json();
                     const liveIncs = await incRes.json();
+                    let livePbis = [];
+                    if (pbisRes && pbisRes.ok) {
+                        try { livePbis = await pbisRes.json(); } catch (_) {}
+                    }
+                    const nextPbisMap = {};
+                    if (Array.isArray(livePbis)) {
+                        livePbis.forEach(r => {
+                            const sid = r.student_id || r.studentId;
+                            if (!sid) return;
+                            if (!nextPbisMap[sid]) nextPbisMap[sid] = [];
+                            nextPbisMap[sid].push(r);
+                        });
+                    }
+                    livePbisRewardsMap = nextPbisMap;
+
                     if (Array.isArray(liveStus) && liveStus.length > 0) {
+                        const changed = typeof sentinelHasChanged !== 'function' || sentinelHasChanged('engine_page', {
+                            s: liveStus.map(x => `${x.id}|${x.class_id}|${x.attendance}|${x.triage_level}|${x.incident_count}|${x.gpa}|${x.course_failures}`),
+                            i: (Array.isArray(liveIncs) ? liveIncs : []).map(x => `${x.id}|${x.status}|${x.matrix}|${x.weight}`),
+                            p: Array.isArray(livePbis) ? livePbis.map(x => `${x.id}|${x.student_id}|${x.points}`) : []
+                        });
+                        if (!changed) return;
+
+                        lastLiveStus = liveStus;
+                        lastLiveIncs = liveIncs;
+                        try {
+                            liveStus.forEach(st => {
+                                if (st.id && st.attendance !== undefined && st.attendance !== null) {
+                                    localStorage.setItem(`sentinel_att_rate_${st.id}`, String(st.attendance));
+                                }
+                            });
+                        } catch (_) {}
+                        const prevCount = evaluatedStudents.length;
                         processDatabaseData(liveStus, liveIncs);
                         renderFloatingList();
-                        if (riskChart) initChart();
-                        if (selectedStudentId) {
+                        if (riskChart && evaluatedStudents.length !== prevCount) {
+                            initChart();
+                        }
+                        const visible = getFilteredEngineStudents();
+                        if (selectedStudentId && evaluatedStudents.some(s => s.id === selectedStudentId)) {
                             selectStudent(selectedStudentId);
+                        } else if (visible.length > 0) {
+                            selectStudent(visible[0].id);
                         } else if (evaluatedStudents.length > 0) {
                             selectStudent(evaluatedStudents[0].id);
                         }
                     }
                 }
             } catch (_) {}
+        }
+
+        if (typeof sentinelOnLiveSync === 'function') {
+            sentinelOnLiveSync(syncLiveDatabase, { intervalMs: 8000 });
         }
     </script>
 </body>

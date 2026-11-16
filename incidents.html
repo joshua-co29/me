@@ -981,9 +981,13 @@
 
             renderIncidentsTable(allIncidents);
             loadIncidents();
-            window.addEventListener('focus', () => {
-                loadIncidents();
-            });
+            if (typeof sentinelOnLiveSync === 'function') {
+                sentinelOnLiveSync(loadIncidents, { intervalMs: 8000 });
+            } else {
+                window.addEventListener('focus', () => {
+                    loadIncidents();
+                });
+            }
         });
 
         // ── AUTOCOMPLETE & REAL-TIME VALIDATION HELPERS ───────────────────────
@@ -1285,8 +1289,17 @@
                 });
             } catch (_) {}
 
+            const changed = typeof sentinelHasChanged !== 'function' || sentinelHasChanged('incidents_page',
+                loaded.map(x => `${x.id}|${x.status}|${x.matrix}|${x.weight}|${x.action}|${x.studentId}`)
+            );
             allIncidents = loaded;
-            renderIncidentsTable(allIncidents);
+            if (!changed) return;
+
+            if (typeof filterIncidents === 'function') {
+                filterIncidents();
+            } else {
+                renderIncidentsTable(allIncidents);
+            }
             const actionsHeader = document.getElementById('incActionsHeader');
             if (actionsHeader && (isMinistryUser || isDeanUser)) actionsHeader.style.display = '';
         }
@@ -1343,6 +1356,17 @@
             }).join('');
 
             document.getElementById('incRecordCount').textContent = `Showing ${incidents.length} record${incidents.length !== 1 ? 's' : ''}`;
+            try {
+                const sQ = sessionStorage.getItem('sentinel_incidents_search');
+                const sL = sessionStorage.getItem('sentinel_incidents_level');
+                const searchEl = document.getElementById('searchInc');
+                const levelEl = document.getElementById('filterLevel');
+                if (searchEl && !searchEl.value && sQ) searchEl.value = sQ;
+                if (levelEl && !levelEl.value && sL) levelEl.value = sL;
+                if ((searchEl && searchEl.value) || (levelEl && levelEl.value)) {
+                    filterIncidents();
+                }
+            } catch (_) {}
         }
 
         function openEditModal(incId) {
@@ -1898,8 +1922,14 @@
         }
 
         function filterIncidents() {
-            const search = document.getElementById('searchInc').value.toLowerCase();
-            const level  = document.getElementById('filterLevel').value;
+            const rawSearch = document.getElementById('searchInc').value;
+            const rawLevel = document.getElementById('filterLevel').value;
+            try {
+                sessionStorage.setItem('sentinel_incidents_search', rawSearch);
+                sessionStorage.setItem('sentinel_incidents_level', rawLevel);
+            } catch (_) {}
+            const search = rawSearch.toLowerCase();
+            const level  = rawLevel;
             const rows   = document.querySelectorAll('#incidentsBody tr');
             let count = 0;
 
@@ -1918,6 +1948,10 @@
         function resetIncFilters() {
             document.getElementById('searchInc').value = '';
             document.getElementById('filterLevel').value = '';
+            try {
+                sessionStorage.removeItem('sentinel_incidents_search');
+                sessionStorage.removeItem('sentinel_incidents_level');
+            } catch (_) {}
             filterIncidents();
         }
 

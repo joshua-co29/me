@@ -1142,6 +1142,9 @@
                 const target = document.querySelector(window.location.hash);
                 if (target) setTimeout(() => target.scrollIntoView({ behavior: 'smooth', block: 'start' }), 250);
             }
+            if (typeof sentinelOnLiveSync === 'function') {
+                sentinelOnLiveSync(loadAllData, { intervalMs: 8000 });
+            }
         });
 
         // ── DATA LOAD ─────────────────────────────────────────────────────────
@@ -1287,10 +1290,23 @@
             renderIncidentsTable();
         }
 
-        function filterIncidents() { renderIncidentsTable(); }
+        function filterIncidents() {
+            try {
+                const el = document.getElementById('incidentSearchInput');
+                if (el) sessionStorage.setItem('sentinel_dean_inc_search', el.value);
+            } catch (_) {}
+            renderIncidentsTable();
+        }
 
         function getFilteredIncidents() {
-            const query = (document.getElementById('incidentSearchInput')?.value || '').toLowerCase().trim();
+            const searchEl = document.getElementById('incidentSearchInput');
+            try {
+                if (searchEl && !searchEl.value) {
+                    const saved = sessionStorage.getItem('sentinel_dean_inc_search');
+                    if (saved) searchEl.value = saved;
+                }
+            } catch (_) {}
+            const query = (searchEl?.value || '').toLowerCase().trim();
             return allIncidents.filter(i => {
                 if (activeFormFilter !== 'All' && i.form !== activeFormFilter) return false;
                 if (activeStatusFilter !== 'All' && (i.status || '').toLowerCase() !== activeStatusFilter.toLowerCase()) return false;
@@ -1748,10 +1764,23 @@
             renderStudentsTable();
         }
 
-        function filterStudents() { renderStudentsTable(); }
+        function filterStudents() {
+            try {
+                const el = document.getElementById('studentSearchInput');
+                if (el) sessionStorage.setItem('sentinel_dean_stu_search', el.value);
+            } catch (_) {}
+            renderStudentsTable();
+        }
 
         function renderStudentsTable() {
-            const query = (document.getElementById('studentSearchInput')?.value || '').toLowerCase().trim();
+            const searchEl = document.getElementById('studentSearchInput');
+            try {
+                if (searchEl && !searchEl.value) {
+                    const saved = sessionStorage.getItem('sentinel_dean_stu_search');
+                    if (saved) searchEl.value = saved;
+                }
+            } catch (_) {}
+            const query = (searchEl?.value || '').toLowerCase().trim();
             let students = allStudents.filter(s => {
                 if (activeStudentForm !== 'All' && s.form !== activeStudentForm) return false;
                 if (query) {

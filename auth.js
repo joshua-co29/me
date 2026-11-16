@@ -1678,6 +1678,170 @@ function redirectByRole(user) {
         window.updateSentinelSyncBadge = updateSyncBadgeUI;
         window.checkSentinelServerHealth = checkServerHealth;
         window.isSentinelServerOnline = function () { return serverOnline; };
+
+        // Push-Based Real-Time Sync (Supabase Realtime WebSocket + SSE + BroadcastChannel, Zero Polling)
+        let syncChannel = null;
+        try {
+            if (typeof BroadcastChannel !== 'undefined') {
+                syncChannel = new BroadcastChannel('sentinel_edu_sync');
+            }
+        } catch (_) {}
+
+        const _syncSignatures = {};
+        window.sentinelHasChanged = function (key, payload) {
+            try {
+                const str = JSON.stringify(payload);
+                // Fast FNV-1a style hash + length so comparison is O(1) memory
+                let hash = 2166136261;
+                for (let i = 0; i < str.length; i++) {
+                    hash ^= str.charCodeAt(i);
+                    hash = Math.imul(hash, 16777619);
+                }
+                const sig = `${str.length}:${hash >>> 0}`;
+                if (_syncSignatures[key] === sig) return false;
+                _syncSignatures[key] = sig;
+                return true;
+            } catch (_) {
+                return true;
+            }
+        };
+
+        window.sentinelBroadcastUpdate = function (entityType, detail) {
+            const payload = { type: entityType || 'all', ts: Date.now(), detail: detail || null };
+            try { if (syncChannel) syncChannel.postMessage(payload); } catch (_) {}
+            try { localStorage.setItem('sentinel_last_sync_event', JSON.stringify(payload)); } catch (_) {}
+        };
+
+        const _pushSubscribers = [];
+        let _pushInitialized = false;
+        let _pushDebounceTimer = null;
+
+        function _notifyPushSubscribers(force, detail) {
+            if (_pushDebounceTimer) clearTimeout(_pushDebounceTimer);
+            _pushDebounceTimer = setTimeout(() => {
+                _pushDebounceTimer = null;
+                for (const sub of _pushSubscribers) {
+                    sub(force, detail);
+                }
+            }, 250);
+        }
+
+        function _initPushListeners() {
+            if (_pushInitialized) return;
+            _pushInitialized = true;
+
+            // 1. Same-browser cross-tab push
+            if (syncChannel) {
+                syncChannel.addEventListener('message', (e) => _notifyPushSubscribers(true, e.data));
+            }
+            window.addEventListener('storage', (e) => {
+                if (e.key === 'sentinel_last_sync_event' || (e.key && e.key.startsWith('sentinel_'))) {
+                    _notifyPushSubscribers(true, { key: e.key });
+                }
+            });
+
+            // 2. Local Node Server SSE push (/api/events)
+            let sseSource = null;
+            const connectSse = () => {
+                if (typeof EventSource === 'undefined' || sseSource) return;
+                const origin = (window.location && window.location.port === '5000')
+                    ? ''
+                    : 'http://localhost:5000';
+                try {
+                    sseSource = new EventSource(`${origin}/api/events`);
+                    sseSource.addEventListener('sync', (ev) => {
+                        let detail = null;
+                        try { detail = JSON.parse(ev.data); } catch (_) {}
+                        _notifyPushSubscribers(false, detail);
+                    });
+                    sseSource.onerror = () => {
+                        try { sseSource.close(); } catch (_) {}
+                        sseSource = null;
+                        setTimeout(connectSse, 8000);
+                    };
+                } catch (_) {
+                    sseSource = null;
+                }
+            };
+            connectSse();
+
+            // 3. Direct Online Supabase Realtime WebSocket (independent per-table channels)
+            const SUPA_WS_URL = 'wss://wrumedevccqkopguaxdi.supabase.co/realtime/v1/websocket?apikey=sb_publishable_zpd_lzgRqghcN-0X7qw7SA_I2hAZHXH&vsn=1.0.0';
+            const watchedTables = ['students', 'incidents', 'classes', 'pbis_rewards', 'student_concerns', 'attendance_logs', 'interventions'];
+            let ws = null;
+            let hbTimer = null;
+            let refCounter = 1;
+
+            const connectSupabaseWs = () => {
+                if (typeof WebSocket === 'undefined') return;
+                try {
+                    ws = new WebSocket(SUPA_WS_URL);
+                    ws.onopen = () => {
+                        watchedTables.forEach((table) => {
+                            const joinMsg = {
+                                topic: `realtime:${table}`,
+                                event: 'phx_join',
+                                payload: {
+                                    config: {
+                                        broadcast: { self: false },
+                                        presence: { key: '' },
+                                        postgres_changes: [{
+                                            event: '*',
+                                            schema: 'public',
+                                            table
+                                        }]
+                                    }
+                                },
+                                ref: String(refCounter++)
+                            };
+                            ws.send(JSON.stringify(joinMsg));
+                        });
+                        if (hbTimer) clearInterval(hbTimer);
+                        hbTimer = setInterval(() => {
+                            if (ws && ws.readyState === WebSocket.OPEN) {
+                                ws.send(JSON.stringify({
+                                    topic: 'phoenix',
+                                    event: 'heartbeat',
+                                    payload: {},
+                                    ref: String(refCounter++)
+                                }));
+                            }
+                        }, 25000);
+                    };
+                    ws.onmessage = (ev) => {
+                        try {
+                            const msg = JSON.parse(ev.data);
+                            if (msg && msg.event === 'postgres_changes') {
+                                const table = msg.payload && msg.payload.data && msg.payload.data.table;
+                                _notifyPushSubscribers(false, { source: 'supabase_realtime', table });
+                            }
+                        } catch (_) {}
+                    };
+                    ws.onclose = () => {
+                        if (hbTimer) { clearInterval(hbTimer); hbTimer = null; }
+                        ws = null;
+                        setTimeout(connectSupabaseWs, 5000);
+                    };
+                    ws.onerror = () => {
+                        try { ws.close(); } catch (_) {}
+                    };
+                } catch (_) {}
+            };
+            connectSupabaseWs();
+        }
+
+        window.sentinelOnLiveSync = function (callback) {
+            if (typeof callback !== 'function') return;
+            const isModalOpen = () => {
+                if (typeof document === 'undefined') return false;
+                return !!document.querySelector('.modal-overlay.is-active, .modal-backdrop.is-active, #createIncidentModal[style*="flex"], #editIncidentModal[style*="flex"]');
+            };
+            _pushSubscribers.push((force, detail) => {
+                if (!force && isModalOpen()) return;
+                try { callback(detail); } catch (_) {}
+            });
+            _initPushListeners();
+        };
     }
 
     window.sentinelQueueOfflineMutation = function (endpoint, method, body) {

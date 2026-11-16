@@ -790,6 +790,10 @@
             }
 
             await loadClassesData();
+
+            if (typeof sentinelOnLiveSync === 'function') {
+                sentinelOnLiveSync(loadClassesData, { intervalMs: 8000 });
+            }
         });
 
         async function loadClassesData() {
@@ -836,19 +840,66 @@
                 }
             }
 
-            // Sync with backend API if available
+            // Sync live students & classes from Supabase + backend API
             try {
-                const apiBase = (typeof API_BASE !== 'undefined') ? API_BASE : 'http://localhost:5000';
-                const res = await fetch(`${apiBase}/api/classes/by-teacher/${teacherId}`).catch(() => null);
-                if (res && res.ok) {
-                    const data = await res.json();
-                    if (Array.isArray(data) && data.length > 0) myClasses = data;
+                const sRes = await fetch(`${SUPABASE_REST_URL}/students?select=*&order=name.asc`, {
+                    headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` }
+                }).catch(() => null);
+                if (sRes && sRes.ok) {
+                    const rawStu = await sRes.json();
+                    if (Array.isArray(rawStu) && rawStu.length > 0) {
+                        allStudents = rawStu.map(st => ({
+                            id: st.id,
+                            studentNumber: st.student_number || st.id,
+                            studentId: st.student_number || st.id,
+                            name: st.name,
+                            firstName: st.first_name,
+                            lastName: st.last_name,
+                            classId: st.class_id,
+                            schoolId: st.school_id,
+                            school: st.school || 'Port of Spain North Secondary',
+                            district: st.district || 'St. George East District',
+                            form: st.form,
+                            incidentCount: st.incident_count || 0,
+                            triageLevel: st.triage_level || 0,
+                            attendance: (st.attendance !== undefined && st.attendance !== null) ? Number(st.attendance) : 95,
+                            status: st.status || 'Active'
+                        })).filter(s =>
+                            (s.schoolId || s.school_id) === schId ||
+                            (schName && (s.school || '').toLowerCase().includes(schName.toLowerCase()))
+                        );
+                    }
                 }
             } catch (_) {}
 
+            try {
+                const apiBase = (typeof API_BASE !== 'undefined') ? API_BASE : 'http://localhost:5000';
+                const [clsRes, stuRes] = await Promise.all([
+                    fetch(`${apiBase}/api/classes/by-teacher/${teacherId}`).catch(() => null),
+                    fetch(`${apiBase}/api/students/by-school/${schId}`).catch(() => null)
+                ]);
+                if (clsRes && clsRes.ok) {
+                    const data = await clsRes.json();
+                    if (Array.isArray(data) && data.length > 0) myClasses = data;
+                }
+                if (stuRes && stuRes.ok && allStudents.length === 0) {
+                    const data = await stuRes.json();
+                    if (Array.isArray(data) && data.length > 0) allStudents = data;
+                }
+            } catch (_) {}
+
+            const changed = typeof sentinelHasChanged !== 'function' || sentinelHasChanged('classes_page', {
+                c: myClasses.map(c => `${c.id}|${c.label}`),
+                s: allStudents.map(s => `${s.id}|${s.classId}|${s.form}|${s.attendance}`),
+                i: allIncidents.map(i => `${i.id}|${i.status}`)
+            });
+            if (!changed && activeClassId) return;
+
             renderClassesBoxes();
 
-            if (myClasses.length > 0) {
+            if (activeClassId && myClasses.some(c => c.id === activeClassId)) {
+                selectClass(activeClassId);
+            } else if (myClasses.length > 0) {
                 selectClass(myClasses[0].id);
             }
         }
@@ -925,15 +976,9 @@
 
             let students = allStudents.filter(s => {
                 if (!cls) return true;
-                const matchClassId = s.classId && s.classId.toLowerCase() === cls.id.toLowerCase();
-                const matchForm = cls.form && s.form && s.form.toLowerCase().includes(cls.form.toLowerCase());
-                const matchLabel = cls.label && s.form && s.form.toLowerCase().includes(cls.label.toLowerCase());
-                return matchClassId || matchForm || matchLabel;
+                if (!s.classId) return false;
+                return s.classId.toLowerCase() === cls.id.toLowerCase();
             });
-
-            if (students.length === 0) {
-                students = allStudents.slice(0, 10);
-            }
 
             if (query) {
                 students = students.filter(s => {
@@ -1003,19 +1048,34 @@
         // Each entry: { date: 'Nov 10', dayName: 'Mon', isoDate: '2026-11-10', isFuture: bool, isPresent: bool }
         let allGeneratedDays = [];
 
-        /** Build the full multi-week school-day list around today */
-        function buildAllSchoolDays(studentId, baseRate) {
+        /** Build the full 5-month school-day list from database attendance_logs + future slots */
+        function buildAllSchoolDays(studentId, baseRate, dbLogs = []) {
             const today = new Date();
             today.setHours(0, 0, 0, 0);
 
-            const totalDays = (PAST_WEEKS + FUTURE_WEEKS) * 5; // Mon-Fri, ~5 per week
-            const start = new Date(today);
-            start.setDate(start.getDate() - PAST_WEEKS * 7);
+            // Start 4 calendar months back (5-month window: e.g. Jul 1 – Nov)
+            const start = new Date(today.getFullYear(), today.getMonth() - 4, 1);
+            start.setHours(0, 0, 0, 0);
+            const end = new Date(today.getTime() + FUTURE_WEEKS * 7 * 86400000);
 
             const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
             const dayNames   = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 
-            // Load any saved days from localStorage
+            // 1. Load live database logs first (source of truth)
+            const dbMap = {};
+            const dbIdMap = {};
+            if (Array.isArray(dbLogs)) {
+                dbLogs.forEach(l => {
+                    const dStr = (l.date || '').slice(0, 10);
+                    if (!dStr) return;
+                    const stLow = (l.status || '').toLowerCase();
+                    if (stLow === 'monthly summary') return;
+                    dbMap[dStr] = (stLow === 'present' || stLow === 'late');
+                    if (l.id) dbIdMap[dStr] = l.id;
+                });
+            }
+
+            // 2. Fallback to localStorage only for dates not in dbMap
             let savedMap = {};
             try {
                 const raw = localStorage.getItem(`sentinel_att_days_${studentId}`);
@@ -1028,21 +1088,25 @@
             const result = [];
             const cursor = new Date(start);
 
-            while (result.length < totalDays || cursor <= new Date(today.getTime() + FUTURE_WEEKS * 7 * 86400000)) {
+            while (cursor <= end) {
                 const dow = cursor.getDay();
                 if (dow >= 1 && dow <= 5) { // Mon-Fri
-                    const isoDate = cursor.toISOString().slice(0, 10);
+                    const yyyy = cursor.getFullYear();
+                    const mm = String(cursor.getMonth() + 1).padStart(2, '0');
+                    const dd = String(cursor.getDate()).padStart(2, '0');
+                    const isoDate = `${yyyy}-${mm}-${dd}`;
                     const isFuture = cursor > today;
                     const dayName  = dayNames[cursor.getDay()];
                     const dateLabel = `${monthNames[cursor.getMonth()]} ${cursor.getDate()}`;
 
                     let isPresent;
                     if (isFuture) {
-                        isPresent = false; // future = not yet attended
-                    } else if (savedMap.hasOwnProperty(isoDate)) {
+                        isPresent = false;
+                    } else if (Object.prototype.hasOwnProperty.call(dbMap, isoDate)) {
+                        isPresent = dbMap[isoDate];
+                    } else if (Object.prototype.hasOwnProperty.call(savedMap, isoDate)) {
                         isPresent = savedMap[isoDate];
                     } else {
-                        // Fallback: derive from base rate
                         const isGood = baseRate >= 80;
                         const dayIdx = result.filter(d => !d.isFuture).length;
                         isPresent = true;
@@ -1050,12 +1114,16 @@
                         if (baseRate < 70 && (dayIdx % 5 === 1 || dayIdx % 5 === 2)) isPresent = false;
                     }
 
-                    result.push({ isoDate, date: dateLabel, dayName, isFuture, isPresent });
+                    result.push({
+                        isoDate,
+                        date: dateLabel,
+                        dayName,
+                        isFuture,
+                        isPresent,
+                        logId: dbIdMap[isoDate] || `att_${studentId}_${isoDate}`
+                    });
                 }
                 cursor.setDate(cursor.getDate() + 1);
-
-                // Safety: stop after generating enough days
-                if (result.length >= (PAST_WEEKS + FUTURE_WEEKS) * 5 + 10) break;
             }
 
             return result;
@@ -1091,7 +1159,7 @@
             }
         }
 
-        function openAttendanceModal(studentId) {
+        async function openAttendanceModal(studentId) {
             const student = allStudents.find(s => s.id === studentId);
             if (!student) return;
 
@@ -1107,12 +1175,25 @@
 
             const baseRate = (student.attendance !== undefined && student.attendance !== null) ? Number(student.attendance) : 85;
 
-            // Build full day list (past + future)
-            allGeneratedDays = buildAllSchoolDays(student.id, baseRate);
-            currentStudentDays = allGeneratedDays; // keep reference
-
+            // Render immediately, then hydrate from live Supabase 5-month attendance_logs
+            allGeneratedDays = buildAllSchoolDays(student.id, baseRate, []);
+            currentStudentDays = allGeneratedDays;
             renderDaysMiniBoxes();
             document.getElementById('attendanceModal').classList.add('is-active');
+
+            try {
+                const res = await fetch(`${SUPABASE_REST_URL}/attendance_logs?student_id=eq.${encodeURIComponent(student.id)}&order=date.asc`, {
+                    headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` }
+                });
+                if (res.ok) {
+                    const dbLogs = await res.json();
+                    if (Array.isArray(dbLogs) && dbLogs.length > 0 && currentEditStudent && currentEditStudent.id === student.id) {
+                        allGeneratedDays = buildAllSchoolDays(student.id, baseRate, dbLogs);
+                        currentStudentDays = allGeneratedDays;
+                        renderDaysMiniBoxes();
+                    }
+                }
+            } catch (_) {}
         }
 
         function closeAttendanceModal() {
@@ -1209,16 +1290,34 @@
             localStorage.setItem(`sentinel_att_rate_${currentEditStudent.id}`, String(newRate));
             localStorage.setItem(`sentinel_att_days_${currentEditStudent.id}`, JSON.stringify(allGeneratedDays));
 
-            // 3. Sync to API & Supabase
+            // 3. Sync to Supabase attendance_logs + students.attendance + local API
             try {
-                const apiBase = (typeof API_BASE !== 'undefined') ? API_BASE : 'http://localhost:5000';
-                await fetch(`${apiBase}/api/students/${currentEditStudent.id}`, {
-                    method: 'PATCH',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ attendance: newRate })
+                const logRows = pastDays.map(d => ({
+                    id: d.logId || `att_${currentEditStudent.id}_${d.isoDate}`,
+                    student_id: currentEditStudent.id,
+                    student_number: currentEditStudent.studentNumber || currentEditStudent.studentId || currentEditStudent.id,
+                    student_name: currentEditStudent.name || `${currentEditStudent.firstName || ''} ${currentEditStudent.lastName || ''}`.trim(),
+                    form: currentEditStudent.form || 'Form 1',
+                    class_id: currentEditStudent.classId || activeClassId || null,
+                    school_id: currentEditStudent.schoolId || (currentUser && currentUser.schoolId) || 'sch_001',
+                    date: d.isoDate,
+                    status: d.isPresent ? 'Present' : 'Absent',
+                    period: 'Full Day',
+                    remarks: d.isPresent ? '' : 'Marked Absent via Class Roll'
+                }));
+
+                await fetch(`${SUPABASE_REST_URL}/attendance_logs?on_conflict=id,date`, {
+                    method: 'POST',
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                        'Content-Type': 'application/json',
+                        'Prefer': 'resolution=merge-duplicates,return=minimal'
+                    },
+                    body: JSON.stringify(logRows)
                 }).catch(() => null);
 
-                await fetch(`${SUPABASE_REST_URL}/students?id=eq.${currentEditStudent.id}`, {
+                await fetch(`${SUPABASE_REST_URL}/students?id=eq.${encodeURIComponent(currentEditStudent.id)}`, {
                     method: 'PATCH',
                     headers: {
                         'apikey': SUPABASE_ANON_KEY,
@@ -1227,7 +1326,18 @@
                     },
                     body: JSON.stringify({ attendance: newRate })
                 }).catch(() => null);
+
+                const apiBase = (typeof API_BASE !== 'undefined') ? API_BASE : 'http://localhost:5000';
+                await fetch(`${apiBase}/api/students/${currentEditStudent.id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ attendance: newRate })
+                }).catch(() => null);
             } catch (_) {}
+
+            if (typeof sentinelBroadcastUpdate === 'function') {
+                sentinelBroadcastUpdate('students', { studentId: currentEditStudent.id, attendance: newRate });
+            }
 
             closeAttendanceModal();
             renderClassRollTable();

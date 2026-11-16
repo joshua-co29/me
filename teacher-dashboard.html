@@ -85,8 +85,8 @@
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.06em;
-            color: #1d4ed8;
-            background: #eff6ff;
+            color: #ffffff;
+            background: #1d4ed8;
             padding: 0.3rem 0.75rem;
             border-radius: 4px;
             margin-bottom: 0.8rem;
@@ -832,7 +832,7 @@
             <!-- Left Headline Area -->
             <div class="hero-banner-left">
                 <div class="hero-school-pill" id="heroSchoolBadge">
-                    <span>🏛</span> <span id="heroSchoolBadgeText">Port of Spain North Secondary</span>
+                    <span id="heroSchoolBadgeText">Port of Spain North Secondary</span>
                 </div>
                 <div class="hero-greeting" id="heroGreeting">Welcome back, Teacher!</div>
                 <h1 class="hero-big-title">
@@ -1087,9 +1087,11 @@
                         <canvas id="incidentLevelsChart"></canvas>
                     </div>
                     <div class="chart-legend-row">
-                        <div class="legend-item"><span class="legend-box box-level-1"></span> Level 1: <strong id="legL1">0</strong></div>
-                        <div class="legend-item"><span class="legend-box box-level-2"></span> Level 2: <strong id="legL2">0</strong></div>
-                        <div class="legend-item"><span class="legend-box box-level-3"></span> Level 3: <strong id="legL3">0</strong></div>
+                        <div class="legend-item"><span class="legend-box box-level-1"></span> L1: <strong id="legL1">0</strong></div>
+                        <div class="legend-item"><span class="legend-box box-level-2"></span> L2: <strong id="legL2">0</strong></div>
+                        <div class="legend-item"><span class="legend-box" style="background:#dc2626;"></span> L3: <strong id="legL3">0</strong></div>
+                        <div class="legend-item"><span class="legend-box" style="background:#991b1b;"></span> L4: <strong id="legL4">0</strong></div>
+                        <div class="legend-item"><span class="legend-box" style="background:#450a0a;"></span> L5: <strong id="legL5">0</strong></div>
                     </div>
                 </div>
 
@@ -1224,6 +1226,10 @@
 
             await loadTeacherData();
 
+            if (typeof sentinelOnLiveSync === 'function') {
+                sentinelOnLiveSync(loadTeacherData, { intervalMs: 8000 });
+            }
+
             // Smooth hash scroll handler
             if (window.location.hash) {
                 const target = document.querySelector(window.location.hash);
@@ -1280,14 +1286,46 @@
                 }
             }
 
-            renderDashboard();
+            if (!activeClassId) renderDashboard();
 
-            // 2. Sync live data from Express API
+            // 2. Sync live students, classes & incidents from Supabase + Express API
+            try {
+                const sRes = await fetch(`${SUPABASE_REST_URL}/students?select=*&order=name.asc`, {
+                    headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` }
+                }).catch(() => null);
+                if (sRes && sRes.ok) {
+                    const rawStu = await sRes.json();
+                    if (Array.isArray(rawStu) && rawStu.length > 0) {
+                        allStudents = rawStu.map(st => ({
+                            id: st.id,
+                            studentNumber: st.student_number || st.id,
+                            studentId: st.student_number || st.id,
+                            name: st.name,
+                            firstName: st.first_name,
+                            lastName: st.last_name,
+                            classId: st.class_id,
+                            schoolId: st.school_id,
+                            school: st.school || 'Port of Spain North Secondary',
+                            district: st.district || 'St. George East District',
+                            form: st.form,
+                            incidentCount: st.incident_count || 0,
+                            triageLevel: st.triage_level || 0,
+                            attendance: (st.attendance !== undefined && st.attendance !== null) ? Number(st.attendance) : 95,
+                            status: st.status || 'Active'
+                        })).filter(s =>
+                            (s.schoolId || s.school_id) === schId ||
+                            (schName && (s.school || '').toLowerCase().includes(schName.toLowerCase()))
+                        );
+                    }
+                }
+            } catch (_) {}
+
             try {
                 const apiBase = (typeof API_BASE !== 'undefined') ? API_BASE : 'http://localhost:5000';
-                const [clsRes, incRes] = await Promise.all([
+                const [clsRes, incRes, stuRes] = await Promise.all([
                     fetch(`${apiBase}/api/classes/by-teacher/${teacherId}`).catch(() => null),
-                    fetch(`${apiBase}/api/incidents/by-teacher/${teacherId}`).catch(() => null)
+                    fetch(`${apiBase}/api/incidents/by-teacher/${teacherId}`).catch(() => null),
+                    fetch(`${apiBase}/api/students/by-school/${schId}`).catch(() => null)
                 ]);
 
                 if (clsRes && clsRes.ok) {
@@ -1298,7 +1336,18 @@
                     const data = await incRes.json();
                     if (Array.isArray(data) && data.length > 0) myIncidents = data;
                 }
+                if (stuRes && stuRes.ok && allStudents.length === 0) {
+                    const data = await stuRes.json();
+                    if (Array.isArray(data) && data.length > 0) allStudents = data;
+                }
             } catch (_) {}
+
+            const changed = typeof sentinelHasChanged !== 'function' || sentinelHasChanged('teacher_page', {
+                c: myClasses.map(c => `${c.id}|${c.label}`),
+                s: allStudents.map(s => `${s.id}|${s.classId}|${s.form}|${s.attendance}`),
+                i: myIncidents.map(i => `${i.id}|${i.status}|${i.matrix}`)
+            });
+            if (!changed && activeClassId) return;
 
             renderDashboard();
         }
@@ -1323,11 +1372,9 @@
             const l3Count = myIncidents.filter(i => parseInt(i.level || 1) === 3 || (i.matrix && i.matrix.includes('3'))).length;
 
             // Students in teacher's classes
-            const myClassForms = myClasses.map(c => (c.form || c.label || '').toLowerCase());
             const myClassIds = myClasses.map(c => (c.id || '').toLowerCase());
             const enrolledStudents = allStudents.filter(s =>
-                myClassIds.includes((s.classId || '').toLowerCase()) ||
-                myClassForms.some(f => (s.form || '').toLowerCase().includes(f))
+                s.classId && myClassIds.includes(s.classId.toLowerCase())
             );
             const studentCount = enrolledStudents.length || Math.max(allStudents.length, 24);
 
@@ -1425,6 +1472,10 @@
         }
 
         function filterClassRoll() {
+            try {
+                const el = document.getElementById('rollSearchInput');
+                if (el) sessionStorage.setItem('sentinel_teacher_roll_search', el.value);
+            } catch (_) {}
             renderClassRoll();
         }
 
@@ -1433,20 +1484,24 @@
             if (!tbody) return;
 
             const cls = myClasses.find(c => c.id === activeClassId);
-            const query = (document.getElementById('rollSearchInput') ? document.getElementById('rollSearchInput').value : '').toLowerCase().trim();
+            const searchEl = document.getElementById('rollSearchInput');
+            try {
+                if (searchEl && !searchEl.value) {
+                    const saved = sessionStorage.getItem('sentinel_teacher_roll_search');
+                    if (saved) searchEl.value = saved;
+                }
+            } catch (_) {}
+            const query = (searchEl ? searchEl.value : '').toLowerCase().trim();
 
             let students = allStudents.filter(s => {
                 if (!cls) return true;
-                const matchClassId = s.classId && s.classId.toLowerCase() === cls.id.toLowerCase();
+                if (s.classId) {
+                    return s.classId.toLowerCase() === cls.id.toLowerCase();
+                }
                 const matchForm = cls.form && s.form && s.form.toLowerCase().includes(cls.form.toLowerCase());
                 const matchLabel = cls.label && s.form && s.form.toLowerCase().includes(cls.label.toLowerCase());
-                return matchClassId || matchForm || matchLabel;
+                return matchForm || matchLabel;
             });
-
-            if (students.length === 0) {
-                // Fallback: show first 8 students from school roster
-                students = allStudents.slice(0, 8);
-            }
 
             if (query) {
                 students = students.filter(s => {
@@ -1621,84 +1676,105 @@
 
         function renderAnalyticsCharts() {
             const total = myIncidents.length;
-            const l1 = myIncidents.filter(i => parseInt(i.level || 1) === 1 || (i.matrix && i.matrix.includes('1'))).length;
-            const l2 = myIncidents.filter(i => parseInt(i.level || 1) === 2 || (i.matrix && i.matrix.includes('2'))).length;
-            const l3 = myIncidents.filter(i => parseInt(i.level || 1) === 3 || (i.matrix && i.matrix.includes('3'))).length;
+            let l1 = 0, l2 = 0, l3 = 0, l4 = 0, l5 = 0;
+            myIncidents.forEach(i => {
+                const m = (i.matrix || '').toLowerCase();
+                const lvl = parseInt(i.level || 0, 10);
+                if (lvl === 5 || m.includes('level 5')) l5++;
+                else if (lvl === 4 || m.includes('level 4')) l4++;
+                else if (lvl === 3 || m.includes('level 3')) l3++;
+                else if (lvl === 2 || m.includes('level 2')) l2++;
+                else l1++;
+            });
 
             const badgeTotal = document.getElementById('chartTotalBadge');
             if (badgeTotal) badgeTotal.textContent = `${total} Total`;
 
             const badgeL3 = document.getElementById('chartLevelBadge');
-            if (badgeL3) badgeL3.textContent = `${l3} Level 3`;
+            if (badgeL3) badgeL3.textContent = `${l3 + l4 + l5} Level 3–5`;
 
             const leg1 = document.getElementById('legL1');
             const leg2 = document.getElementById('legL2');
             const leg3 = document.getElementById('legL3');
+            const leg4 = document.getElementById('legL4');
+            const leg5 = document.getElementById('legL5');
             if (leg1) leg1.textContent = l1;
             if (leg2) leg2.textContent = l2;
             if (leg3) leg3.textContent = l3;
+            if (leg4) leg4.textContent = l4;
+            if (leg5) leg5.textContent = l5;
 
-            // Chart 1: 7-Day Trend
+            // Chart 1: 7-Day Trend (update in place to avoid regenerating)
             const ctxTotal = document.getElementById('totalIncidentsChart');
             if (ctxTotal && typeof Chart !== 'undefined') {
-                if (chartTotal) chartTotal.destroy();
-                chartTotal = new Chart(ctxTotal, {
-                    type: 'line',
-                    data: {
-                        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-                        datasets: [{
-                            label: 'Incidents',
-                            data: [0, 2, 1, 3, 1, 0, Math.max(total, 1)],
-                            borderColor: '#111111',
-                            backgroundColor: 'rgba(17, 17, 17, 0.05)',
-                            borderWidth: 2.2,
-                            fill: true,
-                            tension: 0.35,
-                            pointBackgroundColor: '#111111',
-                            pointBorderColor: '#ffffff',
-                            pointBorderWidth: 1.5,
-                            pointRadius: 4,
-                            pointHoverRadius: 6
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: { legend: { display: false } },
-                        scales: {
-                            x: { grid: { display: false }, ticks: { font: { family: "'Google Sans', sans-serif", size: 11 }, color: '#717682' } },
-                            y: { beginAtZero: true, ticks: { stepSize: 1, font: { family: "'Google Sans', sans-serif", size: 11 }, color: '#717682' }, grid: { color: 'rgba(0, 0, 0, 0.05)' } }
+                const totalSeries = [0, 2, 1, 3, 1, 0, Math.max(total, 1)];
+                if (chartTotal && chartTotal.data && chartTotal.data.datasets[0]) {
+                    chartTotal.data.datasets[0].data = totalSeries;
+                    chartTotal.update('none');
+                } else {
+                    chartTotal = new Chart(ctxTotal, {
+                        type: 'line',
+                        data: {
+                            labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                            datasets: [{
+                                label: 'Incidents',
+                                data: totalSeries,
+                                borderColor: '#111111',
+                                backgroundColor: 'rgba(17, 17, 17, 0.05)',
+                                borderWidth: 2.2,
+                                fill: true,
+                                tension: 0.35,
+                                pointBackgroundColor: '#111111',
+                                pointBorderColor: '#ffffff',
+                                pointBorderWidth: 1.5,
+                                pointRadius: 4,
+                                pointHoverRadius: 6
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: { legend: { display: false } },
+                            scales: {
+                                x: { grid: { display: false }, ticks: { font: { family: "'Google Sans', sans-serif", size: 11 }, color: '#717682' } },
+                                y: { beginAtZero: true, ticks: { stepSize: 1, font: { family: "'Google Sans', sans-serif", size: 11 }, color: '#717682' }, grid: { color: 'rgba(0, 0, 0, 0.05)' } }
+                            }
                         }
-                    }
-                });
+                    });
+                }
             }
 
-            // Chart 2: Incidents by Level
+            // Chart 2: Incidents by Level (Levels 1-5, update in place)
             const ctxLevels = document.getElementById('incidentLevelsChart');
             if (ctxLevels && typeof Chart !== 'undefined') {
-                if (chartLevels) chartLevels.destroy();
-                chartLevels = new Chart(ctxLevels, {
-                    type: 'bar',
-                    data: {
-                        labels: ['Level 1', 'Level 2', 'Level 3'],
-                        datasets: [{
-                            label: 'Incidents',
-                            data: [l1, l2, l3],
-                            backgroundColor: ['#f59e0b', '#ea580c', '#991b1b'],
-                            borderRadius: 0,
-                            barThickness: 28
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: { legend: { display: false } },
-                        scales: {
-                            x: { grid: { display: false }, ticks: { font: { family: "'Google Sans', sans-serif", size: 11, weight: '600' }, color: '#111111' } },
-                            y: { beginAtZero: true, ticks: { stepSize: 1, font: { family: "'Google Sans', sans-serif", size: 11 }, color: '#717682' }, grid: { color: 'rgba(0, 0, 0, 0.05)' } }
+                const levelSeries = [l1, l2, l3, l4, l5];
+                if (chartLevels && chartLevels.data && chartLevels.data.datasets[0]) {
+                    chartLevels.data.datasets[0].data = levelSeries;
+                    chartLevels.update('none');
+                } else {
+                    chartLevels = new Chart(ctxLevels, {
+                        type: 'bar',
+                        data: {
+                            labels: ['Level 1', 'Level 2', 'Level 3', 'Level 4', 'Level 5'],
+                            datasets: [{
+                                label: 'Incidents',
+                                data: levelSeries,
+                                backgroundColor: ['#f59e0b', '#ea580c', '#dc2626', '#991b1b', '#450a0a'],
+                                borderRadius: 0,
+                                barThickness: 24
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: { legend: { display: false } },
+                            scales: {
+                                x: { grid: { display: false }, ticks: { font: { family: "'Google Sans', sans-serif", size: 11, weight: '600' }, color: '#111111' } },
+                                y: { beginAtZero: true, ticks: { stepSize: 1, font: { family: "'Google Sans', sans-serif", size: 11 }, color: '#717682' }, grid: { color: 'rgba(0, 0, 0, 0.05)' } }
+                            }
                         }
-                    }
-                });
+                    });
+                }
             }
         }
 
@@ -1843,6 +1919,7 @@
             } catch (_) {}
 
             closeQuickIncidentModal();
+            if (typeof sentinelBroadcastUpdate === 'function') sentinelBroadcastUpdate('incidents', { incidentId: newIncident.id });
             renderDashboard();
         }
     </script>

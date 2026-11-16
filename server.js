@@ -66,7 +66,8 @@ function loadDb() {
  * Called after every write operation (signup, new incident, etc.).
  */
 function saveDb() {
-    fs.writeFileSync(DB_FILE, JSON.stringify(db, null, 2), 'utf8');
+    const diskSnapshot = { ...db, attendanceLogs: [] };
+    fs.writeFileSync(DB_FILE, JSON.stringify(diskSnapshot, null, 2), 'utf8');
 }
 
 // In-memory cache synced directly from Supabase with disk backup
@@ -192,15 +193,89 @@ async function refreshFromSupabase() {
             }));
         }
 
+        // Hydrate attendanceLogs directly from Supabase attendance_logs (paginated)
+        try {
+            const pulledLogs = [];
+            let offset = 0;
+            const pageSize = 1000;
+            while (true) {
+                const { data: attRows, error: errAtt } = await supabase
+                    .from('attendance_logs')
+                    .select('*')
+                    .order('date', { ascending: true })
+                    .range(offset, offset + pageSize - 1);
+                if (errAtt || !Array.isArray(attRows) || attRows.length === 0) break;
+                attRows.forEach(a => pulledLogs.push({
+                    id: a.id,
+                    studentId: a.student_id,
+                    studentNumber: a.student_number,
+                    studentName: a.student_name,
+                    form: a.form,
+                    classId: a.class_id,
+                    schoolId: a.school_id,
+                    date: a.date,
+                    status: a.status,
+                    period: a.period || 'Full Day',
+                    remarks: a.remarks || ''
+                }));
+                if (attRows.length < pageSize) break;
+                offset += pageSize;
+            }
+            if (pulledLogs.length > 0) {
+                db.attendanceLogs = pulledLogs;
+            }
+        } catch (attPullErr) {
+            console.warn('[Supabase Attendance Pull] Notice:', attPullErr.message);
+        }
+
         saveDb();
-        console.log(`[Supabase Live Pull] Hydrated ${db.schools.length} schools, ${db.classes.length} classes, ${db.users.length} users, ${db.students.length} students, ${db.incidents.length} incidents, ${(db.interventions || []).length} interventions.`);
+        console.log(`[Supabase Live Pull] Hydrated ${db.schools.length} schools, ${db.classes.length} classes, ${db.users.length} users, ${db.students.length} students, ${db.incidents.length} incidents, ${(db.interventions || []).length} interventions, ${(db.attendanceLogs || []).length} attendance logs.`);
     } catch (err) {
         console.warn('[Supabase Live Pull] Notice:', err.message);
     }
 }
 
-// Initial pull on server boot
+// ─────────────────────────────────────────────────────────────────────────────
+// 2b. Push-Based Real-Time Sync (SSE + Supabase postgres_changes, Zero Polling)
+// ─────────────────────────────────────────────────────────────────────────────
+const sseClients = new Set();
+function broadcastSseEvent(type, detail) {
+    const payload = JSON.stringify({ type: type || 'all', ts: Date.now(), detail: detail || null });
+    for (const client of sseClients) {
+        try {
+            client.write(`event: sync\ndata: ${payload}\n\n`);
+        } catch (_) {
+            sseClients.delete(client);
+        }
+    }
+}
+
+let realtimePullTimer = null;
+function scheduleRealtimePull(tableName, eventType) {
+    if (realtimePullTimer) clearTimeout(realtimePullTimer);
+    realtimePullTimer = setTimeout(async () => {
+        realtimePullTimer = null;
+        await refreshFromSupabase();
+        broadcastSseEvent(tableName || 'all', { eventType: eventType || 'UPDATE', source: 'supabase_realtime' });
+    }, 300);
+}
+
+// Initial pull on server boot + event-driven Supabase Realtime push listener
 refreshFromSupabase();
+if (supabase && typeof supabase.channel === 'function') {
+    const watchedTables = ['students', 'incidents', 'classes', 'pbis_rewards', 'student_concerns', 'attendance_logs', 'interventions'];
+    watchedTables.forEach(tbl => {
+        const ch = supabase.channel(`sentinel-server-${tbl}`);
+        ch.on('postgres_changes', { event: '*', schema: 'public', table: tbl }, (payload) => {
+            console.log(`[Supabase Realtime] Push signal: ${tbl} (${payload.eventType})`);
+            scheduleRealtimePull(tbl, payload.eventType);
+        }).subscribe((status) => {
+            if (status === 'SUBSCRIBED') {
+                console.log(`[Supabase Realtime] Server subscribed: ${tbl}`);
+            }
+        });
+    });
+}
 
 // Ensure all expected collections exist (backwards-compat guard)
 ['schools', 'classes', 'students', 'users', 'incidents', 'interventions'].forEach(col => {
@@ -229,6 +304,23 @@ app.get('/api/health', (req, res) => {
         incidentCount: db.incidents.length,
         schoolCount:   db.schools.length,
         studentCount:  db.students.length
+    });
+});
+
+// Server-Sent Events (SSE) push stream for real-time cross-browser updates
+app.get('/api/events', (req, res) => {
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+    if (typeof res.flushHeaders === 'function') res.flushHeaders();
+    res.write(`event: connected\ndata: ${JSON.stringify({ ok: true, ts: Date.now() })}\n\n`);
+    sseClients.add(res);
+    const keepAlive = setInterval(() => {
+        try { res.write(': keepalive\n\n'); } catch (_) { clearInterval(keepAlive); sseClients.delete(res); }
+    }, 25000);
+    req.on('close', () => {
+        clearInterval(keepAlive);
+        sseClients.delete(res);
     });
 });
 
@@ -665,6 +757,7 @@ app.post('/api/incidents', async (req, res) => {
         }
 
         console.log(`[Incident] ${newInc.incidentId} logged for ${newInc.studentName} by ${newInc.loggedBy} -> status: ${newInc.status}`);
+        broadcastSseEvent('incidents', { id: newInc.id, action: 'INSERT' });
         res.status(201).json({ success: true, incident: newInc });
     } catch (err) {
         console.error('Log incident error:', err);
@@ -725,6 +818,7 @@ app.put('/api/incidents/:id', async (req, res) => {
         }
 
         console.log(`[Incident] Updated incident ${existing.incidentId} (${existing.id}) -> status: ${existing.status}`);
+        broadcastSseEvent('incidents', { id: existing.id, action: 'UPDATE' });
         res.json({ success: true, incident: existing });
     } catch (err) {
         console.error('Update incident error:', err);
@@ -758,6 +852,7 @@ app.delete('/api/incidents/:id', async (req, res) => {
         }
 
         console.log(`[Incident] Deleted incident ${removed.incidentId} (${removed.id})`);
+        broadcastSseEvent('incidents', { id: removed.id, action: 'DELETE' });
         res.json({ success: true, message: 'Incident successfully deleted', incident: removed });
     } catch (err) {
         console.error('Delete incident error:', err);
@@ -807,6 +902,21 @@ app.get('/api/schools/:schoolId', (req, res) => {
 // ─────────────────────────────────────────────────────────────────────────────
 // 8. CLASS ROUTES
 // ─────────────────────────────────────────────────────────────────────────────
+
+// GET all classes (with teacher info)
+app.get('/api/classes', (req, res) => {
+    const classes = (db.classes || []).map(c => {
+        const teacher = (db.users || []).find(u => u.id === c.teacherId);
+        return {
+            ...c,
+            teacherName: teacher ? teacher.name : 'Unassigned Teacher',
+            teacher: teacher
+                ? { id: teacher.id, name: teacher.name, email: teacher.email, subjects: teacher.subjects || [] }
+                : null
+        };
+    });
+    res.json(classes);
+});
 
 // GET all classes for a school (with teacher info)
 app.get('/api/classes/by-school/:schoolId', (req, res) => {
@@ -913,7 +1023,7 @@ app.post('/api/students', async (req, res) => {
             name: student.name,
             firstName: student.firstName || student.name.split(' ')[0],
             lastName: student.lastName || student.name.split(' ').slice(1).join(' '),
-            classId: student.classId || 'cls_1A',
+            classId: student.classId || null,
             schoolId: student.schoolId || 'sch_001',
             form: student.form || 'General',
             incidentCount: student.incidentCount || 0,
@@ -953,6 +1063,7 @@ app.post('/api/students', async (req, res) => {
             }
         }
 
+        broadcastSseEvent('students', { id: newStu.id, action: 'INSERT' });
         res.status(201).json({ success: true, student: newStu });
     } catch (err) {
         console.error('Create student error:', err);
@@ -974,6 +1085,8 @@ app.put('/api/students/:id', async (req, res) => {
         if (updates.name !== undefined) student.name = updates.name;
         if (updates.form !== undefined) student.form = updates.form;
         if (updates.school !== undefined) student.school = updates.school;
+        if (updates.schoolId !== undefined) student.schoolId = updates.schoolId;
+        if (updates.classId !== undefined) student.classId = updates.classId;
         if (updates.district !== undefined) student.district = updates.district;
         if (updates.triageLevel !== undefined) student.triageLevel = parseInt(updates.triageLevel);
         if (updates.incidentCount !== undefined) student.incidentCount = parseInt(updates.incidentCount);
@@ -990,6 +1103,8 @@ app.put('/api/students/:id', async (req, res) => {
                 let { error: sErr } = await supabase.from('students').update({
                     name: student.name,
                     form: student.form,
+                    class_id: student.classId,
+                    school_id: student.schoolId,
                     school: student.school,
                     district: student.district,
                     triage_level: student.triageLevel,
@@ -1002,6 +1117,7 @@ app.put('/api/students/:id', async (req, res) => {
                     const fallback = await supabase.from('students').update({
                         name: student.name,
                         form: student.form,
+                        class_id: student.classId,
                         triage_level: student.triageLevel,
                         incident_count: student.incidentCount,
                         attendance: student.attendance
@@ -1016,6 +1132,7 @@ app.put('/api/students/:id', async (req, res) => {
         }
 
         console.log(`[Student] Updated file for ${student.name} (${student.id})`);
+        broadcastSseEvent('students', { id: student.id, action: 'UPDATE' });
         res.json({ success: true, student });
     } catch (err) {
         console.error('Update student error:', err);
@@ -1080,11 +1197,27 @@ app.get('/api/attendance/:studentId', (req, res) => {
         (s.id && s.id.toLowerCase() === sid) || 
         (s.studentNumber && s.studentNumber.toLowerCase() === sid)
     );
-    const totalDays = logs.length;
-    const presentCount = logs.filter(l => l.status === 'Present').length;
-    const lateCount = logs.filter(l => l.status === 'Late').length;
-    const absentCount = logs.filter(l => l.status === 'Absent').length;
-    const excusedCount = logs.filter(l => l.status === 'Excused').length;
+    let totalDays = 0;
+    let presentCount = 0;
+    let lateCount = 0;
+    let absentCount = 0;
+    let excusedCount = 0;
+    logs.forEach(l => {
+        if (l.status === 'Monthly Summary' && /^\d+\/\d+$/.test(l.period || '')) {
+            const [pStr, tStr] = l.period.split('/');
+            const p = parseInt(pStr, 10) || 0;
+            const t = parseInt(tStr, 10) || 0;
+            presentCount += p;
+            totalDays += t;
+            absentCount += Math.max(0, t - p);
+        } else {
+            totalDays++;
+            if (l.status === 'Present') presentCount++;
+            else if (l.status === 'Late') lateCount++;
+            else if (l.status === 'Absent') absentCount++;
+            else if (l.status === 'Excused') excusedCount++;
+        }
+    });
     const rate = totalDays > 0 ? Math.round(((presentCount + lateCount) / totalDays) * 100) : (student?.attendance || 95);
 
     res.json({
@@ -1099,6 +1232,61 @@ app.get('/api/attendance/:studentId', (req, res) => {
         excusedCount,
         logs
     });
+});
+
+// POST bulk attendance logs for a student (synced to Supabase attendance_logs)
+app.post('/api/attendance/bulk', async (req, res) => {
+    try {
+        const { studentId, logs, replaceExisting } = req.body || {};
+        if (!Array.isArray(logs)) {
+            return res.status(400).json({ error: 'logs array is required' });
+        }
+        if (!Array.isArray(db.attendanceLogs)) db.attendanceLogs = [];
+        if (replaceExisting && studentId) {
+            const sidLower = String(studentId).toLowerCase();
+            db.attendanceLogs = db.attendanceLogs.filter(l =>
+                !(l.studentId && l.studentId.toLowerCase() === sidLower) &&
+                !(l.studentNumber && l.studentNumber.toLowerCase() === sidLower)
+            );
+        }
+        const existingIds = new Set(db.attendanceLogs.map(l => l.id));
+        logs.forEach(entry => {
+            if (!entry || !entry.id || existingIds.has(entry.id)) return;
+            existingIds.add(entry.id);
+            db.attendanceLogs.push(entry);
+        });
+
+        if (supabase) {
+            try {
+                if (replaceExisting && studentId) {
+                    await supabase.from('attendance_logs').delete().eq('student_id', studentId);
+                }
+                const rows = logs.map(l => ({
+                    id: l.id,
+                    student_id: l.studentId,
+                    student_number: l.studentNumber || null,
+                    student_name: l.studentName || null,
+                    form: l.form || null,
+                    class_id: l.classId || null,
+                    school_id: l.schoolId || null,
+                    date: l.date,
+                    status: l.status || 'Present',
+                    period: l.period || 'Full Day',
+                    remarks: l.remarks || ''
+                }));
+                for (let i = 0; i < rows.length; i += 500) {
+                    await supabase.from('attendance_logs').upsert(rows.slice(i, i + 500), { onConflict: 'id,date' });
+                }
+            } catch (supaErr) {
+                console.warn('[Supabase Attendance Bulk] Notice:', supaErr.message);
+            }
+        }
+
+        broadcastSseEvent('attendance_logs', { count: logs.length, action: 'UPSERT' });
+        res.status(201).json({ success: true, count: logs.length });
+    } catch (err) {
+        res.status(500).json({ error: 'Failed to save attendance logs: ' + err.message });
+    }
 });
 
 // ─────────────────────────────────────────────────────────────────────────────

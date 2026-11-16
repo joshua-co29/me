@@ -1086,17 +1086,25 @@
             }
 
             // Instantly render initial data so metrics and table are NEVER 0 or blank
-            renderIncidentsTable(allIncidents);
+            if (typeof applyFilters === 'function') {
+                applyFilters();
+            } else {
+                renderIncidentsTable(allIncidents);
+            }
             renderAnalyticsCharts(allIncidents);
             updateDashboardMetrics();
 
             // Pull live updates from server and online Supabase database in background
             loadDashboardData();
 
-            // Auto-refresh when tab gains focus
-            window.addEventListener('focus', () => {
-                loadDashboardData();
-            });
+            // Auto-refresh when tab gains focus or data changes in another session
+            if (typeof sentinelOnLiveSync === 'function') {
+                sentinelOnLiveSync(loadDashboardData, { intervalMs: 8000 });
+            } else {
+                window.addEventListener('focus', () => {
+                    loadDashboardData();
+                });
+            }
         });
 
         const SUPABASE_REST_URL = "https://wrumedevccqkopguaxdi.supabase.co/rest/v1";
@@ -1263,7 +1271,17 @@
                     allStudents = stus;
                 }
 
-                renderIncidentsTable(allIncidents);
+                const changed = typeof sentinelHasChanged !== 'function' || sentinelHasChanged('dashboard_page', {
+                    s: allStudents.map(x => `${x.id}|${x.classId}|${x.attendance}|${x.triageLevel}|${x.incidentCount}`),
+                    i: allIncidents.map(x => `${x.id}|${x.status}|${x.matrix}|${x.weight}`)
+                });
+                if (!changed) return;
+
+                if (typeof applyFilters === 'function') {
+                    applyFilters();
+                } else {
+                    renderIncidentsTable(allIncidents);
+                }
                 renderAnalyticsCharts(allIncidents);
                 updateDashboardMetrics();
             } catch (err) {
@@ -1410,7 +1428,11 @@
                 allIncidents.unshift(payload);
             }
 
-            renderIncidentsTable(allIncidents);
+            if (typeof applyFilters === 'function') {
+                applyFilters();
+            } else {
+                renderIncidentsTable(allIncidents);
+            }
             renderAnalyticsCharts(allIncidents);
             updateDashboardMetrics();
             closeCreateIncidentModal();
@@ -1560,7 +1582,11 @@
                 }
             }
 
-            renderIncidentsTable(allIncidents);
+            if (typeof applyFilters === 'function') {
+                applyFilters();
+            } else {
+                renderIncidentsTable(allIncidents);
+            }
             renderAnalyticsCharts(allIncidents);
             updateDashboardMetrics();
             closeEditModal();
@@ -1612,7 +1638,11 @@
 
             // 3. Remove from memory & re-render immediately
             allIncidents = allIncidents.filter(i => i.id !== id && i.incidentId !== id && i.incidentId !== code);
-            renderIncidentsTable(allIncidents);
+            if (typeof applyFilters === 'function') {
+                applyFilters();
+            } else {
+                renderIncidentsTable(allIncidents);
+            }
             renderAnalyticsCharts(allIncidents);
             updateDashboardMetrics();
 
@@ -1658,73 +1688,82 @@
             const pillTotal = document.querySelector('.analytics-chart-card .chart-pill-badge');
             if (pillTotal) pillTotal.textContent = `${total} Active`;
 
-            // Chart 1: Total Incidents (Last 7 Days)
+            // Chart 1: Total Incidents (Last 7 Days) - update in place to avoid regenerating
             const ctxTotal = document.getElementById('totalIncidentsChart');
             if (ctxTotal && typeof Chart !== 'undefined') {
-                if (chartTotal) chartTotal.destroy();
-                chartTotal = new Chart(ctxTotal, {
-                    type: 'line',
-                    data: {
-                        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-                        datasets: [{
-                            label: 'Total Incidents',
-                            data: [4, 7, 5, 8, 6, 3, total],
-                            borderColor: '#111111',
-                            backgroundColor: 'rgba(17, 17, 17, 0.05)',
-                            borderWidth: 2.2,
-                            fill: true,
-                            tension: 0.35,
-                            pointBackgroundColor: '#111111',
-                            pointBorderColor: '#ffffff',
-                            pointBorderWidth: 1.5,
-                            pointRadius: 4,
-                            pointHoverRadius: 6
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: { display: false },
-                            tooltip: {
-                                backgroundColor: '#111111',
-                                titleFont: { family: "'Google Sans', sans-serif", weight: '600' },
-                                bodyFont: { family: "'Google Sans', sans-serif" },
-                                cornerRadius: 0,
-                                padding: 8
-                            }
+                const totalSeries = [4, 7, 5, 8, 6, 3, total];
+                if (chartTotal && chartTotal.data && chartTotal.data.datasets[0]) {
+                    chartTotal.data.datasets[0].data = totalSeries;
+                    chartTotal.update('none');
+                } else {
+                    chartTotal = new Chart(ctxTotal, {
+                        type: 'line',
+                        data: {
+                            labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                            datasets: [{
+                                label: 'Total Incidents',
+                                data: totalSeries,
+                                borderColor: '#111111',
+                                backgroundColor: 'rgba(17, 17, 17, 0.05)',
+                                borderWidth: 2.2,
+                                fill: true,
+                                tension: 0.35,
+                                pointBackgroundColor: '#111111',
+                                pointBorderColor: '#ffffff',
+                                pointBorderWidth: 1.5,
+                                pointRadius: 4,
+                                pointHoverRadius: 6
+                            }]
                         },
-                        scales: {
-                            x: {
-                                grid: { display: false },
-                                ticks: { font: { family: "'Google Sans', sans-serif", size: 11 }, color: '#717682' }
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { display: false },
+                                tooltip: {
+                                    backgroundColor: '#111111',
+                                    titleFont: { family: "'Google Sans', sans-serif", weight: '600' },
+                                    bodyFont: { family: "'Google Sans', sans-serif" },
+                                    cornerRadius: 0,
+                                    padding: 8
+                                }
                             },
-                            y: {
-                                beginAtZero: true,
-                                ticks: { stepSize: 2, font: { family: "'Google Sans', sans-serif", size: 11 }, color: '#717682' },
-                                grid: { color: 'rgba(0, 0, 0, 0.05)' }
+                            scales: {
+                                x: {
+                                    grid: { display: false },
+                                    ticks: { font: { family: "'Google Sans', sans-serif", size: 11 }, color: '#717682' }
+                                },
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: { stepSize: 2, font: { family: "'Google Sans', sans-serif", size: 11 }, color: '#717682' },
+                                    grid: { color: 'rgba(0, 0, 0, 0.05)' }
+                                }
                             }
                         }
-                    }
-                });
+                    });
+                }
             }
 
-            // Chart 2: Incidents by Level (Levels 1-5)
+            // Chart 2: Incidents by Level (Levels 1-5) - update in place to avoid regenerating
             const ctxLevels = document.getElementById('incidentLevelsChart');
             if (ctxLevels && typeof Chart !== 'undefined') {
-                if (chartLevels) chartLevels.destroy();
-                chartLevels = new Chart(ctxLevels, {
-                    type: 'bar',
-                    data: {
-                        labels: ['Level 1', 'Level 2', 'Level 3', 'Level 4', 'Level 5'],
-                        datasets: [{
-                            label: 'Incidents Logged',
-                            data: [l1, l2, l3, l4, l5],
-                            backgroundColor: ['#f59e0b', '#ea580c', '#dc2626', '#991b1b', '#450a0a'],
-                            borderRadius: 0,
-                            barThickness: 24
-                        }]
-                    },
+                const levelSeries = [l1, l2, l3, l4, l5];
+                if (chartLevels && chartLevels.data && chartLevels.data.datasets[0]) {
+                    chartLevels.data.datasets[0].data = levelSeries;
+                    chartLevels.update('none');
+                } else {
+                    chartLevels = new Chart(ctxLevels, {
+                        type: 'bar',
+                        data: {
+                            labels: ['Level 1', 'Level 2', 'Level 3', 'Level 4', 'Level 5'],
+                            datasets: [{
+                                label: 'Incidents Logged',
+                                data: levelSeries,
+                                backgroundColor: ['#f59e0b', '#ea580c', '#dc2626', '#991b1b', '#450a0a'],
+                                borderRadius: 0,
+                                barThickness: 24
+                            }]
+                        },
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
@@ -1751,6 +1790,7 @@
                         }
                     }
                 });
+                }
             }
         }
     </script>

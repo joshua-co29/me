@@ -294,12 +294,12 @@
             display: inline-flex;
             align-items: center;
             gap: 0.4rem;
-            padding: 0.35rem 0.75rem;
-            border: 1px solid #069494;
-            background: rgba(6, 148, 148, 0.08);
-            color: #069494;
+            padding: 0;
+            border: none;
+            background: transparent;
+            color: #475569;
             font-size: 0.78rem;
-            font-weight: 700;
+            font-weight: 600;
         }
         .cap-usage-sub {
             font-size: 0.72rem;
@@ -397,8 +397,11 @@
                 <div class="class-pills-group" id="classPillsGroup">
                     <!-- Populated dynamically -->
                 </div>
-                <div style="font-size: 0.88rem; color: #64748b; font-weight: 600;" id="classEnrolledCount">
-                    Showing class members
+                <div style="display:flex; align-items:center; gap:0.75rem; flex-wrap:wrap;">
+                    <input type="text" id="pointsSearchInput" placeholder="Search student name, ID, or form..." oninput="filterPointsTable()" style="padding:0.45rem 0.75rem; font-size:0.85rem; border:1px solid #cbd5e1; border-radius:4px; min-width:230px; font-family:inherit; outline:none;">
+                    <div style="font-size: 0.88rem; color: #64748b; font-weight: 600;" id="classEnrolledCount">
+                        Showing class members
+                    </div>
                 </div>
             </div>
 
@@ -494,8 +497,93 @@
                 banner.textContent = `${currentUser.schoolName || 'Port of Spain North Secondary'} • Participation & Engagement`;
             }
 
+            try {
+                const savedSearch = sessionStorage.getItem('sentinel_points_search');
+                const searchEl = document.getElementById('pointsSearchInput');
+                if (searchEl && savedSearch) searchEl.value = savedSearch;
+            } catch (_) {}
+
             loadParticipationData();
+            loadLiveParticipationData();
+            if (typeof sentinelOnLiveSync === 'function') {
+                sentinelOnLiveSync(loadLiveParticipationData);
+            }
         });
+
+        async function loadLiveParticipationData() {
+            const teacherId = currentUser.id || 'usr_teacher_01';
+            const schId = currentUser.schoolId || 'sch_001';
+            const schName = currentUser.schoolName || '';
+            try {
+                const [stuRes, clsRes] = await Promise.all([
+                    fetch(`${SUPABASE_REST_URL}/students?select=*&order=name.asc`, {
+                        headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` }
+                    }),
+                    fetch(`${SUPABASE_REST_URL}/classes?select=*`, {
+                        headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` }
+                    }).catch(() => null)
+                ]);
+
+                let liveStudents = null;
+                if (stuRes && stuRes.ok) {
+                    const raw = await stuRes.json();
+                    if (Array.isArray(raw) && raw.length > 0) {
+                        liveStudents = raw.map(st => ({
+                            id: st.id,
+                            studentId: st.student_number || st.id,
+                            studentNumber: st.student_number || st.id,
+                            name: st.name,
+                            firstName: st.first_name,
+                            lastName: st.last_name,
+                            classId: st.class_id || null,
+                            schoolId: st.school_id,
+                            school: st.school,
+                            district: st.district,
+                            form: st.form,
+                            triageLevel: st.triage_level,
+                            incidentCount: st.incident_count,
+                            attendance: st.attendance,
+                            status: st.status
+                        })).filter(s =>
+                            (s.schoolId || s.school_id) === schId ||
+                            (schName && (s.school || '').toLowerCase().includes(schName.toLowerCase()))
+                        );
+                    }
+                }
+
+                if (clsRes && clsRes.ok) {
+                    const rawCls = await clsRes.json();
+                    if (Array.isArray(rawCls) && rawCls.length > 0) {
+                        const teacherClasses = rawCls.filter(c =>
+                            (c.teacher_id || c.teacherId) === teacherId ||
+                            (Array.isArray(currentUser.assignedClassIds) && currentUser.assignedClassIds.includes(c.id))
+                        ).map(c => ({
+                            id: c.id,
+                            label: c.label || c.form || c.id,
+                            form: c.form || c.label || '',
+                            teacherId: c.teacher_id || c.teacherId,
+                            schoolId: c.school_id || c.schoolId
+                        }));
+                        if (teacherClasses.length > 0) {
+                            myClasses = [{ id: '__all__', label: 'All Students', form: '' }, ...teacherClasses];
+                            if (!activeClassId || !myClasses.some(c => c.id === activeClassId)) {
+                                activeClassId = myClasses[0].id;
+                            }
+                            renderClassTabs();
+                        }
+                    }
+                }
+
+                if (liveStudents && liveStudents.length > 0) {
+                    const changed = typeof sentinelHasChanged !== 'function' || sentinelHasChanged('participation_page', {
+                        s: liveStudents.map(x => `${x.id}|${x.name}|${x.classId}|${x.form}`)
+                    });
+                    if (!changed) return;
+                    allStudents = liveStudents;
+                    renderPointsTable();
+                }
+            } catch (_) {}
+        }
 
         function loadParticipationData() {
             const teacherId = currentUser.id || 'usr_teacher_01';
@@ -521,6 +609,8 @@
                         form: lbl.includes('Form') ? lbl : `Form ${lbl}`
                     }));
                 }
+
+                myClasses = [{ id: '__all__', label: 'All Students', form: '' }, ...myClasses.filter(c => c.id !== '__all__')];
 
                 if (Array.isArray(window.SENTINEL_SEED_DATA.students)) {
                     allStudents = window.SENTINEL_SEED_DATA.students.filter(s =>
@@ -701,20 +791,31 @@
             const student = allStudents.find(s => s.id === studentId);
             const sName = student ? (student.name || 'Student') : 'Student';
 
-            const categoryCap = PBIS_CATEGORY_CAPS[reason] || 25;
-            if (amount > categoryCap) {
-                showToast(`Award capped: max +${categoryCap} pts per award for "${reason}".`);
-                return;
-            }
-
             const used30d = getMonthlyAwardedTotal(studentId, now);
-            const remainingCap = Math.max(0, PBIS_MONTHLY_STUDENT_CAP - used30d);
-            if (remainingCap <= 0) {
-                showToast(`Monthly PBIS cap (${PBIS_MONTHLY_STUDENT_CAP} pts / 30 days) reached for ${sName} to prevent points inflation.`);
-                return;
-            }
+            let finalAmount = amount;
 
-            const finalAmount = Math.min(amount, remainingCap);
+            if (amount < 0) {
+                const currentPts = getStudentPoints(studentId, now);
+                if (currentPts <= 0) {
+                    showToast(`${sName} already has 0 participation points.`);
+                    return;
+                }
+                finalAmount = Math.max(-currentPts, amount);
+            } else {
+                const categoryCap = PBIS_CATEGORY_CAPS[reason] || 25;
+                if (amount > categoryCap) {
+                    showToast(`Award capped: max +${categoryCap} pts per award for "${reason}".`);
+                    return;
+                }
+
+                const remainingCap = Math.max(0, PBIS_MONTHLY_STUDENT_CAP - used30d);
+                if (remainingCap <= 0) {
+                    showToast(`Monthly PBIS cap (${PBIS_MONTHLY_STUDENT_CAP} pts / 30 days) reached for ${sName} to prevent points inflation.`);
+                    return;
+                }
+
+                finalAmount = Math.min(amount, remainingCap);
+            }
 
             try {
                 const logRaw = localStorage.getItem(`sentinel_points_log_${studentId}`);
@@ -730,10 +831,10 @@
                 localStorage.setItem(`sentinel_points_log_${studentId}`, JSON.stringify(log));
             } catch (_) {}
 
-            const updated = getStudentPoints(studentId, now);
+            const updated = Math.max(0, getStudentPoints(studentId, now));
             setStudentPoints(studentId, updated, now);
 
-            const newUsed30d = used30d + finalAmount;
+            const newUsed30d = Math.max(0, used30d + finalAmount);
             savePbisAuditEntry({
                 id: `pbis_${now}_${Math.random().toString(36).slice(2, 7)}`,
                 studentId,
@@ -749,7 +850,13 @@
                 timestamp: new Date(now).toISOString()
             });
 
-            if (finalAmount < amount) {
+            if (typeof sentinelBroadcastUpdate === 'function') {
+                sentinelBroadcastUpdate('pbis_rewards', { studentId, amount: finalAmount });
+            }
+
+            if (finalAmount < 0) {
+                showToast(`${finalAmount} point deducted from ${sName} (${updated} pts total).`);
+            } else if (finalAmount < amount) {
                 showToast(`Awarded +${finalAmount} pts (capped at 50-pt monthly limit) to ${sName}.`);
             } else {
                 showToast(`+${finalAmount} points awarded to ${sName} for ${reason}!`);
@@ -783,7 +890,7 @@
                             <div class="student-id-sub">${e.form || ''}</div>
                         </td>
                         <td style="font-weight:600; color:#1e293b;">${e.category || 'PBIS Merit'}</td>
-                        <td><span class="points-counter-badge">+${e.points || 0} <small>pts</small></span></td>
+                        <td><span class="points-counter-badge" style="${(e.points || 0) < 0 ? 'color:#991b1b;' : ''}">${(e.points || 0) >= 0 ? '+' : ''}${e.points || 0} <small>pts</small></span></td>
                         <td>
                             <div style="font-weight:700; color:#111111;">${e.awardedByName || 'Staff'}</div>
                             <div style="font-size:0.75rem; color:#64748b;">${e.awardedByRole || 'Teacher'}</div>
@@ -794,27 +901,43 @@
             }).join('');
         }
 
+        function filterPointsTable() {
+            try {
+                const el = document.getElementById('pointsSearchInput');
+                if (el) sessionStorage.setItem('sentinel_points_search', el.value);
+            } catch (_) {}
+            renderPointsTable();
+        }
+
         function renderPointsTable() {
             const tbody = document.getElementById('pointsTableBody');
             const enrolledEl = document.getElementById('classEnrolledCount');
             if (!tbody) return;
 
             const cls = myClasses.find(c => c.id === activeClassId);
+            const searchEl = document.getElementById('pointsSearchInput');
+            const query = (searchEl ? searchEl.value : '').toLowerCase().trim();
 
             let students = allStudents.filter(s => {
-                if (!cls) return true;
-                const matchClassId = s.classId && s.classId.toLowerCase() === cls.id.toLowerCase();
-                const matchForm = cls.form && s.form && s.form.toLowerCase().includes(cls.form.toLowerCase());
-                const matchLabel = cls.label && s.form && s.form.toLowerCase().includes(cls.label.toLowerCase());
-                return matchClassId || matchForm || matchLabel;
+                if (!cls || cls.id === '__all__') return true;
+                return !!(s.classId && s.classId.toLowerCase() === cls.id.toLowerCase());
             });
 
-            if (students.length === 0) {
-                students = allStudents.slice(0, 10);
+            if (query) {
+                students = students.filter(s => {
+                    const name = (s.name || `${s.firstName || ''} ${s.lastName || ''}`).toLowerCase();
+                    const sid = (s.studentId || s.studentNumber || s.id || '').toLowerCase();
+                    const form = (s.form || '').toLowerCase();
+                    return name.includes(query) || sid.includes(query) || form.includes(query);
+                });
+            }
+
+            if (!query && students.length === 0 && (!cls || cls.id === '__all__')) {
+                students = allStudents;
             }
 
             if (enrolledEl) {
-                enrolledEl.textContent = `${students.length} students enrolled in ${cls ? cls.label : 'Class'}`;
+                enrolledEl.textContent = `${students.length} student${students.length !== 1 ? 's' : ''} in ${cls ? cls.label : 'Roster'}`;
             }
 
             // Calculate overall stats
@@ -881,6 +1004,7 @@
                         </td>
                         <td style="text-align: right;">
                             <div style="display: flex; gap: 0.35rem; justify-content: flex-end;">
+                                <button type="button" class="btn-award-pill" ${pts <= 0 ? 'disabled' : ''} onclick="awardPoints('${s.id}', -1, 'Point Deduction')" title="Decrease points by 1" style="border-color:#fca5a5; color:#991b1b; background:#fef2f2;">-1</button>
                                 <button type="button" class="btn-award-pill" ${isCapped ? 'disabled' : ''} onclick="awardPoints('${s.id}', 1, 'Active Class Discussion')" title="Award +1 for class discussion (Cap: 5/award)">+1</button>
                                 <button type="button" class="btn-award-pill" ${isCapped ? 'disabled' : ''} onclick="awardPoints('${s.id}', 2, 'Helpful Teamwork & Preparation')" title="Award +2 for teamwork (Cap: 10/award)">+2</button>
                                 <button type="button" class="btn-award-pill btn-award-gold" ${isCapped ? 'disabled' : ''} onclick="awardPoints('${s.id}', 5, 'Exemplary Leadership & Focus')" title="Award +5 for leadership (Cap: 15/award)">+5</button>

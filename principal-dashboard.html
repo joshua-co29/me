@@ -92,8 +92,8 @@
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.06em;
-            color: #581c87;
-            background: #f3e8ff;
+            color: #ffffff;
+            background: #1d4ed8;
             padding: 0.3rem 0.75rem;
             border-radius: 4px;
             margin-bottom: 0.8rem;
@@ -816,7 +816,7 @@
             <!-- Left Headline Area -->
             <div class="hero-banner-left">
                 <div class="hero-school-pill" id="heroSchoolBadge">
-                    <span>🏛</span> <span id="heroSchoolBadgeText">Port of Spain North Secondary</span>
+                    <span id="heroSchoolBadgeText">Port of Spain North Secondary</span>
                 </div>
                 <div class="hero-greeting" id="heroGreeting">Welcome back, Principal!</div>
                 <h1 class="hero-big-title" id="heroBigTitle">
@@ -1053,9 +1053,11 @@
                         <canvas id="incidentLevelsChart"></canvas>
                     </div>
                     <div class="chart-legend-row">
-                        <div class="legend-item"><span class="legend-box box-level-1"></span> Level 1: <strong id="legL1">0</strong></div>
-                        <div class="legend-item"><span class="legend-box box-level-2"></span> Level 2: <strong id="legL2">0</strong></div>
-                        <div class="legend-item"><span class="legend-box box-level-3"></span> Level 3: <strong id="legL3">0</strong></div>
+                        <div class="legend-item"><span class="legend-box box-level-1"></span> L1: <strong id="legL1">0</strong></div>
+                        <div class="legend-item"><span class="legend-box box-level-2"></span> L2: <strong id="legL2">0</strong></div>
+                        <div class="legend-item"><span class="legend-box" style="background:#dc2626;"></span> L3: <strong id="legL3">0</strong></div>
+                        <div class="legend-item"><span class="legend-box" style="background:#991b1b;"></span> L4: <strong id="legL4">0</strong></div>
+                        <div class="legend-item"><span class="legend-box" style="background:#450a0a;"></span> L5: <strong id="legL5">0</strong></div>
                     </div>
                 </div>
 
@@ -1186,14 +1188,19 @@
                     setTimeout(() => target.scrollIntoView({ behavior: 'smooth', block: 'start' }), 200);
                 }
             }
+
+            if (typeof sentinelOnLiveSync === 'function') {
+                sentinelOnLiveSync(loadSchoolDashboardData, { intervalMs: 8000 });
+            }
         });
 
         async function loadSchoolDashboardData() {
             const schId = currentUser.schoolId;
             const schName = currentUser.schoolName || '';
 
-            // 1. Initial synchronous populate from seed data
-            if (window.SENTINEL_SEED_DATA) {
+            // 1. Initial synchronous populate from seed data (only on initial empty load)
+            const isInitialLoad = (allIncidents.length === 0 && allStudents.length === 0);
+            if (isInitialLoad && window.SENTINEL_SEED_DATA) {
                 if (Array.isArray(window.SENTINEL_SEED_DATA.incidents)) {
                     allIncidents = window.SENTINEL_SEED_DATA.incidents.filter(i =>
                         (i.schoolId || i.school_id) === schId ||
@@ -1217,19 +1224,17 @@
                         (c.schoolId || c.school_id) === schId
                     );
                 }
+                // Merge any custom users from localStorage for this school
+                if (typeof getCustomUsers === 'function') {
+                    const customUsers = getCustomUsers();
+                    customUsers.forEach(cu => {
+                        if ((cu.schoolId === schId || cu.school_id === schId) && !allStaff.some(s => s.id === cu.id)) {
+                            allStaff.unshift(cu);
+                        }
+                    });
+                }
+                renderDashboardOverview();
             }
-
-            // Merge any custom users from localStorage for this school
-            if (typeof getCustomUsers === 'function') {
-                const customUsers = getCustomUsers();
-                customUsers.forEach(cu => {
-                    if ((cu.schoolId === schId || cu.school_id === schId) && !allStaff.some(s => s.id === cu.id)) {
-                        allStaff.unshift(cu);
-                    }
-                });
-            }
-
-            renderDashboardOverview();
 
             // 2. Sync live data from Express API or Supabase direct REST
             try {
@@ -1258,6 +1263,14 @@
                     if (Array.isArray(data) && data.length > 0) allClasses = data;
                 }
             } catch (_) {}
+
+            const changed = typeof sentinelHasChanged !== 'function' || sentinelHasChanged('principal_page', {
+                s: allStudents.map(x => `${x.id}|${x.classId}|${x.attendance}|${x.triageLevel}|${x.incidentCount}`),
+                i: allIncidents.map(x => `${x.id}|${x.status}|${x.matrix}|${x.weight}`),
+                u: allStaff.length,
+                c: allClasses.length
+            });
+            if (!changed) return;
 
             renderDashboardOverview();
         }
@@ -1305,6 +1318,10 @@
         }
 
         function filterDashboardIncidents() {
+            try {
+                const el = document.getElementById('incidentSearchInput');
+                if (el) sessionStorage.setItem('sentinel_principal_search', el.value);
+            } catch (_) {}
             renderIncidentsTable();
         }
 
@@ -1312,7 +1329,14 @@
             const tbody = document.getElementById('dashboardIncidentsBody');
             if (!tbody) return;
 
-            const query = (document.getElementById('incidentSearchInput') ? document.getElementById('incidentSearchInput').value : '').toLowerCase().trim();
+            const searchEl = document.getElementById('incidentSearchInput');
+            try {
+                if (searchEl && !searchEl.value) {
+                    const saved = sessionStorage.getItem('sentinel_principal_search');
+                    if (saved) searchEl.value = saved;
+                }
+            } catch (_) {}
+            const query = (searchEl ? searchEl.value : '').toLowerCase().trim();
 
             let filtered = allIncidents.filter(inc => {
                 const st = (inc.status || 'Open').toLowerCase();
@@ -1424,84 +1448,105 @@
 
         function renderAnalyticsCharts() {
             const total = allIncidents.length;
-            const l1 = allIncidents.filter(i => parseInt(i.level || 1) === 1 || (i.matrix && i.matrix.includes('1'))).length;
-            const l2 = allIncidents.filter(i => parseInt(i.level || 1) === 2 || (i.matrix && i.matrix.includes('2'))).length;
-            const l3 = allIncidents.filter(i => parseInt(i.level || 1) === 3 || (i.matrix && i.matrix.includes('3'))).length;
+            let l1 = 0, l2 = 0, l3 = 0, l4 = 0, l5 = 0;
+            allIncidents.forEach(i => {
+                const m = (i.matrix || '').toLowerCase();
+                const lvl = parseInt(i.level || 0, 10);
+                if (lvl === 5 || m.includes('level 5')) l5++;
+                else if (lvl === 4 || m.includes('level 4')) l4++;
+                else if (lvl === 3 || m.includes('level 3')) l3++;
+                else if (lvl === 2 || m.includes('level 2')) l2++;
+                else l1++;
+            });
 
             const badgeTotal = document.getElementById('chartTotalBadge');
             if (badgeTotal) badgeTotal.textContent = `${total} Total`;
 
             const badgeL3 = document.getElementById('chartLevelBadge');
-            if (badgeL3) badgeL3.textContent = `${l3} Level 3`;
+            if (badgeL3) badgeL3.textContent = `${l3 + l4 + l5} Level 3–5`;
 
             const leg1 = document.getElementById('legL1');
             const leg2 = document.getElementById('legL2');
             const leg3 = document.getElementById('legL3');
+            const leg4 = document.getElementById('legL4');
+            const leg5 = document.getElementById('legL5');
             if (leg1) leg1.textContent = l1;
             if (leg2) leg2.textContent = l2;
             if (leg3) leg3.textContent = l3;
+            if (leg4) leg4.textContent = l4;
+            if (leg5) leg5.textContent = l5;
 
-            // Chart 1: 7-Day Trend
+            // Chart 1: 7-Day Trend (update in place to avoid regenerating)
             const ctxTotal = document.getElementById('totalIncidentsChart');
             if (ctxTotal && typeof Chart !== 'undefined') {
-                if (chartTotal) chartTotal.destroy();
-                chartTotal = new Chart(ctxTotal, {
-                    type: 'line',
-                    data: {
-                        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-                        datasets: [{
-                            label: 'Incidents',
-                            data: [1, 3, 2, 4, 3, 1, Math.max(total, 2)],
-                            borderColor: '#111111',
-                            backgroundColor: 'rgba(17, 17, 17, 0.05)',
-                            borderWidth: 2.2,
-                            fill: true,
-                            tension: 0.35,
-                            pointBackgroundColor: '#111111',
-                            pointBorderColor: '#ffffff',
-                            pointBorderWidth: 1.5,
-                            pointRadius: 4,
-                            pointHoverRadius: 6
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: { legend: { display: false } },
-                        scales: {
-                            x: { grid: { display: false }, ticks: { font: { family: "'Google Sans', sans-serif", size: 11 }, color: '#717682' } },
-                            y: { beginAtZero: true, ticks: { stepSize: 1, font: { family: "'Google Sans', sans-serif", size: 11 }, color: '#717682' }, grid: { color: 'rgba(0, 0, 0, 0.05)' } }
+                const totalSeries = [1, 3, 2, 4, 3, 1, Math.max(total, 2)];
+                if (chartTotal && chartTotal.data && chartTotal.data.datasets[0]) {
+                    chartTotal.data.datasets[0].data = totalSeries;
+                    chartTotal.update('none');
+                } else {
+                    chartTotal = new Chart(ctxTotal, {
+                        type: 'line',
+                        data: {
+                            labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                            datasets: [{
+                                label: 'Incidents',
+                                data: totalSeries,
+                                borderColor: '#111111',
+                                backgroundColor: 'rgba(17, 17, 17, 0.05)',
+                                borderWidth: 2.2,
+                                fill: true,
+                                tension: 0.35,
+                                pointBackgroundColor: '#111111',
+                                pointBorderColor: '#ffffff',
+                                pointBorderWidth: 1.5,
+                                pointRadius: 4,
+                                pointHoverRadius: 6
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: { legend: { display: false } },
+                            scales: {
+                                x: { grid: { display: false }, ticks: { font: { family: "'Google Sans', sans-serif", size: 11 }, color: '#717682' } },
+                                y: { beginAtZero: true, ticks: { stepSize: 1, font: { family: "'Google Sans', sans-serif", size: 11 }, color: '#717682' }, grid: { color: 'rgba(0, 0, 0, 0.05)' } }
+                            }
                         }
-                    }
-                });
+                    });
+                }
             }
 
-            // Chart 2: Incidents by Level
+            // Chart 2: Incidents by Level (Levels 1-5, update in place)
             const ctxLevels = document.getElementById('incidentLevelsChart');
             if (ctxLevels && typeof Chart !== 'undefined') {
-                if (chartLevels) chartLevels.destroy();
-                chartLevels = new Chart(ctxLevels, {
-                    type: 'bar',
-                    data: {
-                        labels: ['Level 1', 'Level 2', 'Level 3'],
-                        datasets: [{
-                            label: 'Incidents',
-                            data: [l1, l2, l3],
-                            backgroundColor: ['#f59e0b', '#ea580c', '#991b1b'],
-                            borderRadius: 0,
-                            barThickness: 28
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: { legend: { display: false } },
-                        scales: {
-                            x: { grid: { display: false }, ticks: { font: { family: "'Google Sans', sans-serif", size: 11, weight: '600' }, color: '#111111' } },
-                            y: { beginAtZero: true, ticks: { stepSize: 1, font: { family: "'Google Sans', sans-serif", size: 11 }, color: '#717682' }, grid: { color: 'rgba(0, 0, 0, 0.05)' } }
+                const levelSeries = [l1, l2, l3, l4, l5];
+                if (chartLevels && chartLevels.data && chartLevels.data.datasets[0]) {
+                    chartLevels.data.datasets[0].data = levelSeries;
+                    chartLevels.update('none');
+                } else {
+                    chartLevels = new Chart(ctxLevels, {
+                        type: 'bar',
+                        data: {
+                            labels: ['Level 1', 'Level 2', 'Level 3', 'Level 4', 'Level 5'],
+                            datasets: [{
+                                label: 'Incidents',
+                                data: levelSeries,
+                                backgroundColor: ['#f59e0b', '#ea580c', '#dc2626', '#991b1b', '#450a0a'],
+                                borderRadius: 0,
+                                barThickness: 24
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: { legend: { display: false } },
+                            scales: {
+                                x: { grid: { display: false }, ticks: { font: { family: "'Google Sans', sans-serif", size: 11, weight: '600' }, color: '#111111' } },
+                                y: { beginAtZero: true, ticks: { stepSize: 1, font: { family: "'Google Sans', sans-serif", size: 11 }, color: '#717682' }, grid: { color: 'rgba(0, 0, 0, 0.05)' } }
+                            }
                         }
-                    }
-                });
+                    });
+                }
             }
         }
 
@@ -1603,6 +1648,7 @@
             } catch (_) {}
 
             closeEditModal();
+            if (typeof sentinelBroadcastUpdate === 'function') sentinelBroadcastUpdate('incidents');
             renderDashboardOverview();
         }
     </script>
