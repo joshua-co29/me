@@ -415,6 +415,13 @@ app.post('/api/auth/login', async (req, res) => {
             return res.status(400).json({ error: 'Please provide your Name/Email and Password.' });
         }
 
+        const SQL_INJECTION_REGEX = /(['";=]|--|\/\*|\*\/|\b(SELECT|INSERT|UPDATE|DELETE|DROP|UNION|ALTER|EXEC|TRUNCATE|OR\s+1\s*=\s*1)\b)/i;
+        if (SQL_INJECTION_REGEX.test(identifier)) {
+            return res.status(400).json({
+                error: 'Invalid input: SQL syntax or special characters are not allowed in the email field.'
+            });
+        }
+
         const cleanIdent = identifier.toLowerCase().trim();
 
         // Match by email (exact), name (exact / includes), or role
@@ -427,7 +434,7 @@ app.post('/api/auth/login', async (req, res) => {
         );
 
         if (!user) {
-            return res.status(401).json({ error: 'No account found matching that name or email.' });
+            return res.status(401).json({ error: 'There is no account with this email.' });
         }
 
         const passwordValid = await bcrypt.compare(password, user.passwordHash);
@@ -831,12 +838,25 @@ app.delete('/api/incidents/:id', async (req, res) => {
     try {
         const { id } = req.params;
         const idx = db.incidents.findIndex(i => i.id === id || i.incidentId === id);
-        if (idx === -1) {
-            return res.status(404).json({ error: 'Incident not found' });
+        let removed = null;
+
+        if (idx !== -1) {
+            removed = db.incidents.splice(idx, 1)[0];
+            saveDb();
+        } else if (supabase) {
+            // Fallback to Supabase in case an initial/realtime cache refresh overwrote db.incidents mid-flight
+            const { data: sbMatches } = await supabase.from('incidents')
+                .select('*')
+                .or(`id.eq.${id},incident_id.eq.${id}`)
+                .limit(1);
+            if (sbMatches && sbMatches.length > 0) {
+                removed = { id: sbMatches[0].id, incidentId: sbMatches[0].incident_id };
+            }
         }
 
-        const removed = db.incidents.splice(idx, 1)[0];
-        saveDb();
+        if (!removed) {
+            return res.status(404).json({ error: 'Incident not found' });
+        }
 
         // Delete from Supabase
         if (supabase) {

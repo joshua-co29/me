@@ -483,27 +483,18 @@ function findLocalUser(identifier) {
     );
 }
 
-// Direct Database Authentication API with Instant Local Database Fallback
+// Direct Database Authentication API (rejects unknown accounts, wrong passwords, and SQL injection)
 async function performLogin(identifier, password) {
-    // 1. Instant local database check for rapid switching and test accounts
-    const localMatch = findLocalUser(identifier);
-    if (localMatch) {
-        localStorage.setItem('sentinel_user', JSON.stringify(localMatch));
-        console.log(`[Local Auth] Instant switch to: ${localMatch.name} (${localMatch.role})`);
+    const cleanIdent = (identifier || '').trim();
+    const SQL_INJECTION_REGEX = /(['";=]|--|\/\*|\*\/|\b(SELECT|INSERT|UPDATE|DELETE|DROP|UNION|ALTER|EXEC|TRUNCATE|OR\s+1\s*=\s*1)\b)/i;
 
-        // Async notify server in background if running (non-blocking)
-        try {
-            fetch(`${API_BASE}/api/auth/login`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ identifier, password: password || 'demo1234' })
-            }).catch(() => {});
-        } catch (_) {}
-
-        return { success: true, user: localMatch };
+    if (!cleanIdent || !password) {
+        throw new Error('Please provide your Name/Email and Password.');
+    }
+    if (SQL_INJECTION_REGEX.test(cleanIdent)) {
+        throw new Error('Invalid input: SQL syntax or special characters are not allowed in the email field.');
     }
 
-    // 2. Query backend API if not in preset local list
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 4000);
 
@@ -511,31 +502,30 @@ async function performLogin(identifier, password) {
         const response = await fetch(`${API_BASE}/api/auth/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ identifier, password }),
+            body: JSON.stringify({ identifier: cleanIdent, password }),
             signal: controller.signal
         });
         clearTimeout(timeout);
         const data = await response.json();
         if (!response.ok) {
-            throw new Error(data.error || 'Login failed');
+            const authErr = new Error(data.error || 'Login failed');
+            authErr.isAuthRejection = true;
+            throw authErr;
         }
         localStorage.setItem('sentinel_user', JSON.stringify(data.user));
         return { success: true, user: data.user };
     } catch (err) {
         clearTimeout(timeout);
-        // Fallback: construct full local user matching role
-        const role = inferRole(identifier);
-        const fallbackUser = {
-            id: 'usr_local_' + Date.now(),
-            name: identifier.includes('@') ? identifier.split('@')[0].replace('.', ' ') : identifier,
-            email: identifier.includes('@') ? identifier : generateEmail(identifier),
-            role: role,
-            schoolId: 'sch_001',
-            schoolName: 'Port of Spain North Secondary',
-            assignedClassIds: ['cls_1A']
-        };
-        localStorage.setItem('sentinel_user', JSON.stringify(fallbackUser));
-        return { success: true, user: fallbackUser };
+        if (err && err.isAuthRejection) {
+            throw err;
+        }
+        // Offline-only fallback for known preset accounts with demo password
+        const localMatch = findLocalUser(cleanIdent);
+        if (localMatch && password === 'demo1234') {
+            localStorage.setItem('sentinel_user', JSON.stringify(localMatch));
+            return { success: true, user: localMatch };
+        }
+        throw new Error(err.message || 'Unable to reach authentication server.');
     }
 }
 
